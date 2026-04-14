@@ -263,9 +263,11 @@ export function WeeklyViewClient({
                           <span className="text-xs text-muted">
                             {event.source}
                           </span>
-                          {event.keyReaction && (
+                        </div>
+                        {event.keyReaction && (
+                          <div className="mt-1.5">
                             <span
-                              className={`text-[11px] etoro-nums ml-auto ${
+                              className={`text-[13px] etoro-nums ${
                                 event.keyReaction.direction === "up"
                                   ? "text-etoro-green"
                                   : "text-etoro-red"
@@ -276,8 +278,8 @@ export function WeeklyViewClient({
                               {event.keyReaction.day1Pct > 0 ? "+" : ""}
                               {event.keyReaction.day1Pct.toFixed(1)}%
                             </span>
-                          )}
-                        </div>
+                          </div>
+                        )}
                         <span className="text-[11px] text-muted/60 group-hover:text-muted transition-colors mt-1.5 inline-flex items-center gap-1">
                           View analysis
                           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" className="group-hover:translate-x-0.5 transition-transform">
