@@ -6,12 +6,25 @@ import { EventTypeBadge } from "@/components/EventTypeBadge";
 import { UnifiedInsight } from "@/components/UnifiedInsight";
 import { AffectedAssets } from "@/components/AffectedAssets";
 import { EventHeroImage } from "@/components/EventHeroImage";
+import { EventNavigation } from "@/components/EventNavigation";
 
 export const revalidate = 300;
 
 async function fetchEvent(id: string): Promise<MarketEvent | undefined> {
   const { getEventById } = await import("@/lib/event-service");
   return getEventById(id);
+}
+
+async function fetchAdjacentEvents(id: string, scope: "global" | "local") {
+  const { getEvents } = await import("@/lib/event-service");
+  const events = await getEvents(scope);
+  const idx = events.findIndex((e) => e.id === id);
+  if (idx === -1) return { prev: null, next: null };
+  // Events are sorted descending by date — prev = newer (idx-1), next = older (idx+1)
+  return {
+    prev: idx > 0 ? events[idx - 1] : null,
+    next: idx < events.length - 1 ? events[idx + 1] : null,
+  };
 }
 
 export async function generateMetadata({
@@ -42,6 +55,9 @@ export default async function EventDetail({
   if (!event) {
     notFound();
   }
+
+  const scope: "global" | "local" = from_scope === "local" ? "local" : (event.scope ?? "global");
+  const { prev, next } = await fetchAdjacentEvents(id, scope);
 
   return (
     <article className="space-y-10">
@@ -107,6 +123,8 @@ export default async function EventDetail({
           </p>
         </section>
       )}
+
+      <EventNavigation prevEvent={prev} nextEvent={next} scope={from_scope} />
     </article>
   );
 }
