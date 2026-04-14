@@ -12,27 +12,26 @@ export function ScopeToggle({
   const handleGlobal = useCallback(() => onChange("global"), [onChange]);
   const handleLocal = useCallback(() => onChange("local"), [onChange]);
 
+  const active =
+    "bg-[var(--card)] text-foreground shadow-sm";
+  const inactive =
+    "bg-transparent text-[var(--gray-text)] hover:text-foreground";
+
   return (
-    <div className="inline-flex items-center bg-[var(--gray-border)] rounded-full p-0.5">
+    <div className="inline-flex items-center h-9 bg-[var(--gray-border)] rounded-full p-0.5">
       <button
         onClick={handleGlobal}
-        className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-all cursor-pointer
-          ${
-            scope === "global"
-              ? "bg-navy text-white shadow-sm"
-              : "text-[var(--gray-text)] hover:text-[var(--text-dark)]"
-          }`}
+        className={`px-3 h-full text-xs font-semibold rounded-full transition-all duration-150 cursor-pointer ${
+          scope === "global" ? active : inactive
+        }`}
       >
         Global
       </button>
       <button
         onClick={handleLocal}
-        className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-all cursor-pointer
-          ${
-            scope === "local"
-              ? "bg-navy text-white shadow-sm"
-              : "text-[var(--gray-text)] hover:text-[var(--text-dark)]"
-          }`}
+        className={`px-3 h-full text-xs font-semibold rounded-full transition-all duration-150 cursor-pointer ${
+          scope === "local" ? active : inactive
+        }`}
       >
         UK / DE / FR
       </button>
