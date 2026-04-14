@@ -91,8 +91,21 @@ export function UnifiedInsight({ matches }: { matches: HistoricalMatch[] }) {
         <MarketReactionTable reactions={consolidatedReactions} />
       </div>
 
-      <div className="bg-foreground/[0.03] rounded-lg px-5 py-4 space-y-2">
-        <h3 className="text-xs font-semibold tracking-wide uppercase text-muted">
+      <div className="bg-foreground/[0.06] border-l-4 border-foreground/25 rounded-r-lg px-5 py-4 space-y-2">
+        <h3 className="text-xs font-semibold tracking-wide uppercase text-muted flex items-center gap-1.5">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="shrink-0"
+          >
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+          </svg>
           Key Takeaway
         </h3>
         <p className="text-sm font-medium leading-relaxed text-foreground/90">
