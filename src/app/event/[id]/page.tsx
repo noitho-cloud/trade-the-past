@@ -4,6 +4,7 @@ import type { MarketEvent } from "@/lib/types";
 import type { Metadata } from "next";
 import { EventTypeBadge } from "@/components/EventTypeBadge";
 import { UnifiedInsight } from "@/components/UnifiedInsight";
+import { AffectedAssets } from "@/components/AffectedAssets";
 import { EventHeroImage } from "@/components/EventHeroImage";
 
 export const dynamic = "force-dynamic";
@@ -92,7 +93,10 @@ export default async function EventDetail({
       </header>
 
       {event.historicalMatches.length > 0 ? (
-        <UnifiedInsight matches={event.historicalMatches} />
+        <>
+          <UnifiedInsight matches={event.historicalMatches} />
+          <AffectedAssets matches={event.historicalMatches} />
+        </>
       ) : (
         <section className="rounded-lg border border-card-border bg-card px-6 py-8 text-center">
           <p className="text-sm text-muted">
