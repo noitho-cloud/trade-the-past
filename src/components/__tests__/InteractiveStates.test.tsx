@@ -21,22 +21,30 @@ vi.mock("next/link", () => ({
   ),
 }));
 
+vi.mock("next/navigation", () => ({
+  useSearchParams: () => new URLSearchParams(),
+}));
+
 const mockEvents: MarketEventSummary[] = [
   {
     id: "evt-001",
     title: "Fed Holds Rates Steady",
     type: "interest-rates",
     date: new Date().toISOString().split("T")[0],
+    summary: "The Fed held rates steady.",
     imageUrl: null,
     source: "Reuters",
+    keyReaction: { asset: "S&P 500", direction: "up", day1Pct: 1.1 },
   },
   {
     id: "evt-002",
     title: "Tesla Reports Record Q1",
     type: "earnings",
     date: new Date(Date.now() - 86400000).toISOString().split("T")[0],
+    summary: "Tesla delivered record vehicles.",
     imageUrl: null,
     source: "Bloomberg",
+    keyReaction: { asset: "TSLA", direction: "up", day1Pct: 3.2 },
   },
 ];
 

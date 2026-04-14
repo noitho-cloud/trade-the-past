@@ -12,7 +12,7 @@ const matches: HistoricalMatch[] = [
     insight: "S&P rallied after pause.",
     reactions: [
       { asset: "S&P 500", direction: "up", day1Pct: 1.1, week1Pct: 2.3 },
-      { asset: "10Y Treasury", direction: "down", day1Pct: -0.8, week1Pct: -1.5 },
+      { asset: "Gold", direction: "up", day1Pct: 0.9, week1Pct: 1.8 },
     ],
   },
   {
@@ -22,7 +22,7 @@ const matches: HistoricalMatch[] = [
     insight: "Led to rate cuts.",
     reactions: [
       { asset: "S&P 500", direction: "up", day1Pct: 0.8, week1Pct: 1.9 },
-      { asset: "Gold", direction: "up", day1Pct: 1.2, week1Pct: 2.8 },
+      { asset: "EUR/USD", direction: "up", day1Pct: 0.4, week1Pct: 1.2 },
     ],
   },
 ];
@@ -41,8 +41,8 @@ describe("AffectedAssets", () => {
   it("shows all unique assets from matches", () => {
     render(<AffectedAssets matches={matches} />);
     expect(screen.getByText("S&P 500")).toBeDefined();
-    expect(screen.getByText("10Y Treasury")).toBeDefined();
     expect(screen.getByText("Gold")).toBeDefined();
+    expect(screen.getByText("EUR/USD")).toBeDefined();
   });
 
   it("deduplicates assets that appear in multiple matches", () => {
@@ -65,11 +65,12 @@ describe("AffectedAssets", () => {
     expect(cards.length).toBe(3);
   });
 
-  it("shows a toast when Trade button is clicked", async () => {
-    const user = userEvent.setup();
+  it("links Trade button to eToro", () => {
     render(<AffectedAssets matches={matches} />);
-    const tradeButtons = screen.getAllByText("Trade");
-    await user.click(tradeButtons[0]);
-    expect(screen.getByText(/Coming soon/)).toBeDefined();
+    const tradeLinks = screen.getAllByText("Trade");
+    const firstTradeLink = tradeLinks[0].closest("a");
+    expect(firstTradeLink).toBeDefined();
+    expect(firstTradeLink!.getAttribute("href")).toContain("etoro.com/markets/");
+    expect(firstTradeLink!.getAttribute("target")).toBe("_blank");
   });
 });
