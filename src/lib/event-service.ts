@@ -1,6 +1,11 @@
 import { fetchHeadlines } from "./news-client";
-import { classifyAndRank, selectTopEventPerDay } from "./event-classifier";
+import {
+  classifyAndRank,
+  selectTopEventPerDay,
+  type ClassifiedEvent,
+} from "./event-classifier";
 import { getMockEvents, getMockEventById } from "./mock-data";
+import { getHistoricalMatches } from "./historical-service";
 import type { MarketEvent, MarketEventSummary } from "./types";
 
 interface CacheEntry<T> {
@@ -10,6 +15,7 @@ interface CacheEntry<T> {
 
 const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
 const eventsCache = new Map<string, CacheEntry<MarketEventSummary[]>>();
+const classifiedCache = new Map<string, CacheEntry<ClassifiedEvent[]>>();
 
 function getCached<T>(key: string, cache: Map<string, CacheEntry<T>>): T | null {
   const entry = cache.get(key);
@@ -46,7 +52,9 @@ export async function getEvents(
     const classified = classifyAndRank(articles);
     const topPerDay = selectTopEventPerDay(classified);
 
-    const summaries: MarketEventSummary[] = topPerDay.slice(0, 7).map((e, i) => ({
+    const top7 = topPerDay.slice(0, 7);
+
+    const summaries: MarketEventSummary[] = top7.map((e, i) => ({
       id: `live-${i}-${e.date}`,
       title: e.title,
       type: e.type,
@@ -56,6 +64,7 @@ export async function getEvents(
     }));
 
     setCache(cacheKey, summaries, eventsCache);
+    setCache(`classified-${scope}`, top7, classifiedCache);
     return summaries;
   } catch {
     return getMockEvents();
@@ -65,20 +74,30 @@ export async function getEvents(
 export async function getEventById(
   id: string
 ): Promise<MarketEvent | undefined> {
-  // For live events, return a partial event (matches added later by historical-matching)
   if (id.startsWith("live-")) {
     const allScopes: Array<"global" | "local"> = ["global", "local"];
     for (const scope of allScopes) {
       const events = await getEvents(scope);
       const summary = events.find((e) => e.id === id);
-      if (summary) {
-        return {
-          ...summary,
-          summary: summary.title,
-          scope,
-          historicalMatches: [],
-        };
-      }
+      if (!summary) continue;
+
+      const classified = getCached(`classified-${scope}`, classifiedCache);
+      const detail = classified?.find((c) => c.title === summary.title);
+      const eventSummary = detail?.summary || summary.title;
+
+      const historicalMatches = await getHistoricalMatches(
+        summary.title,
+        summary.type,
+        eventSummary,
+        summary.source
+      );
+
+      return {
+        ...summary,
+        summary: eventSummary,
+        scope,
+        historicalMatches,
+      };
     }
     return undefined;
   }
