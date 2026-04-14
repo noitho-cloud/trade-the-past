@@ -5,7 +5,9 @@ import type { Metadata } from "next";
 import { EventTypeBadge } from "@/components/EventTypeBadge";
 import { MarketReactionTable } from "@/components/MarketReactionTable";
 import { CTAButton } from "@/components/CTAButton";
-import { EventImagePlaceholder } from "@/components/EventImagePlaceholder";
+import { EventHeroImage } from "@/components/EventHeroImage";
+
+export const dynamic = "force-dynamic";
 
 async function fetchEvent(id: string): Promise<MarketEvent | undefined> {
   const { getEventById } = await import("@/lib/event-service");
@@ -63,26 +65,13 @@ export default async function EventDetail({
           This Week
         </Link>
 
-        {event.imageUrl ? (
-          <img
-            src={event.imageUrl}
-            alt=""
-            width={672}
-            height={192}
-            className="w-full h-48 object-cover rounded-xl"
-          />
-        ) : (
-          <EventImagePlaceholder
-            type={event.type}
-            className="w-full h-48 rounded-xl"
-          />
-        )}
+        <EventHeroImage url={event.imageUrl} type={event.type} />
 
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <EventTypeBadge type={event.type} />
             <span className="text-xs text-muted">
-              {new Date(event.date).toLocaleDateString("en-US", {
+              {new Date(event.date + "T12:00:00").toLocaleDateString("en-US", {
                 weekday: "long",
                 month: "long",
                 day: "numeric",
@@ -142,6 +131,14 @@ export default async function EventDetail({
               </p>
             </div>
           ))}
+        </section>
+      )}
+
+      {event.historicalMatches.length === 0 && (
+        <section className="rounded-lg border border-card-border bg-card px-6 py-8 text-center">
+          <p className="text-sm text-muted">
+            Historical analysis is being generated. Check back shortly.
+          </p>
         </section>
       )}
 

@@ -6,7 +6,7 @@ deps: [news-ingestion]
 split: false
 depth: 1
 planned: true
-executed: false
+executed: true
 ---
 
 ## Overview
