@@ -10,6 +10,16 @@ const PLACEHOLDER_COLORS: Record<EventType, string> = {
   "commodity-shocks": "from-stone-200 to-stone-100",
 };
 
+const HERO_COLORS: Record<EventType, string> = {
+  earnings: "from-amber-200/80 to-amber-100/50",
+  layoffs: "from-rose-200/80 to-rose-100/50",
+  lawsuits: "from-violet-200/80 to-violet-100/50",
+  regulation: "from-blue-200/80 to-blue-100/50",
+  "interest-rates": "from-emerald-200/80 to-emerald-100/50",
+  geopolitical: "from-orange-200/80 to-orange-100/50",
+  "commodity-shocks": "from-stone-300/70 to-stone-200/50",
+};
+
 function PlaceholderIcon({ type, size }: { type: EventType; size: number }) {
   const props = {
     width: size,
@@ -94,22 +104,32 @@ export function EventImagePlaceholder({
   className?: string;
 }) {
   const isHero = className.includes("h-48");
-  const iconSize = isHero ? 48 : 24;
+  const iconSize = isHero ? 64 : 24;
+  const gradientColors = isHero ? HERO_COLORS[type] : PLACEHOLDER_COLORS[type];
 
   return (
     <div
-      className={`bg-gradient-to-br ${PLACEHOLDER_COLORS[type]} flex items-center justify-center relative overflow-hidden ${className}`}
+      className={`bg-gradient-to-br ${gradientColors} flex items-center justify-center relative overflow-hidden ${className}`}
     >
       {isHero && (
-        <div
-          className="absolute inset-0 opacity-[0.035]"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-            backgroundSize: "128px 128px",
-          }}
-        />
+        <>
+          <div
+            className="absolute inset-0 opacity-[0.06]"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+              backgroundSize: "128px 128px",
+            }}
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.04) 100%)",
+            }}
+          />
+        </>
       )}
-      <div className="text-foreground/20">
+      <div className={isHero ? "text-foreground/25" : "text-foreground/20"}>
         <PlaceholderIcon type={type} size={iconSize} />
       </div>
     </div>
