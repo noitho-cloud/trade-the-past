@@ -65,6 +65,7 @@ export async function getEvents(
       keyReaction: null,
     }));
 
+    summaries.sort((a, b) => b.date.localeCompare(a.date));
     setCache(cacheKey, summaries, eventsCache);
     setCache(`classified-${scope}`, top7, classifiedCache);
     return summaries;
