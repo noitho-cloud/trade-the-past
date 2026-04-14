@@ -191,6 +191,9 @@ export function WeeklyViewClient({
                       <h3 className="font-medium leading-snug text-[15px] transition-colors">
                         {event.title}
                       </h3>
+                      <p className="text-xs text-muted leading-relaxed mt-1 line-clamp-2">
+                        {event.summary}
+                      </p>
                       <div className="flex items-center gap-2 mt-2">
                         <EventTypeBadge type={event.type} />
                         <span className="text-xs text-muted">

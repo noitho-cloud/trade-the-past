@@ -498,11 +498,12 @@ export function getMockEvents(
     ? MOCK_EVENTS.filter((e) => e.scope === scope)
     : MOCK_EVENTS;
 
-  return filtered.map(({ id, title, type, date, imageUrl, source }) => ({
+  return filtered.map(({ id, title, type, date, summary, imageUrl, source }) => ({
     id,
     title,
     type,
     date,
+    summary,
     imageUrl,
     source,
   }));

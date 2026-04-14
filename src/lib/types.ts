@@ -42,6 +42,7 @@ export interface MarketEventSummary {
   title: string;
   type: EventType;
   date: string;
+  summary: string;
   imageUrl: string | null;
   source: string;
 }

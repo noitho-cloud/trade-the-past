@@ -59,6 +59,7 @@ export async function getEvents(
       title: e.title,
       type: e.type,
       date: e.date,
+      summary: e.summary || e.title,
       imageUrl: e.imageUrl,
       source: e.source,
     }));
