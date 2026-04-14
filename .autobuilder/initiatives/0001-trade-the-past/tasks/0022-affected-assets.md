@@ -6,7 +6,7 @@ deps: [trade-the-past-unify-historical-insight]
 split: false
 depth: 1
 planned: true
-executed: false
+executed: true
 ---
 
 ## Problem Statement
