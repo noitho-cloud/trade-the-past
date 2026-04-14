@@ -1,0 +1,22 @@
+"use client";
+
+import Link from "next/link";
+import { useSearchParams, usePathname } from "next/navigation";
+
+export function HeaderLink() {
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+
+  const isEventPage = pathname.startsWith("/event/");
+  const fromScope = searchParams.get("from_scope");
+  const href =
+    isEventPage && fromScope === "local" ? "/?scope=local" : "/";
+
+  return (
+    <Link href={href} className="group">
+      <h1 className="font-serif text-lg font-semibold tracking-tight">
+        Trade the Past
+      </h1>
+    </Link>
+  );
+}

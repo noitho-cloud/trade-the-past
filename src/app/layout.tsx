@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Playfair_Display } from "next/font/google";
+import { HeaderLink } from "@/components/HeaderLink";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -39,11 +40,15 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <header className="border-b border-border bg-card/60 backdrop-blur-sm sticky top-0 z-10">
           <div className="max-w-2xl mx-auto px-6 py-4 flex items-center justify-between">
-            <Link href="/" className="group">
-              <h1 className="font-serif text-lg font-semibold tracking-tight">
-                Trade the Past
-              </h1>
-            </Link>
+            <Suspense
+              fallback={
+                <span className="font-serif text-lg font-semibold tracking-tight">
+                  Trade the Past
+                </span>
+              }
+            >
+              <HeaderLink />
+            </Suspense>
             <span className="text-[11px] tracking-widest uppercase text-muted font-medium">
               {new Date().toLocaleDateString("en-US", {
                 month: "short",
