@@ -2,6 +2,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { MarketEvent } from "@/lib/types";
 import type { Metadata } from "next";
+import { EventTypeBadge } from "@/components/EventTypeBadge";
+import { MarketReactionTable } from "@/components/MarketReactionTable";
+import { CTAButton } from "@/components/CTAButton";
+import { EventImagePlaceholder } from "@/components/EventImagePlaceholder";
 
 async function getEvent(id: string): Promise<MarketEvent | undefined> {
   const { getMockEventById } = await import("@/lib/mock-data");
@@ -35,106 +39,114 @@ export default async function EventDetail({
   }
 
   return (
-    <article className="space-y-8">
-      <header className="space-y-3">
+    <article className="space-y-10">
+      <header className="space-y-4">
         <Link
           href="/"
-          className="text-sm text-muted hover:text-foreground transition-colors"
+          className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors group"
         >
-          Back to This Week
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            className="group-hover:-translate-x-0.5 transition-transform"
+          >
+            <path
+              d="M10 12L6 8L10 4"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          This Week
         </Link>
-        <div>
-          <span className="inline-block text-xs px-2 py-0.5 rounded-full bg-foreground/5 text-muted mb-2">
-            {event.type}
-          </span>
-          <h1 className="font-serif text-3xl font-semibold leading-tight">
+
+        {event.imageUrl ? (
+          <img
+            src={event.imageUrl}
+            alt=""
+            width={672}
+            height={192}
+            className="w-full h-48 object-cover rounded-xl"
+          />
+        ) : (
+          <EventImagePlaceholder
+            type={event.type}
+            className="w-full h-48 rounded-xl"
+          />
+        )}
+
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <EventTypeBadge type={event.type} />
+            <span className="text-xs text-muted">
+              {new Date(event.date).toLocaleDateString("en-US", {
+                weekday: "long",
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              })}
+            </span>
+          </div>
+
+          <h1 className="font-serif text-[28px] md:text-[32px] font-semibold leading-[1.2] tracking-tight">
             {event.title}
           </h1>
-          <p className="text-sm text-muted mt-2">
-            {new Date(event.date).toLocaleDateString("en-US", {
-              weekday: "long",
-              month: "long",
-              day: "numeric",
-              year: "numeric",
-            })}{" "}
-            &middot; {event.source}
+
+          <p className="text-sm text-muted">{event.source}</p>
+
+          <p className="text-[15px] leading-relaxed text-foreground/85">
+            {event.summary}
           </p>
         </div>
-        <p className="text-base leading-relaxed">{event.summary}</p>
       </header>
 
       {event.historicalMatches.length > 0 && (
-        <section className="space-y-6">
-          <h2 className="font-serif text-xl font-semibold border-b border-border pb-2">
-            Similar Past Events
-          </h2>
+        <section className="space-y-8">
+          <div className="flex items-center gap-4">
+            <h2 className="font-serif text-xl font-semibold whitespace-nowrap">
+              Similar Past Events
+            </h2>
+            <div className="h-px flex-1 bg-border" />
+          </div>
+
           {event.historicalMatches.map((match) => (
-            <div key={`${match.year}-${match.description.slice(0, 30)}`} className="space-y-3">
-              <h3 className="font-medium">
-                {match.description}{" "}
-                <span className="text-muted font-normal">({match.year})</span>
-              </h3>
-              <p className="text-sm text-muted italic">{match.whySimilar}</p>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm border border-card-border rounded">
-                  <thead>
-                    <tr className="bg-foreground/3">
-                      <th className="text-left px-3 py-2 font-medium">
-                        Asset
-                      </th>
-                      <th className="text-left px-3 py-2 font-medium">
-                        Direction
-                      </th>
-                      <th className="text-right px-3 py-2 font-medium">
-                        Day 1
-                      </th>
-                      <th className="text-right px-3 py-2 font-medium">
-                        Week 1
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {match.reactions.map((r) => (
-                      <tr key={r.asset} className="border-t border-card-border">
-                        <td className="px-3 py-2">{r.asset}</td>
-                        <td className="px-3 py-2">
-                          <span
-                            className={
-                              r.direction === "up"
-                                ? "text-green-700"
-                                : "text-red-700"
-                            }
-                          >
-                            {r.direction === "up" ? "Up" : "Down"}
-                          </span>
-                        </td>
-                        <td
-                          className={`px-3 py-2 text-right ${r.day1Pct >= 0 ? "text-green-700" : "text-red-700"}`}
-                        >
-                          {r.day1Pct > 0 ? "+" : ""}
-                          {r.day1Pct.toFixed(1)}%
-                        </td>
-                        <td
-                          className={`px-3 py-2 text-right ${r.week1Pct >= 0 ? "text-green-700" : "text-red-700"}`}
-                        >
-                          {r.week1Pct > 0 ? "+" : ""}
-                          {r.week1Pct.toFixed(1)}%
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+            <div
+              key={`${match.year}-${match.description.slice(0, 30)}`}
+              className="space-y-4 pb-8 border-b border-border last:border-0 last:pb-0"
+            >
+              <div>
+                <h3 className="font-medium text-[15px] leading-snug">
+                  {match.description}
+                </h3>
+                <span className="text-sm text-muted">{match.year}</span>
               </div>
-              <p className="text-sm leading-relaxed">{match.insight}</p>
+
+              <blockquote className="border-l-2 border-foreground/15 pl-4 text-sm text-muted italic leading-relaxed">
+                {match.whySimilar}
+              </blockquote>
+
+              <div className="bg-card border border-card-border rounded-lg overflow-hidden">
+                <div className="px-4 py-2 border-b border-card-border bg-foreground/[0.02]">
+                  <span className="text-xs font-semibold tracking-wide uppercase text-muted">
+                    Market Reaction
+                  </span>
+                </div>
+                <MarketReactionTable reactions={match.reactions} />
+              </div>
+
+              <p className="text-sm leading-relaxed text-foreground/75 bg-foreground/[0.02] rounded-lg px-4 py-3">
+                {match.insight}
+              </p>
             </div>
           ))}
         </section>
       )}
 
-      <div className="pt-4">
-        <button className="w-full bg-accent text-accent-foreground py-3 px-6 rounded-lg font-medium hover:opacity-90 transition-opacity cursor-pointer">
-          View affected assets
-        </button>
+      <div className="pt-2 pb-4">
+        <CTAButton eventType={event.type} />
       </div>
     </article>
   );
