@@ -88,4 +88,14 @@ describe("Task 0013 — Interactive states", () => {
     });
   });
 
+  describe("Task 0055 — Focus-visible states", () => {
+    it("event card links have focus-visible ring classes", () => {
+      render(<WeeklyViewClient initialEvents={mockEvents} />);
+      const links = screen.getAllByRole("link");
+      const cardLink = links.find((l) => l.getAttribute("href")?.startsWith("/event/"));
+      expect(cardLink).toBeDefined();
+      expect(cardLink!.className).toContain("focus-visible:ring-2");
+      expect(cardLink!.className).toContain("focus-visible:outline-none");
+    });
+  });
 });

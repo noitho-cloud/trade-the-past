@@ -53,4 +53,11 @@ describe("ScopeToggle — eToro segmented control", () => {
     const btn = screen.getByText("Global");
     expect(btn.className).toContain("duration-150");
   });
+
+  it("buttons have focus-visible ring for keyboard accessibility", () => {
+    render(<ScopeToggle scope="global" onChange={() => {}} />);
+    const btn = screen.getByText("Global");
+    expect(btn.className).toContain("focus-visible:ring-2");
+    expect(btn.className).toContain("focus-visible:outline-none");
+  });
 });

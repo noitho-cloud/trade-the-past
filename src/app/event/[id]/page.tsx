@@ -64,7 +64,7 @@ export default async function EventDetail({
       <header className="space-y-4">
         <Link
           href={from_scope === "local" ? "/?scope=local" : "/"}
-          className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors group"
+          className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors group rounded focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:outline-none"
         >
           <svg
             width="16"

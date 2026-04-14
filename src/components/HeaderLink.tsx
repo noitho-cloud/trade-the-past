@@ -13,7 +13,7 @@ export function HeaderLink() {
     isEventPage && fromScope === "local" ? "/?scope=local" : "/";
 
   return (
-    <Link href={href} className="group">
+    <Link href={href} className="group rounded focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:outline-none">
       <h1 className="text-lg font-bold tracking-tight text-white">
         Trade the Past
       </h1>

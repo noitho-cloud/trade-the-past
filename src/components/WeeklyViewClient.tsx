@@ -191,7 +191,7 @@ export function WeeklyViewClient({
           <span>{error}</span>
           <button
             onClick={handleRetry}
-            className="shrink-0 px-3 py-1.5 text-xs font-semibold rounded-full bg-card border border-[var(--gray-border)] hover:bg-background transition-colors cursor-pointer text-foreground"
+            className="shrink-0 px-3 py-1.5 text-xs font-semibold rounded-full bg-card border border-[var(--gray-border)] hover:bg-background transition-colors cursor-pointer text-foreground focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:outline-none"
           >
             Retry
           </button>
@@ -224,7 +224,7 @@ export function WeeklyViewClient({
                 <Link
                   key={event.id}
                   href={`/event/${event.id}${scope === "local" ? "?from_scope=local" : ""}`}
-                  className={`card-enter group block rounded-[16px] transition-all duration-200 ease-out shadow-[var(--card-shadow)]
+                  className={`card-enter group block rounded-[16px] transition-all duration-200 ease-out shadow-[var(--card-shadow)] focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:outline-none
                     ${
                       today
                         ? "bg-card border-l-[3px] border-l-[var(--etoro-green)] hover:shadow-[var(--card-shadow-hover)] hover:-translate-y-0.5"
@@ -356,7 +356,7 @@ function EmptyState({
       {scope === "local" && (
         <button
           onClick={onSwitchToGlobal}
-          className="px-5 py-3 text-[16px] font-semibold rounded-[48px] bg-[var(--etoro-green)] text-white hover:bg-[var(--etoro-green-hover)] transition-colors cursor-pointer"
+          className="px-5 py-3 text-[16px] font-semibold rounded-[48px] bg-[var(--etoro-green)] text-white hover:bg-[var(--etoro-green-hover)] transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:ring-offset-2 focus-visible:outline-none"
         >
           Switch to Global
         </button>

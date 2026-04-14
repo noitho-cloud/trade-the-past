@@ -36,7 +36,7 @@ export function EventNavigation({
         {prevEvent ? (
           <Link
             href={`/event/${prevEvent.id}${scopeParam}`}
-            className="group flex items-center gap-3 text-left min-w-0 flex-1 rounded-xl px-3 py-3 -mx-3 hover:bg-foreground/[0.03] transition-colors"
+            className="group flex items-center gap-3 text-left min-w-0 flex-1 rounded-xl px-3 py-3 -mx-3 hover:bg-foreground/[0.03] transition-colors focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:outline-none"
           >
             <svg
               width="16"
@@ -69,7 +69,7 @@ export function EventNavigation({
         {nextEvent ? (
           <Link
             href={`/event/${nextEvent.id}${scopeParam}`}
-            className="group flex items-center gap-3 text-right min-w-0 flex-1 justify-end rounded-xl px-3 py-3 -mx-3 hover:bg-foreground/[0.03] transition-colors"
+            className="group flex items-center gap-3 text-right min-w-0 flex-1 justify-end rounded-xl px-3 py-3 -mx-3 hover:bg-foreground/[0.03] transition-colors focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:outline-none"
           >
             <div className="min-w-0">
               <span className="text-[11px] font-medium text-muted tracking-wide uppercase block">
