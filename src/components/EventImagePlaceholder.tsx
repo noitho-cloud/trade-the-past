@@ -129,7 +129,7 @@ export function EventImagePlaceholder({
           />
         </>
       )}
-      <div className={isHero ? "text-foreground/25" : "text-foreground/20"}>
+      <div className={isHero ? "text-black/20" : "text-black/15"}>
         <PlaceholderIcon type={type} size={iconSize} />
       </div>
     </div>
