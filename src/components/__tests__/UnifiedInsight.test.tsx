@@ -33,6 +33,29 @@ const twoMatches: HistoricalMatch[] = [
   },
 ];
 
+const contradictoryMatches: HistoricalMatch[] = [
+  {
+    description: "OPEC agrees to historic production cut of 1.2M barrels per day",
+    year: 2016,
+    whySimilar: "Both are major OPEC production cut agreements.",
+    insight: "Oil prices rallied 15% in the month following the 2016 deal.",
+    reactions: [
+      { asset: "Brent Crude", direction: "up", day1Pct: 4.5, week1Pct: 8.2 },
+      { asset: "ExxonMobil", direction: "up", day1Pct: 2.8, week1Pct: 5.6 },
+    ],
+  },
+  {
+    description: "Saudi Arabia launches oil price war, crude crashes 30%",
+    year: 2020,
+    whySimilar: "Opposite outcome from the same dynamic.",
+    insight: "The 2020 crash showed dependency on OPEC+ coordination.",
+    reactions: [
+      { asset: "Brent Crude", direction: "down", day1Pct: -24.1, week1Pct: -19.8 },
+      { asset: "ExxonMobil", direction: "down", day1Pct: -18.2, week1Pct: -15.3 },
+    ],
+  },
+];
+
 describe("UnifiedInsight", () => {
   it("renders nothing when no matches are provided", () => {
     const { container } = render(<UnifiedInsight matches={[]} />);
@@ -71,5 +94,25 @@ describe("UnifiedInsight", () => {
     render(<UnifiedInsight matches={twoMatches} />);
     const spCells = screen.getAllByText("S&P 500");
     expect(spCells).toHaveLength(1);
+  });
+
+  it("shows per-match tables when matches have contradictory directions for the same asset", () => {
+    render(<UnifiedInsight matches={contradictoryMatches} />);
+    const tables = screen.getAllByRole("table");
+    expect(tables.length).toBe(2);
+    expect(screen.queryByText("Consolidated Market Reaction")).toBeNull();
+  });
+
+  it("shows separate reaction data for each contradictory match", () => {
+    render(<UnifiedInsight matches={contradictoryMatches} />);
+    const brentCells = screen.getAllByText("Brent Crude");
+    expect(brentCells.length).toBe(2);
+    const exxonCells = screen.getAllByText("ExxonMobil");
+    expect(exxonCells.length).toBe(2);
+  });
+
+  it("still shows consolidated table when matches agree on direction", () => {
+    render(<UnifiedInsight matches={twoMatches} />);
+    expect(screen.getByText("Consolidated Market Reaction")).toBeDefined();
   });
 });

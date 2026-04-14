@@ -34,7 +34,7 @@ describe("Task 0012 — EventImagePlaceholder", () => {
     );
     const svg = container.querySelector("svg");
     expect(svg).toBeTruthy();
-    expect(svg!.getAttribute("width")).toBe("48");
+    expect(svg!.getAttribute("width")).toBe("64");
   });
 
   it("includes a noise texture overlay for the hero variant", () => {
