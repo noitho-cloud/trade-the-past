@@ -95,4 +95,42 @@ describe("Task 0012 — EventImagePlaceholder", () => {
       expect(wrapper!.className).toContain("overflow-hidden");
     }
   });
+
+  it("includes dark mode gradient classes for all event types (small card)", () => {
+    for (const type of EVENT_TYPES) {
+      const { container } = render(
+        <EventImagePlaceholder type={type} className="w-16 h-16 rounded-lg" />
+      );
+      const wrapper = container.firstElementChild;
+      expect(
+        wrapper!.className,
+        `Missing dark:from- for type: ${type}`
+      ).toMatch(/dark:from-/);
+      expect(
+        wrapper!.className,
+        `Missing dark:to- for type: ${type}`
+      ).toMatch(/dark:to-/);
+    }
+  });
+
+  it("includes dark mode gradient classes for hero variant", () => {
+    for (const type of EVENT_TYPES) {
+      const { container } = render(
+        <EventImagePlaceholder type={type} className="w-full h-48 rounded-xl" />
+      );
+      const wrapper = container.firstElementChild;
+      expect(
+        wrapper!.className,
+        `Missing dark:from- for hero type: ${type}`
+      ).toMatch(/dark:from-/);
+    }
+  });
+
+  it("includes dark mode icon color classes", () => {
+    const { container } = render(
+      <EventImagePlaceholder type="earnings" className="w-16 h-16 rounded-lg" />
+    );
+    const iconWrapper = container.querySelector("[class*='dark:text-white']");
+    expect(iconWrapper, "Missing dark mode icon color class").toBeTruthy();
+  });
 });

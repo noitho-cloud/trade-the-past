@@ -1,23 +1,23 @@
 import type { EventType } from "@/lib/types";
 
 const PLACEHOLDER_COLORS: Record<EventType, string> = {
-  earnings: "from-[#E8F5E9] to-[#F1F8F2]",
-  layoffs: "from-[#FDEDEF] to-[#FEF6F7]",
-  lawsuits: "from-[#EDE7F6] to-[#F5F2FA]",
-  regulation: "from-[#E3F2FD] to-[#F0F7FE]",
-  "interest-rates": "from-[#E8F5E9] to-[#F1F8F2]",
-  geopolitical: "from-[#FFF3E0] to-[#FFF9F0]",
-  "commodity-shocks": "from-[#ECEFF1] to-[#F5F5F5]",
+  earnings: "from-[#E8F5E9] to-[#F1F8F2] dark:from-[#0A2015] dark:to-[#061810]",
+  layoffs: "from-[#FDEDEF] to-[#FEF6F7] dark:from-[#200A10] dark:to-[#180610]",
+  lawsuits: "from-[#EDE7F6] to-[#F5F2FA] dark:from-[#150A20] dark:to-[#100618]",
+  regulation: "from-[#E3F2FD] to-[#F0F7FE] dark:from-[#0A1020] dark:to-[#060D18]",
+  "interest-rates": "from-[#E8F5E9] to-[#F1F8F2] dark:from-[#0A2015] dark:to-[#061810]",
+  geopolitical: "from-[#FFF3E0] to-[#FFF9F0] dark:from-[#201508] dark:to-[#181006]",
+  "commodity-shocks": "from-[#ECEFF1] to-[#F5F5F5] dark:from-[#121418] dark:to-[#0E1014]",
 };
 
 const HERO_COLORS: Record<EventType, string> = {
-  earnings: "from-[#C8E6C9]/80 to-[#E8F5E9]/50",
-  layoffs: "from-[#FFCDD2]/80 to-[#FDEDEF]/50",
-  lawsuits: "from-[#D1C4E9]/80 to-[#EDE7F6]/50",
-  regulation: "from-[#BBDEFB]/80 to-[#E3F2FD]/50",
-  "interest-rates": "from-[#C8E6C9]/80 to-[#E8F5E9]/50",
-  geopolitical: "from-[#FFE0B2]/80 to-[#FFF3E0]/50",
-  "commodity-shocks": "from-[#CFD8DC]/70 to-[#ECEFF1]/50",
+  earnings: "from-[#C8E6C9]/80 to-[#E8F5E9]/50 dark:from-[#0D2E18]/80 dark:to-[#0A2012]/50",
+  layoffs: "from-[#FFCDD2]/80 to-[#FDEDEF]/50 dark:from-[#2E0D14]/80 dark:to-[#200A10]/50",
+  lawsuits: "from-[#D1C4E9]/80 to-[#EDE7F6]/50 dark:from-[#1A0D2E]/80 dark:to-[#150A20]/50",
+  regulation: "from-[#BBDEFB]/80 to-[#E3F2FD]/50 dark:from-[#0D1A2E]/80 dark:to-[#0A1520]/50",
+  "interest-rates": "from-[#C8E6C9]/80 to-[#E8F5E9]/50 dark:from-[#0D2E18]/80 dark:to-[#0A2012]/50",
+  geopolitical: "from-[#FFE0B2]/80 to-[#FFF3E0]/50 dark:from-[#2E1A08]/80 dark:to-[#201508]/50",
+  "commodity-shocks": "from-[#CFD8DC]/70 to-[#ECEFF1]/50 dark:from-[#181A20]/70 dark:to-[#121418]/50",
 };
 
 function PlaceholderIcon({ type, size }: { type: EventType; size: number }) {
@@ -129,7 +129,7 @@ export function EventImagePlaceholder({
           />
         </>
       )}
-      <div className={isHero ? "text-black/20" : "text-black/15"}>
+      <div className={isHero ? "text-black/20 dark:text-white/20" : "text-black/15 dark:text-white/15"}>
         <PlaceholderIcon type={type} size={iconSize} />
       </div>
     </div>
