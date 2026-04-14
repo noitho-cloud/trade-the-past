@@ -40,6 +40,14 @@
   --table-stripe: #F9F9F9;
   --header-bg: var(--navy);
   --header-text: var(--white);
+
+  --badge-text-rates: #0EB12E;
+  --badge-text-earnings: #B45309;
+  --badge-text-regulation: #1D4ED8;
+  --badge-text-lawsuits: #1D4ED8;
+  --badge-text-layoffs: #E31937;
+  --badge-text-geopolitical: #6D28D9;
+  --badge-text-commodities: #374151;
 }
 
 .dark {
@@ -60,6 +68,14 @@
   --text-dark: #FFFFFF;
   --header-bg: #000021;
   --header-text: #FFFFFF;
+
+  --badge-text-rates: #0EB12E;
+  --badge-text-earnings: #FBBF24;
+  --badge-text-regulation: #60A5FA;
+  --badge-text-lawsuits: #60A5FA;
+  --badge-text-layoffs: #E31937;
+  --badge-text-geopolitical: #A78BFA;
+  --badge-text-commodities: #9CA3AF;
 }
 
 @theme inline {
