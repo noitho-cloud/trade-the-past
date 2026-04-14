@@ -240,6 +240,23 @@ export function WeeklyViewClient({
                         className="w-16 h-16 rounded-lg shrink-0"
                       />
                     )}
+
+                    <svg
+                      data-testid="card-chevron"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      className="shrink-0 self-center text-muted/50 group-hover:text-muted group-hover:translate-x-0.5 transition-all"
+                    >
+                      <path
+                        d="M6 4L10 8L6 12"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
                   </div>
                 </div>
               </Link>

@@ -151,6 +151,12 @@ describe("WeeklyViewClient", () => {
     });
   });
 
+  it("renders a chevron affordance on each event card", () => {
+    render(<WeeklyViewClient initialEvents={mockEvents} />);
+    const chevrons = document.querySelectorAll("[data-testid='card-chevron']");
+    expect(chevrons.length).toBe(mockEvents.length);
+  });
+
   it("shows empty state when scope returns zero events", async () => {
     const user = userEvent.setup();
     (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
