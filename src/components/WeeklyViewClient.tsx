@@ -123,7 +123,7 @@ export function WeeklyViewClient({
             onSwitchToGlobal={() => handleScopeChange("global")}
           />
         ) : (
-          events.map((event) => {
+          events.map((event, index) => {
             const { weekday, display } = formatDate(event.date);
             const today = isToday(event.date);
 
@@ -131,12 +131,13 @@ export function WeeklyViewClient({
               <Link
                 key={event.id}
                 href={`/event/${event.id}`}
-                className={`group block rounded-xl border transition-all duration-200
+                className={`card-enter group block rounded-xl border transition-all duration-200 ease-out
                   ${
                     today
-                      ? "bg-card border-foreground/15 shadow-sm hover:shadow-md"
-                      : "bg-card border-card-border hover:border-foreground/15 hover:shadow-sm"
+                      ? "bg-card border-foreground/15 shadow-sm hover:shadow-md hover:-translate-y-0.5"
+                      : "bg-card border-card-border hover:border-foreground/15 hover:shadow-md hover:-translate-y-0.5"
                   }`}
+                style={{ animationDelay: `${index * 60}ms` }}
               >
                 <div className="flex items-stretch">
                   <div className="w-20 shrink-0 flex flex-col items-center justify-center border-r border-card-border py-4">
@@ -158,7 +159,7 @@ export function WeeklyViewClient({
                           Today
                         </span>
                       )}
-                      <h3 className="font-medium leading-snug text-[15px] group-hover:text-foreground/80 transition-colors">
+                      <h3 className="font-medium leading-snug text-[15px] transition-colors">
                         {event.title}
                       </h3>
                       <div className="flex items-center gap-2 mt-2">

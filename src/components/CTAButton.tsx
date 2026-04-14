@@ -31,7 +31,9 @@ export function CTAButton({ eventType }: { eventType: EventType }) {
       <button
         onClick={handleClick}
         className="w-full bg-foreground text-background py-3.5 px-6 rounded-lg font-medium
-                   hover:opacity-90 active:scale-[0.99] transition-all cursor-pointer
+                   hover:bg-foreground/85 hover:scale-[1.01] active:scale-[0.99]
+                   focus-visible:ring-2 focus-visible:ring-foreground/30 focus-visible:ring-offset-2
+                   transition-all duration-200 ease-out cursor-pointer
                    text-[15px] tracking-tight"
       >
         {CTA_TEXT[eventType]}
