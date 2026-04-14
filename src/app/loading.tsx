@@ -13,7 +13,7 @@ export default function Loading() {
         {Array.from({ length: 5 }).map((_, i) => (
           <div
             key={i}
-            className="rounded-[16px] bg-white shadow-[0_0_13px_rgba(0,0,0,0.08)]"
+            className="rounded-[16px] bg-card shadow-[var(--card-shadow)]"
           >
             <div className="flex items-stretch">
               <div className="w-20 shrink-0 border-r border-[var(--gray-border)] py-4 flex flex-col items-center justify-center">

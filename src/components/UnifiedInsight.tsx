@@ -88,8 +88,8 @@ function hasContradictoryReactions(matches: HistoricalMatch[]): boolean {
 function ConsolidatedReactionTable({ matches }: { matches: HistoricalMatch[] }) {
   const consolidatedReactions = consolidateReactions(matches);
   return (
-    <div className="bg-white rounded-[16px] shadow-[0_0_13px_rgba(0,0,0,0.08)] overflow-hidden">
-      <div className="px-4 py-2.5 border-b border-[var(--gray-border)] bg-[var(--gray-bg)]">
+    <div className="bg-card rounded-[16px] shadow-[var(--card-shadow)] overflow-hidden">
+      <div className="px-4 py-2.5 border-b border-[var(--gray-border)] bg-background">
         <span className="text-xs font-semibold tracking-wide uppercase text-muted">
           Consolidated Market Reaction
         </span>
@@ -105,9 +105,9 @@ function PerMatchReactionTables({ matches }: { matches: HistoricalMatch[] }) {
       {matches.map((match) => (
         <div
           key={`${match.year}-${match.description.slice(0, 20)}`}
-          className="bg-white rounded-[16px] shadow-[0_0_13px_rgba(0,0,0,0.08)] overflow-hidden"
+          className="bg-card rounded-[16px] shadow-[var(--card-shadow)] overflow-hidden"
         >
-          <div className="px-4 py-2.5 border-b border-[var(--gray-border)] bg-[var(--gray-bg)]">
+          <div className="px-4 py-2.5 border-b border-[var(--gray-border)] bg-background">
             <span className="text-xs font-semibold tracking-wide uppercase text-muted">
               {match.year}
             </span>
@@ -148,7 +148,7 @@ export function UnifiedInsight({ matches }: { matches: HistoricalMatch[] }) {
         <ConsolidatedReactionTable matches={matches} />
       )}
 
-      <div className="bg-[#E8F5E9] border-l-4 border-[var(--etoro-green)] rounded-r-lg px-5 py-4 space-y-2">
+      <div className="bg-[var(--success-bg)] border-l-4 border-[var(--etoro-green)] rounded-r-lg px-5 py-4 space-y-2">
         <h3 className="text-xs font-semibold tracking-wide uppercase text-muted flex items-center gap-1.5">
           <svg
             width="14"

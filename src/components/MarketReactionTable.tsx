@@ -60,7 +60,7 @@ export function MarketReactionTable({
           {reactions.map((r) => (
             <tr
               key={r.asset}
-              className="border-b border-foreground/5 last:border-0"
+              className="border-b border-foreground/5 last:border-0 even:bg-[var(--table-stripe)]"
             >
               <td className="px-4 py-2.5 font-medium">{r.asset}</td>
               <td className="px-4 py-2.5">

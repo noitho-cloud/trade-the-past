@@ -11,7 +11,7 @@ import { ScopeToggle } from "@/components/ScopeToggle";
 
 function EventCardSkeleton() {
   return (
-    <div className="rounded-[16px] bg-white shadow-[0_0_13px_rgba(0,0,0,0.08)] animate-pulse">
+    <div className="rounded-[16px] bg-card shadow-[var(--card-shadow)] animate-pulse">
       <div className="flex items-stretch">
         <div className="w-20 shrink-0 border-r border-[var(--gray-border)] py-4 flex flex-col items-center justify-center">
           <div className="h-3 w-8 bg-foreground/5 rounded" />
@@ -147,11 +147,11 @@ export function WeeklyViewClient({
       </div>
 
       {error && (
-        <div className="rounded-[16px] border border-[var(--gray-border)] bg-[#FDEDEF] px-4 py-3 text-sm text-[var(--red)] flex items-center justify-between gap-3">
+        <div className="rounded-[16px] border border-[var(--gray-border)] bg-[var(--error-bg)] px-4 py-3 text-sm text-[var(--red)] flex items-center justify-between gap-3">
           <span>{error}</span>
           <button
             onClick={handleRetry}
-            className="shrink-0 px-3 py-1.5 text-xs font-semibold rounded-full bg-white border border-[var(--gray-border)] hover:bg-[var(--gray-bg)] transition-colors cursor-pointer text-[var(--text-dark)]"
+            className="shrink-0 px-3 py-1.5 text-xs font-semibold rounded-full bg-card border border-[var(--gray-border)] hover:bg-background transition-colors cursor-pointer text-foreground"
           >
             Retry
           </button>
@@ -177,11 +177,11 @@ export function WeeklyViewClient({
               <Link
                 key={event.id}
                 href={`/event/${event.id}${scope === "local" ? "?from_scope=local" : ""}`}
-                className={`card-enter group block rounded-[16px] transition-all duration-200 ease-out shadow-[0_0_13px_rgba(0,0,0,0.08)]
+                className={`card-enter group block rounded-[16px] transition-all duration-200 ease-out shadow-[var(--card-shadow)]
                   ${
                     today
-                      ? "bg-white border-l-[3px] border-l-[var(--etoro-green)] hover:shadow-[0_0_20px_rgba(0,0,0,0.12)] hover:-translate-y-0.5"
-                      : "bg-white hover:shadow-[0_0_20px_rgba(0,0,0,0.12)] hover:-translate-y-0.5"
+                      ? "bg-card border-l-[3px] border-l-[var(--etoro-green)] hover:shadow-[var(--card-shadow-hover)] hover:-translate-y-0.5"
+                      : "bg-card hover:shadow-[var(--card-shadow-hover)] hover:-translate-y-0.5"
                   }`}
                 style={{ animationDelay: `${index * 60}ms` }}
               >

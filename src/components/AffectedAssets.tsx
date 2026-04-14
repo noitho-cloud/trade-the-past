@@ -46,7 +46,7 @@ function consolidateAssets(matches: HistoricalMatch[]): ConsolidatedAsset[] {
 function DirectionBadge({ direction }: { direction: "up" | "down" }) {
   if (direction === "up") {
     return (
-      <span className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--etoro-green)] bg-[#E8F5E9] px-2 py-0.5 rounded-full">
+      <span className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--etoro-green)] bg-[var(--success-bg)] px-2 py-0.5 rounded-full">
         <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
           <path d="M5 1L9 6H1L5 1Z" fill="currentColor" />
         </svg>
@@ -55,7 +55,7 @@ function DirectionBadge({ direction }: { direction: "up" | "down" }) {
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--red)] bg-[#FDEDEF] px-2 py-0.5 rounded-full">
+    <span className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--red)] bg-[var(--error-bg)] px-2 py-0.5 rounded-full">
       <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
         <path d="M5 9L1 4H9L5 9Z" fill="currentColor" />
       </svg>
@@ -83,7 +83,7 @@ function EtoroLabel() {
 
 function AssetCard({ asset }: { asset: ConsolidatedAsset }) {
   return (
-    <div className="rounded-[16px] bg-white p-[var(--space-xl)] flex flex-col gap-3 shadow-[0_0_13px_rgba(0,0,0,0.08)]">
+    <div className="rounded-[16px] bg-card p-[var(--space-xl)] flex flex-col gap-3 shadow-[var(--card-shadow)]">
       <div className="flex items-start justify-between gap-2">
         <div>
           <h3 className="font-medium text-[15px] leading-snug">
@@ -123,8 +123,8 @@ function AssetCard({ asset }: { asset: ConsolidatedAsset }) {
             href={getEtoroWatchlistUrl()}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 border border-[var(--gray-border)] bg-white text-[var(--text-dark)] text-[16px] font-semibold py-3 px-4 rounded-[48px]
-                       hover:bg-[var(--gray-bg)] active:scale-[0.98] transition-all text-center"
+            className="flex-1 border border-[var(--gray-border)] bg-card text-foreground text-[16px] font-semibold py-3 px-4 rounded-[48px]
+                       hover:bg-background active:scale-[0.98] transition-all text-center"
           >
             Watchlist
           </a>

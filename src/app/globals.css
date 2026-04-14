@@ -33,6 +33,33 @@
   --accent-foreground: var(--white);
   --card: var(--white);
   --card-border: var(--gray-border);
+  --card-shadow: 0 0 13px rgba(0,0,0,0.08);
+  --card-shadow-hover: 0 0 20px rgba(0,0,0,0.12);
+  --success-bg: #E8F5E9;
+  --error-bg: #FDEDEF;
+  --table-stripe: #F9F9F9;
+  --header-bg: var(--navy);
+  --header-text: var(--white);
+}
+
+.dark {
+  --background: #0A0A2E;
+  --foreground: #FFFFFF;
+  --muted: #8B8BA7;
+  --border: #2A2A4E;
+  --card: #000021;
+  --card-border: #2A2A4E;
+  --card-shadow: 0 0 13px rgba(0,0,0,0.3);
+  --card-shadow-hover: 0 0 20px rgba(0,0,0,0.4);
+  --success-bg: rgba(14,177,46,0.12);
+  --error-bg: rgba(227,25,55,0.12);
+  --table-stripe: #0D0D35;
+  --gray-bg: #0A0A2E;
+  --gray-border: #2A2A4E;
+  --gray-text: #8B8BA7;
+  --text-dark: #FFFFFF;
+  --header-bg: #000021;
+  --header-text: #FFFFFF;
 }
 
 @theme inline {
