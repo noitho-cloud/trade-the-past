@@ -327,6 +327,168 @@ export const MOCK_EVENTS: MarketEvent[] = [
       },
     ],
   },
+  {
+    id: "evt-008",
+    title: "US Justice Department Opens Antitrust Probe Into Cloud Computing Market",
+    type: "regulation",
+    date: getDateString(5),
+    summary:
+      "The DOJ announced a formal antitrust investigation into potential anti-competitive practices in the cloud computing market, focusing on bundling and contract lock-in by the three dominant providers.",
+    imageUrl: null,
+    source: "Wall Street Journal",
+    scope: "global",
+    historicalMatches: [
+      {
+        description:
+          "EU opens antitrust case against Google Shopping, fines company $2.7 billion",
+        year: 2017,
+        whySimilar:
+          "Both are government antitrust actions targeting dominant tech platforms over market abuse. The Google Shopping case set precedent for tech antitrust enforcement globally.",
+        insight:
+          "Google parent Alphabet dipped 2% on the ruling but recovered within a month as investors concluded the fine was manageable relative to revenue.",
+        reactions: [
+          {
+            asset: "Alphabet (Google)",
+            direction: "down",
+            day1Pct: -2.5,
+            week1Pct: -1.1,
+          },
+          {
+            asset: "Amazon",
+            direction: "down",
+            day1Pct: -1.3,
+            week1Pct: -0.7,
+          },
+          {
+            asset: "Salesforce",
+            direction: "up",
+            day1Pct: 1.8,
+            week1Pct: 3.2,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "evt-009",
+    title: "Bank of England Holds Rate at 4.5%, Warns of Persistent Services Inflation",
+    type: "interest-rates",
+    date: getDateString(1),
+    summary:
+      "The Bank of England voted 7-2 to keep interest rates unchanged at 4.5%, citing persistent services inflation running at 5.4% despite weakening GDP growth in the first quarter.",
+    imageUrl: null,
+    source: "Financial Times",
+    scope: "local",
+    historicalMatches: [
+      {
+        description:
+          "Bank of England pauses rate hikes at 5.25% after 14 consecutive increases",
+        year: 2023,
+        whySimilar:
+          "Both events represent the BoE holding rates amid conflicting inflation and growth signals. The 2023 pause came after the most aggressive tightening cycle in decades.",
+        insight:
+          "FTSE 100 rallied 1.2% in the week after the 2023 pause as markets anticipated the end of the hiking cycle.",
+        reactions: [
+          {
+            asset: "FTSE 100",
+            direction: "up",
+            day1Pct: 0.6,
+            week1Pct: 1.2,
+          },
+          {
+            asset: "GBP/USD",
+            direction: "down",
+            day1Pct: -0.3,
+            week1Pct: -0.8,
+          },
+          {
+            asset: "UK 10Y Gilt",
+            direction: "down",
+            day1Pct: -0.5,
+            week1Pct: -1.1,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "evt-010",
+    title: "Volkswagen Announces Closure of Two German Plants in EV Restructuring",
+    type: "layoffs",
+    date: getDateString(3),
+    summary:
+      "Volkswagen confirmed it will close two assembly plants in Lower Saxony by 2028, eliminating 7,500 positions as part of a sweeping restructuring to fund its electric vehicle transition and cut costs by 4 billion euros.",
+    imageUrl: null,
+    source: "Handelsblatt",
+    scope: "local",
+    historicalMatches: [
+      {
+        description:
+          "Volkswagen diesel emissions scandal triggers $30B in fines and restructuring",
+        year: 2015,
+        whySimilar:
+          "Both events mark major strategic crises at VW forcing costly restructuring. The 2015 Dieselgate scandal forced a pivot away from diesel engines toward electrification.",
+        insight:
+          "VW stock dropped 35% in the month after the emissions scandal but recovered half its losses within six months as the restructuring plan took shape.",
+        reactions: [
+          {
+            asset: "Volkswagen",
+            direction: "down",
+            day1Pct: -4.2,
+            week1Pct: -8.6,
+          },
+          {
+            asset: "DAX",
+            direction: "down",
+            day1Pct: -1.1,
+            week1Pct: -2.3,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "evt-011",
+    title: "TotalEnergies Posts Record Q1 Profit on High Gas Prices and Trading Gains",
+    type: "earnings",
+    date: getDateString(0),
+    summary:
+      "TotalEnergies reported Q1 2026 net profit of 6.8 billion euros, up 18% year-over-year, driven by elevated European natural gas prices and a strong performance from its LNG trading division.",
+    imageUrl: null,
+    source: "Les Echos",
+    scope: "local",
+    historicalMatches: [
+      {
+        description:
+          "TotalEnergies posts record annual profit of $36.2B amid energy crisis",
+        year: 2022,
+        whySimilar:
+          "Both events reflect TotalEnergies benefiting from elevated energy prices. The 2022 profit came during the European energy crisis following Russia's invasion of Ukraine.",
+        insight:
+          "TotalEnergies shares rose 4% in the week after the 2022 earnings, outperforming the CAC 40 as investors rewarded the dividend increase.",
+        reactions: [
+          {
+            asset: "TotalEnergies",
+            direction: "up",
+            day1Pct: 2.4,
+            week1Pct: 4.1,
+          },
+          {
+            asset: "CAC 40",
+            direction: "up",
+            day1Pct: 0.5,
+            week1Pct: 1.0,
+          },
+          {
+            asset: "European Natural Gas",
+            direction: "up",
+            day1Pct: 1.8,
+            week1Pct: 3.5,
+          },
+        ],
+      },
+    ],
+  },
 ];
 
 export function getMockEvents(
