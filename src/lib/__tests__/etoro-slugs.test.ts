@@ -3,6 +3,7 @@ import {
   isEtoroTradeable,
   filterTradeableReactions,
   getEtoroTradeUrl,
+  getEtoroWatchlistUrl,
 } from "../etoro-slugs";
 
 describe("isEtoroTradeable", () => {
@@ -69,5 +70,20 @@ describe("getEtoroTradeUrl", () => {
 
   it("generates fallback URL for unknown assets", () => {
     expect(getEtoroTradeUrl("Unknown Asset")).toBe("https://www.etoro.com/markets/unknownasset");
+  });
+});
+
+describe("getEtoroWatchlistUrl", () => {
+  it("returns generic watchlists URL when no asset given", () => {
+    expect(getEtoroWatchlistUrl()).toBe("https://www.etoro.com/watchlists");
+  });
+
+  it("returns asset-specific market page for known assets", () => {
+    expect(getEtoroWatchlistUrl("Gold")).toBe("https://www.etoro.com/markets/gold");
+    expect(getEtoroWatchlistUrl("S&P 500")).toBe("https://www.etoro.com/markets/spx500");
+  });
+
+  it("generates fallback URL for unknown assets", () => {
+    expect(getEtoroWatchlistUrl("Unknown Asset")).toBe("https://www.etoro.com/markets/unknownasset");
   });
 });

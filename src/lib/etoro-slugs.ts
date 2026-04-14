@@ -49,8 +49,12 @@ export function getEtoroTradeUrl(assetName: string): string {
   return `${ETORO_BASE}/markets/${fallbackSlug}`;
 }
 
-export function getEtoroWatchlistUrl(): string {
-  return `${ETORO_BASE}/watchlists`;
+export function getEtoroWatchlistUrl(assetName?: string): string {
+  if (!assetName) return `${ETORO_BASE}/watchlists`;
+  const slug = ASSET_TO_SLUG[assetName];
+  if (slug) return `${ETORO_BASE}/markets/${slug}`;
+  const fallbackSlug = assetName.toLowerCase().replace(/[^a-z0-9]/g, "");
+  return `${ETORO_BASE}/markets/${fallbackSlug}`;
 }
 
 export interface MarketReactionLike {

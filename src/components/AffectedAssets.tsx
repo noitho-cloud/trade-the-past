@@ -120,7 +120,7 @@ function AssetCard({ asset }: { asset: ConsolidatedAsset }) {
             Trade
           </a>
           <a
-            href={getEtoroWatchlistUrl()}
+            href={getEtoroWatchlistUrl(asset.asset)}
             target="_blank"
             rel="noopener noreferrer"
             className="flex-1 border border-[var(--gray-border)] bg-card text-foreground text-[16px] font-semibold py-3 px-4 rounded-[48px]
