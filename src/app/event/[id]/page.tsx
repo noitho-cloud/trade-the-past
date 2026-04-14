@@ -7,9 +7,9 @@ import { MarketReactionTable } from "@/components/MarketReactionTable";
 import { CTAButton } from "@/components/CTAButton";
 import { EventImagePlaceholder } from "@/components/EventImagePlaceholder";
 
-async function getEvent(id: string): Promise<MarketEvent | undefined> {
-  const { getMockEventById } = await import("@/lib/mock-data");
-  return getMockEventById(id);
+async function fetchEvent(id: string): Promise<MarketEvent | undefined> {
+  const { getEventById } = await import("@/lib/event-service");
+  return getEventById(id);
 }
 
 export async function generateMetadata({
@@ -18,7 +18,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const event = await getEvent(id);
+  const event = await fetchEvent(id);
   if (!event) return { title: "Event not found" };
   return {
     title: `${event.title} — Trade the Past`,
@@ -32,7 +32,7 @@ export default async function EventDetail({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const event = await getEvent(id);
+  const event = await fetchEvent(id);
 
   if (!event) {
     notFound();

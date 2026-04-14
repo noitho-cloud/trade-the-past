@@ -10,9 +10,9 @@ export const metadata: Metadata = {
     "This week's market-moving events paired with similar historical events and market reactions.",
 };
 
-async function getEvents(): Promise<MarketEventSummary[]> {
-  const { getMockEvents } = await import("@/lib/mock-data");
-  return getMockEvents();
+async function fetchEvents(): Promise<MarketEventSummary[]> {
+  const { getEvents } = await import("@/lib/event-service");
+  return getEvents("global");
 }
 
 function formatDate(dateStr: string): { weekday: string; display: string } {
@@ -24,7 +24,7 @@ function formatDate(dateStr: string): { weekday: string; display: string } {
 }
 
 export default async function WeeklyView() {
-  const events = await getEvents();
+  const events = await fetchEvents();
 
   return (
     <div className="space-y-8">

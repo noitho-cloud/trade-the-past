@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getMockEvents } from "@/lib/mock-data";
+import { getEvents } from "@/lib/event-service";
 
 export async function GET(request: NextRequest) {
-  const scope = request.nextUrl.searchParams.get("scope") || "global";
+  const scope =
+    (request.nextUrl.searchParams.get("scope") as "global" | "local") ||
+    "global";
 
-  const events = getMockEvents().filter(
-    (e) => scope === "global" || e.source !== undefined
-  );
-
+  const events = await getEvents(scope);
   return NextResponse.json({ events, scope });
 }
