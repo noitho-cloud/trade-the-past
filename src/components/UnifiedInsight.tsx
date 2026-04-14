@@ -36,23 +36,47 @@ function consolidateReactions(matches: HistoricalMatch[]): ConsolidatedAsset[] {
 export { consolidateReactions };
 export type { ConsolidatedAsset };
 
-function buildTakeaway(matches: HistoricalMatch[]): string {
+function formatPct(value: number): string {
+  const prefix = value > 0 ? "+" : "";
+  return `${prefix}${value.toFixed(1)}%`;
+}
+
+function buildTakeaway(
+  matches: HistoricalMatch[],
+  consolidated: ConsolidatedAsset[]
+): string {
   if (matches.length === 1) {
     return matches[0].insight;
   }
 
-  const directions = new Set(
-    matches.flatMap((m) => m.reactions.map((r) => r.direction))
-  );
-  const dominantDirection =
-    directions.size === 1 ? [...directions][0] : "mixed";
-
-  if (dominantDirection === "up") {
-    return "Historical precedents suggest a broadly positive market reaction to this type of event.";
-  } else if (dominantDirection === "down") {
-    return "Historical precedents suggest a broadly negative market reaction to this type of event.";
+  if (consolidated.length === 0) {
+    return "Historical data is limited for this type of event.";
   }
-  return "Historical precedents show mixed market reactions, with different asset classes moving in different directions.";
+
+  const upAssets = consolidated.filter((a) => a.week1Pct > 0);
+  const downAssets = consolidated.filter((a) => a.week1Pct < 0);
+
+  if (upAssets.length > 0 && downAssets.length === 0) {
+    const top = upAssets.reduce((best, a) =>
+      a.week1Pct > best.week1Pct ? a : best
+    );
+    return `Historical parallels suggest bullish momentum \u2014 ${top.asset} averaged ${formatPct(top.week1Pct)} over one week in similar past events.`;
+  }
+
+  if (downAssets.length > 0 && upAssets.length === 0) {
+    const worst = downAssets.reduce((best, a) =>
+      a.week1Pct < best.week1Pct ? a : best
+    );
+    return `Historical parallels suggest bearish pressure \u2014 ${worst.asset} averaged ${formatPct(worst.week1Pct)} over one week in similar past events.`;
+  }
+
+  const topUp = upAssets.reduce((best, a) =>
+    a.week1Pct > best.week1Pct ? a : best
+  );
+  const topDown = downAssets.reduce((best, a) =>
+    a.week1Pct < best.week1Pct ? a : best
+  );
+  return `Mixed signals \u2014 ${topUp.asset} tended up (${formatPct(topUp.week1Pct)} wk1) while ${topDown.asset} dropped (${formatPct(topDown.week1Pct)} wk1).`;
 }
 
 function hasContradictoryReactions(matches: HistoricalMatch[]): boolean {
@@ -136,7 +160,8 @@ function PerMatchReactionTables({ matches }: { matches: HistoricalMatch[] }) {
 export function UnifiedInsight({ matches }: { matches: HistoricalMatch[] }) {
   if (matches.length === 0) return null;
 
-  const takeaway = buildTakeaway(matches);
+  const consolidated = consolidateReactions(matches);
+  const takeaway = buildTakeaway(matches, consolidated);
   const showPerMatch = hasContradictoryReactions(matches);
 
   return (
