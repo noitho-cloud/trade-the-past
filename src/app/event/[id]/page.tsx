@@ -3,8 +3,7 @@ import { notFound } from "next/navigation";
 import type { MarketEvent } from "@/lib/types";
 import type { Metadata } from "next";
 import { EventTypeBadge } from "@/components/EventTypeBadge";
-import { MarketReactionTable } from "@/components/MarketReactionTable";
-import { CTAButton } from "@/components/CTAButton";
+import { UnifiedInsight } from "@/components/UnifiedInsight";
 import { EventHeroImage } from "@/components/EventHeroImage";
 
 export const dynamic = "force-dynamic";
@@ -92,59 +91,15 @@ export default async function EventDetail({
         </div>
       </header>
 
-      {event.historicalMatches.length > 0 && (
-        <section className="space-y-8">
-          <div className="flex items-center gap-4">
-            <h2 className="font-serif text-xl font-semibold whitespace-nowrap">
-              Similar Past Events
-            </h2>
-            <div className="h-px flex-1 bg-border" />
-          </div>
-
-          {event.historicalMatches.map((match) => (
-            <div
-              key={`${match.year}-${match.description.slice(0, 30)}`}
-              className="space-y-4 pb-8 border-b border-border last:border-0 last:pb-0"
-            >
-              <div>
-                <h3 className="font-medium text-[15px] leading-snug">
-                  {match.description}
-                </h3>
-                <span className="text-sm text-muted">{match.year}</span>
-              </div>
-
-              <blockquote className="border-l-2 border-foreground/15 pl-4 text-sm text-muted italic leading-relaxed">
-                {match.whySimilar}
-              </blockquote>
-
-              <div className="bg-card border border-card-border rounded-lg overflow-hidden">
-                <div className="px-4 py-2 border-b border-card-border bg-foreground/[0.02]">
-                  <span className="text-xs font-semibold tracking-wide uppercase text-muted">
-                    Market Reaction
-                  </span>
-                </div>
-                <MarketReactionTable reactions={match.reactions} />
-              </div>
-
-              <p className="text-sm leading-relaxed text-foreground/75 bg-foreground/[0.02] rounded-lg px-4 py-3">
-                {match.insight}
-              </p>
-            </div>
-          ))}
-        </section>
-      )}
-
-      {event.historicalMatches.length === 0 && (
+      {event.historicalMatches.length > 0 ? (
+        <UnifiedInsight matches={event.historicalMatches} />
+      ) : (
         <section className="rounded-lg border border-card-border bg-card px-6 py-8 text-center">
           <p className="text-sm text-muted">
             Historical analysis is being generated. Check back shortly.
           </p>
         </section>
       )}
-
-      <div className="pt-2 pb-4">
-        <CTAButton eventType={event.type} />
-      </div>
     </article>
   );
 }
