@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import type { MarketEventSummary } from "@/lib/types";
@@ -335,7 +336,7 @@ function EventImage({
   }
 
   return (
-    <img
+    <Image
       src={url}
       alt=""
       width={64}

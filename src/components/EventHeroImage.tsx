@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import type { EventType } from "@/lib/types";
 import { EventImagePlaceholder } from "./EventImagePlaceholder";
 
@@ -23,11 +24,12 @@ export function EventHeroImage({
   }
 
   return (
-    <img
+    <Image
       src={url}
       alt=""
       width={672}
       height={192}
+      priority
       className="w-full h-48 object-cover rounded-xl"
       onError={() => setFailed(true)}
     />
