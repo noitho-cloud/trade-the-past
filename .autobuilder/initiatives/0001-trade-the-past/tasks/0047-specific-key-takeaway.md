@@ -6,7 +6,7 @@ deps: [trade-the-past-structure-historical-matches]
 split: false
 depth: 1
 planned: true
-executed: false
+executed: true
 ---
 
 ## Problem statement
