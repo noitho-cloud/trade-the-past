@@ -27,7 +27,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <ThemeProvider>
           <header className="bg-[var(--header-bg)] sticky top-0 z-10">
-            <div className="max-w-2xl mx-auto px-6 h-14 flex items-center justify-between">
+            <div className="max-w-[720px] mx-auto px-6 h-14 flex items-center justify-between">
               <Suspense
                 fallback={
                   <span className="text-lg font-bold tracking-tight text-[var(--header-text)]">Trade the Past</span>
@@ -43,11 +43,11 @@ export default function RootLayout({
           </header>
 
           <main className="flex-1">
-            <div className="max-w-2xl mx-auto px-6 py-8">{children}</div>
+            <div className="max-w-[720px] mx-auto px-6 py-8">{children}</div>
           </main>
 
           <footer className="border-t border-border mt-auto">
-            <div className="max-w-2xl mx-auto px-6 py-8 space-y-5">
+            <div className="max-w-[720px] mx-auto px-6 py-8 space-y-5">
               <span className="text-sm font-bold tracking-tight text-foreground/40">
                 Trade the Past
               </span>
