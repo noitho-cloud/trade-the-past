@@ -498,15 +498,21 @@ export function getMockEvents(
     ? MOCK_EVENTS.filter((e) => e.scope === scope)
     : MOCK_EVENTS;
 
-  return filtered.map(({ id, title, type, date, summary, imageUrl, source }) => ({
-    id,
-    title,
-    type,
-    date,
-    summary,
-    imageUrl,
-    source,
-  }));
+  return filtered.map(({ id, title, type, date, summary, imageUrl, source, historicalMatches }) => {
+    const firstReaction = historicalMatches?.[0]?.reactions?.[0];
+    return {
+      id,
+      title,
+      type,
+      date,
+      summary,
+      imageUrl,
+      source,
+      keyReaction: firstReaction
+        ? { asset: firstReaction.asset, direction: firstReaction.direction, day1Pct: firstReaction.day1Pct }
+        : null,
+    };
+  });
 }
 
 export function getMockEventById(id: string): MarketEvent | undefined {

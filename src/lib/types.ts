@@ -37,6 +37,12 @@ export interface MarketEvent {
   historicalMatches: HistoricalMatch[];
 }
 
+export interface KeyReaction {
+  asset: string;
+  direction: "up" | "down";
+  day1Pct: number;
+}
+
 export interface MarketEventSummary {
   id: string;
   title: string;
@@ -45,4 +51,5 @@ export interface MarketEventSummary {
   summary: string;
   imageUrl: string | null;
   source: string;
+  keyReaction: KeyReaction | null;
 }

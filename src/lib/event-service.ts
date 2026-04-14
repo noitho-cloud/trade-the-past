@@ -62,6 +62,7 @@ export async function getEvents(
       summary: e.summary || e.title,
       imageUrl: e.imageUrl,
       source: e.source,
+      keyReaction: null,
     }));
 
     setCache(cacheKey, summaries, eventsCache);

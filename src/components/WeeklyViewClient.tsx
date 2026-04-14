@@ -199,6 +199,20 @@ export function WeeklyViewClient({
                         <span className="text-xs text-muted">
                           {event.source}
                         </span>
+                        {event.keyReaction && (
+                          <span
+                            className={`text-[11px] font-medium ml-auto ${
+                              event.keyReaction.direction === "up"
+                                ? "text-emerald-600"
+                                : "text-red-500"
+                            }`}
+                          >
+                            {event.keyReaction.direction === "up" ? "\u25B2" : "\u25BC"}{" "}
+                            {event.keyReaction.asset}{" "}
+                            {event.keyReaction.day1Pct > 0 ? "+" : ""}
+                            {event.keyReaction.day1Pct.toFixed(1)}%
+                          </span>
+                        )}
                       </div>
                     </div>
 
