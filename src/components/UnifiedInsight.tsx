@@ -123,7 +123,7 @@ function MatchBlock({ match }: { match: HistoricalMatch }) {
 function ConsolidatedReactionTable({ matches }: { matches: HistoricalMatch[] }) {
   const consolidatedReactions = consolidateReactions(matches);
   return (
-    <div className="bg-card rounded-[16px] shadow-[var(--card-shadow)] overflow-hidden">
+    <div className="bg-card rounded-[16px] border border-[var(--card-border)] shadow-[var(--card-shadow)] overflow-hidden">
       <div className="px-4 py-2.5 border-b border-[var(--gray-border)] bg-background">
         <span className="text-xs font-semibold tracking-wide uppercase text-muted">
           Consolidated Market Reaction
@@ -140,7 +140,7 @@ function PerMatchReactionTables({ matches }: { matches: HistoricalMatch[] }) {
       {matches.map((match) => (
         <div
           key={`${match.year}-${match.description.slice(0, 20)}`}
-          className="bg-card rounded-[16px] shadow-[var(--card-shadow)] overflow-hidden"
+          className="bg-card rounded-[16px] border border-[var(--card-border)] shadow-[var(--card-shadow)] overflow-hidden"
         >
           <div className="px-4 py-2.5 border-b border-[var(--gray-border)] bg-background">
             <span className="text-xs font-semibold tracking-wide uppercase text-muted">

@@ -224,7 +224,7 @@ export function WeeklyViewClient({
                 <Link
                   key={event.id}
                   href={`/event/${event.id}${scope === "local" ? "?from_scope=local" : ""}`}
-                  className={`card-enter group block rounded-[16px] transition-all duration-200 ease-out shadow-[var(--card-shadow)] focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:outline-none
+                  className={`card-enter group block rounded-[16px] border border-[var(--card-border)] transition-all duration-200 ease-out shadow-[var(--card-shadow)] focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:outline-none
                     ${
                       today
                         ? "bg-card border-l-[3px] border-l-[var(--etoro-green)] hover:shadow-[var(--card-shadow-hover)] hover:-translate-y-0.5"

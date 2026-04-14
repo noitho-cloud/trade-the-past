@@ -98,4 +98,14 @@ describe("Task 0013 — Interactive states", () => {
       expect(cardLink!.className).toContain("focus-visible:outline-none");
     });
   });
+
+  describe("Task 0059 — Card border definition", () => {
+    it("event card links have border class for visual definition", () => {
+      render(<WeeklyViewClient initialEvents={mockEvents} />);
+      const links = screen.getAllByRole("link");
+      const cardLink = links.find((l) => l.getAttribute("href")?.startsWith("/event/"));
+      expect(cardLink).toBeDefined();
+      expect(cardLink!.className).toContain("border");
+    });
+  });
 });

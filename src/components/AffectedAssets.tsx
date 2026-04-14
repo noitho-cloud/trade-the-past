@@ -83,7 +83,7 @@ function EtoroLabel() {
 
 function AssetCard({ asset }: { asset: ConsolidatedAsset }) {
   return (
-    <div className="rounded-[16px] bg-card p-[var(--space-xl)] flex flex-col gap-3 shadow-[var(--card-shadow)]">
+    <div className="rounded-[16px] bg-card border border-[var(--card-border)] p-[var(--space-xl)] flex flex-col gap-3 shadow-[var(--card-shadow)]">
       <div className="flex items-start justify-between gap-2">
         <div>
           <h3 className="font-medium text-[15px] leading-snug">

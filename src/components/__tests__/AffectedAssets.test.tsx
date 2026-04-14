@@ -82,4 +82,14 @@ describe("AffectedAssets", () => {
       expect(el.className).toContain("min-h-[48px]");
     }
   });
+
+  it("asset cards have border class for dark mode definition", () => {
+    render(<AffectedAssets matches={matches} />);
+    const headings = screen.getAllByText(/S&P 500|Gold|EUR\/USD/);
+    for (const heading of headings) {
+      const card = heading.closest("[class*='rounded-[16px]']");
+      expect(card, "Card wrapper should exist").toBeTruthy();
+      expect(card!.className).toContain("border");
+    }
+  });
 });
