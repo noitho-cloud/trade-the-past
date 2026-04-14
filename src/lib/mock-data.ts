@@ -1,4 +1,5 @@
 import { MarketEvent, MarketEventSummary } from "./types";
+import { filterTradeableReactions } from "./etoro-slugs";
 
 function getDateString(daysAgo: number): string {
   const d = new Date();
@@ -29,16 +30,16 @@ export const MOCK_EVENTS: MarketEvent[] = [
         reactions: [
           { asset: "S&P 500", direction: "up", day1Pct: 1.1, week1Pct: 2.3 },
           {
-            asset: "10Y Treasury",
-            direction: "down",
-            day1Pct: -0.8,
-            week1Pct: -1.5,
+            asset: "Gold",
+            direction: "up",
+            day1Pct: 0.9,
+            week1Pct: 1.8,
           },
           {
-            asset: "USD Index",
-            direction: "down",
-            day1Pct: -0.4,
-            week1Pct: -1.2,
+            asset: "EUR/USD",
+            direction: "up",
+            day1Pct: 0.4,
+            week1Pct: 1.2,
           },
         ],
       },
@@ -113,7 +114,7 @@ export const MOCK_EVENTS: MarketEvent[] = [
           "European tech stocks dipped initially after GDPR but recovered within two weeks as compliance fears proved overblown for large-cap names.",
         reactions: [
           {
-            asset: "STOXX 600 Tech",
+            asset: "Euro STOXX 50",
             direction: "down",
             day1Pct: -1.4,
             week1Pct: -0.3,
@@ -204,22 +205,22 @@ export const MOCK_EVENTS: MarketEvent[] = [
           "Rare earth prices surged 300% in the months following the 2010 restrictions, benefiting alternative mining companies.",
         reactions: [
           {
-            asset: "Lynas Rare Earths",
-            direction: "up",
-            day1Pct: 8.5,
-            week1Pct: 22.3,
+            asset: "Nvidia",
+            direction: "down",
+            day1Pct: -4.2,
+            week1Pct: -6.8,
           },
           {
-            asset: "Toyota Motor",
+            asset: "Tesla",
             direction: "down",
             day1Pct: -3.1,
             week1Pct: -5.7,
           },
           {
-            asset: "USD/CNY",
+            asset: "Gold",
             direction: "up",
-            day1Pct: 0.3,
-            week1Pct: 0.8,
+            day1Pct: 1.5,
+            week1Pct: 3.2,
           },
         ],
       },
@@ -253,7 +254,7 @@ export const MOCK_EVENTS: MarketEvent[] = [
             week1Pct: -5.2,
           },
           {
-            asset: "Euro STOXX Banks",
+            asset: "Euro STOXX 50",
             direction: "down",
             day1Pct: -1.1,
             week1Pct: -2.0,
@@ -295,7 +296,7 @@ export const MOCK_EVENTS: MarketEvent[] = [
             week1Pct: 5.6,
           },
           {
-            asset: "Airlines ETF (JETS)",
+            asset: "S&P 500",
             direction: "down",
             day1Pct: -1.9,
             week1Pct: -3.4,
@@ -318,7 +319,7 @@ export const MOCK_EVENTS: MarketEvent[] = [
             week1Pct: -19.8,
           },
           {
-            asset: "S&P 500 Energy",
+            asset: "ExxonMobil",
             direction: "down",
             day1Pct: -18.2,
             week1Pct: -15.3,
@@ -402,10 +403,10 @@ export const MOCK_EVENTS: MarketEvent[] = [
             week1Pct: -0.8,
           },
           {
-            asset: "UK 10Y Gilt",
-            direction: "down",
-            day1Pct: -0.5,
-            week1Pct: -1.1,
+            asset: "Gold",
+            direction: "up",
+            day1Pct: 0.5,
+            week1Pct: 1.1,
           },
         ],
       },
@@ -480,7 +481,7 @@ export const MOCK_EVENTS: MarketEvent[] = [
             week1Pct: 1.0,
           },
           {
-            asset: "European Natural Gas",
+            asset: "Natural Gas",
             direction: "up",
             day1Pct: 1.8,
             week1Pct: 3.5,
@@ -500,7 +501,9 @@ export function getMockEvents(
 
   return filtered
     .map(({ id, title, type, date, summary, imageUrl, source, historicalMatches }) => {
-      const firstReaction = historicalMatches?.[0]?.reactions?.[0];
+      const allReactions = historicalMatches?.flatMap((m) => m.reactions) ?? [];
+      const tradeableReactions = filterTradeableReactions(allReactions);
+      const firstReaction = tradeableReactions[0] ?? null;
       return {
         id,
         title,

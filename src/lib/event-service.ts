@@ -6,7 +6,15 @@ import {
 } from "./event-classifier";
 import { getMockEvents, getMockEventById } from "./mock-data";
 import { getHistoricalMatches } from "./historical-service";
-import type { MarketEvent, MarketEventSummary } from "./types";
+import { filterTradeableReactions } from "./etoro-slugs";
+import type { MarketEvent, MarketEventSummary, HistoricalMatch } from "./types";
+
+function filterMatchReactions(matches: HistoricalMatch[]): HistoricalMatch[] {
+  return matches.map((m) => ({
+    ...m,
+    reactions: filterTradeableReactions(m.reactions),
+  }));
+}
 
 interface CacheEntry<T> {
   data: T;
@@ -88,7 +96,7 @@ export async function getEventById(
       const detail = classified?.find((c) => c.title === summary.title);
       const eventSummary = detail?.summary || summary.title;
 
-      const historicalMatches = await getHistoricalMatches(
+      const rawMatches = await getHistoricalMatches(
         summary.title,
         summary.type,
         eventSummary,
@@ -99,11 +107,16 @@ export async function getEventById(
         ...summary,
         summary: eventSummary,
         scope,
-        historicalMatches,
+        historicalMatches: filterMatchReactions(rawMatches),
       };
     }
     return undefined;
   }
 
-  return getMockEventById(id);
+  const mockEvent = getMockEventById(id);
+  if (!mockEvent) return undefined;
+  return {
+    ...mockEvent,
+    historicalMatches: filterMatchReactions(mockEvent.historicalMatches),
+  };
 }

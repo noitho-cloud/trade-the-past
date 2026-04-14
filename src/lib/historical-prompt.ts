@@ -20,7 +20,8 @@ export function buildHistoricalMatchPrompt(
 
 RULES:
 - Only reference real, well-documented historical events
-- Use real asset names (stock tickers, indices, commodities) that were actually affected
+- ONLY include assets that are tradeable on eToro. Allowed types: US/EU stocks, major ETFs, major indices (S&P 500, FTSE 100, DAX, CAC 40, Euro STOXX 50), commodities (Gold, Oil, Brent Crude, Natural Gas), crypto (Bitcoin, Ethereum), major forex pairs (EUR/USD, GBP/USD, USD/JPY)
+- DO NOT include: bonds (10Y Treasury, UK Gilt), sector sub-indices (S&P 500 Energy, STOXX 600 Tech, Euro STOXX Banks), USD Index, or stocks not available on eToro (e.g. Japanese or Australian stocks)
 - Provide plausible Day 1 and Week 1 percentage changes based on historical records
 - Keep percentages realistic (most single-day moves are under 5% for indices)
 - Write concise, factual descriptions without speculation
@@ -36,7 +37,7 @@ Respond with valid JSON matching this exact schema:
       "insight": "One key takeaway about the market reaction (1-2 sentences)",
       "reactions": [
         {
-          "asset": "Asset name (e.g. S&P 500, TSLA, Gold, Brent Crude)",
+          "asset": "Asset name (e.g. S&P 500, Tesla, Gold, Brent Crude, Meta, Microsoft, Nvidia, EUR/USD)",
           "direction": "up" or "down",
           "day1Pct": 1.5,
           "week1Pct": 3.2

@@ -1,40 +1,46 @@
 const ASSET_TO_SLUG: Record<string, string> = {
   "S&P 500": "spx500",
-  "S&P 500 Energy": "spx500",
-  "10Y Treasury": "us10y",
-  "USD Index": "usdollar",
   Gold: "gold",
+  Oil: "oil",
+  "Brent Crude": "oil",
+  "Natural Gas": "naturalgas",
   TSLA: "tsla",
   Tesla: "tsla",
   "ARKK ETF": "arkk",
-  "STOXX 600 Tech": "eustx50",
   "Meta (Facebook)": "meta",
+  Meta: "meta",
   Microsoft: "msft",
   BP: "bp.l",
-  "Brent Crude": "oil",
   "iShares Clean Energy ETF": "icln",
   GE: "ge",
-  "Lynas Rare Earths": "lnas.au",
-  "Toyota Motor": "tm",
-  "USD/CNY": "usdcny",
   "Alphabet (Google)": "googl",
   Amazon: "amzn",
   Salesforce: "crm",
   "FTSE 100": "uk100",
   "GBP/USD": "gbpusd",
-  "UK 10Y Gilt": "uk10y",
+  "EUR/USD": "eurusd",
   Volkswagen: "vow3.de",
   DAX: "gdaxi",
   "Deutsche Bank": "dbk.de",
-  "Euro STOXX Banks": "eustx50",
   TotalEnergies: "tte.pa",
   "CAC 40": "fchi",
-  "European Natural Gas": "naturalgas",
+  "Euro STOXX 50": "eustx50",
   ExxonMobil: "xom",
-  "Airlines ETF (JETS)": "jets",
+  Bitcoin: "btc",
+  Ethereum: "eth",
+  Apple: "aapl",
+  Nvidia: "nvda",
+  "USD/JPY": "usdjpy",
+  Netflix: "nflx",
+  Chevron: "cvx",
+  Shell: "shel.l",
 };
 
 const ETORO_BASE = "https://www.etoro.com";
+
+export function isEtoroTradeable(assetName: string): boolean {
+  return assetName in ASSET_TO_SLUG;
+}
 
 export function getEtoroTradeUrl(assetName: string): string {
   const slug = ASSET_TO_SLUG[assetName];
@@ -45,4 +51,17 @@ export function getEtoroTradeUrl(assetName: string): string {
 
 export function getEtoroWatchlistUrl(): string {
   return `${ETORO_BASE}/watchlists`;
+}
+
+export interface MarketReactionLike {
+  asset: string;
+  direction: "up" | "down";
+  day1Pct: number;
+  week1Pct: number;
+}
+
+export function filterTradeableReactions<T extends MarketReactionLike>(
+  reactions: T[]
+): T[] {
+  return reactions.filter((r) => isEtoroTradeable(r.asset));
 }
