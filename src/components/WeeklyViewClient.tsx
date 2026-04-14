@@ -46,6 +46,45 @@ function isToday(dateStr: string): boolean {
   return dateStr === today;
 }
 
+function getWeekDates(): string[] {
+  const dates: string[] = [];
+  const now = new Date();
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    dates.push(`${yyyy}-${mm}-${dd}`);
+  }
+  return dates;
+}
+
+function EmptyDaySlot({ dateStr }: { dateStr: string }) {
+  const { weekday, display } = formatDate(dateStr);
+  return (
+    <div className="rounded-[16px] bg-card/50 border border-[var(--gray-border)]">
+      <div className="flex items-stretch">
+        <div className="w-20 shrink-0 flex flex-col items-center justify-center border-r border-[var(--gray-border)] py-4 opacity-50">
+          <span className="text-[11px] font-medium tracking-wide uppercase text-muted">
+            {weekday.slice(0, 3)}
+          </span>
+          <span className="text-lg font-semibold mt-0.5">
+            {display.split(" ")[1]}
+          </span>
+          <span className="text-[10px] text-muted uppercase tracking-wider">
+            {display.split(" ")[0]}
+          </span>
+        </div>
+        <div className="flex-1 p-4 flex items-center">
+          <span className="text-sm text-muted/70 italic">
+            No notable local event
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function WeeklyViewClient({
   initialEvents,
 }: {
@@ -170,103 +209,111 @@ export function WeeklyViewClient({
             onSwitchToGlobal={() => handleScopeChange("global")}
           />
         ) : (
-          events.map((event, index) => {
-            const { weekday, display } = formatDate(event.date);
-            const today = isToday(event.date);
+          (() => {
+            const eventsByDate = new Map(events.map((e) => [e.date, e]));
+            const dates = scope === "local" ? getWeekDates() : events.map((e) => e.date);
+            return dates.map((dateStr, index) => {
+              const event = eventsByDate.get(dateStr);
+              if (!event) {
+                return <EmptyDaySlot key={`empty-${dateStr}`} dateStr={dateStr} />;
+              }
+              const { weekday, display } = formatDate(event.date);
+              const today = isToday(event.date);
 
-            return (
-              <Link
-                key={event.id}
-                href={`/event/${event.id}${scope === "local" ? "?from_scope=local" : ""}`}
-                className={`card-enter group block rounded-[16px] transition-all duration-200 ease-out shadow-[var(--card-shadow)]
-                  ${
-                    today
-                      ? "bg-card border-l-[3px] border-l-[var(--etoro-green)] hover:shadow-[var(--card-shadow-hover)] hover:-translate-y-0.5"
-                      : "bg-card hover:shadow-[var(--card-shadow-hover)] hover:-translate-y-0.5"
-                  }`}
-                style={{ animationDelay: `${index * 60}ms` }}
-              >
-                <div className="flex items-stretch">
-                  <div className="w-20 shrink-0 flex flex-col items-center justify-center border-r border-[var(--gray-border)] py-4">
-                    <span className="text-[11px] font-medium tracking-wide uppercase text-muted">
-                      {weekday.slice(0, 3)}
-                    </span>
-                    <span className="text-lg font-semibold mt-0.5">
-                      {display.split(" ")[1]}
-                    </span>
-                    <span className="text-[10px] text-muted uppercase tracking-wider">
-                      {display.split(" ")[0]}
-                    </span>
-                  </div>
-
-                  <div className="flex-1 p-4 flex items-start gap-4">
-                    <div className="flex-1 min-w-0">
-                      {today && (
-                        <span className="text-[10px] font-semibold tracking-wider uppercase bg-etoro-green text-white px-1.5 py-0.5 rounded-full inline-block mb-1">
-                          Today
-                        </span>
-                      )}
-                      <h3 className="font-medium leading-snug text-[15px] transition-colors">
-                        {event.title}
-                      </h3>
-                      <p className="text-xs text-muted leading-relaxed mt-1 line-clamp-2">
-                        {event.summary}
-                      </p>
-                      <div className="flex items-center gap-2 mt-2">
-                        <EventTypeBadge type={event.type} />
-                        <span className="text-xs text-muted">
-                          {event.source}
-                        </span>
-                        {event.keyReaction && (
-                          <span
-                            className={`text-[11px] font-medium ml-auto ${
-                              event.keyReaction.direction === "up"
-                                ? "text-etoro-green"
-                                : "text-etoro-red"
-                            }`}
-                          >
-                            {event.keyReaction.direction === "up" ? "\u25B2" : "\u25BC"}{" "}
-                            {event.keyReaction.asset}{" "}
-                            {event.keyReaction.day1Pct > 0 ? "+" : ""}
-                            {event.keyReaction.day1Pct.toFixed(1)}%
-                          </span>
-                        )}
-                      </div>
+              return (
+                <Link
+                  key={event.id}
+                  href={`/event/${event.id}${scope === "local" ? "?from_scope=local" : ""}`}
+                  className={`card-enter group block rounded-[16px] transition-all duration-200 ease-out shadow-[var(--card-shadow)]
+                    ${
+                      today
+                        ? "bg-card border-l-[3px] border-l-[var(--etoro-green)] hover:shadow-[var(--card-shadow-hover)] hover:-translate-y-0.5"
+                        : "bg-card hover:shadow-[var(--card-shadow-hover)] hover:-translate-y-0.5"
+                    }`}
+                  style={{ animationDelay: `${index * 60}ms` }}
+                >
+                  <div className="flex items-stretch">
+                    <div className="w-20 shrink-0 flex flex-col items-center justify-center border-r border-[var(--gray-border)] py-4">
+                      <span className="text-[11px] font-medium tracking-wide uppercase text-muted">
+                        {weekday.slice(0, 3)}
+                      </span>
+                      <span className="text-lg font-semibold mt-0.5">
+                        {display.split(" ")[1]}
+                      </span>
+                      <span className="text-[10px] text-muted uppercase tracking-wider">
+                        {display.split(" ")[0]}
+                      </span>
                     </div>
 
-                    {event.imageUrl ? (
-                      <EventImage
-                        url={event.imageUrl}
-                        type={event.type}
-                      />
-                    ) : (
-                      <EventImagePlaceholder
-                        type={event.type}
-                        className="w-16 h-16 rounded-lg shrink-0"
-                      />
-                    )}
+                    <div className="flex-1 p-4 flex items-start gap-4">
+                      <div className="flex-1 min-w-0">
+                        {today && (
+                          <span className="text-[10px] font-semibold tracking-wider uppercase bg-etoro-green text-white px-1.5 py-0.5 rounded-full inline-block mb-1">
+                            Today
+                          </span>
+                        )}
+                        <h3 className="font-medium leading-snug text-[15px] transition-colors">
+                          {event.title}
+                        </h3>
+                        <p className="text-xs text-muted leading-relaxed mt-1 line-clamp-2">
+                          {event.summary}
+                        </p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <EventTypeBadge type={event.type} />
+                          <span className="text-xs text-muted">
+                            {event.source}
+                          </span>
+                          {event.keyReaction && (
+                            <span
+                              className={`text-[11px] font-medium ml-auto ${
+                                event.keyReaction.direction === "up"
+                                  ? "text-etoro-green"
+                                  : "text-etoro-red"
+                              }`}
+                            >
+                              {event.keyReaction.direction === "up" ? "\u25B2" : "\u25BC"}{" "}
+                              {event.keyReaction.asset}{" "}
+                              {event.keyReaction.day1Pct > 0 ? "+" : ""}
+                              {event.keyReaction.day1Pct.toFixed(1)}%
+                            </span>
+                          )}
+                        </div>
+                      </div>
 
-                    <svg
-                      data-testid="card-chevron"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      className="shrink-0 self-center text-muted/50 group-hover:text-muted group-hover:translate-x-0.5 transition-all"
-                    >
-                      <path
-                        d="M6 4L10 8L6 12"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
+                      {event.imageUrl ? (
+                        <EventImage
+                          url={event.imageUrl}
+                          type={event.type}
+                        />
+                      ) : (
+                        <EventImagePlaceholder
+                          type={event.type}
+                          className="w-16 h-16 rounded-lg shrink-0"
+                        />
+                      )}
+
+                      <svg
+                        data-testid="card-chevron"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        className="shrink-0 self-center text-muted/50 group-hover:text-muted group-hover:translate-x-0.5 transition-all"
+                      >
+                        <path
+                          d="M6 4L10 8L6 12"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </div>
                   </div>
-                </div>
-              </Link>
-            );
-          })
+                </Link>
+              );
+            });
+          })()
         )}
       </div>
     </div>
