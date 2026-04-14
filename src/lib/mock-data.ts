@@ -85,10 +85,10 @@ export const MOCK_EVENTS: MarketEvent[] = [
         reactions: [
           { asset: "TSLA", direction: "up", day1Pct: 3.2, week1Pct: 7.8 },
           {
-            asset: "ARKK ETF",
+            asset: "S&P 500",
             direction: "up",
-            day1Pct: 2.1,
-            week1Pct: 5.4,
+            day1Pct: 1.4,
+            week1Pct: 3.2,
           },
         ],
       },
@@ -163,10 +163,10 @@ export const MOCK_EVENTS: MarketEvent[] = [
             week1Pct: 1.4,
           },
           {
-            asset: "iShares Clean Energy ETF",
+            asset: "Shell",
             direction: "down",
-            day1Pct: -2.3,
-            week1Pct: -4.1,
+            day1Pct: -1.5,
+            week1Pct: -2.8,
           },
         ],
       },

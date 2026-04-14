@@ -30,21 +30,13 @@ export default function RootLayout({
             <div className="max-w-2xl mx-auto px-6 h-14 flex items-center justify-between">
               <Suspense
                 fallback={
-                  <span className="text-lg font-bold tracking-tight text-[var(--header-text)]">
-                    Trade the Past
-                  </span>
+                  <span className="text-lg font-bold tracking-tight text-[var(--header-text)]">Trade the Past</span>
                 }
               >
                 <HeaderLink />
               </Suspense>
               <div className="flex items-center gap-2">
                 <ThemeToggle />
-                <span className="text-[11px] tracking-widest uppercase text-white/60 font-medium">
-                  {new Date().toLocaleDateString("en-US", {
-                    month: "short",
-                    year: "numeric",
-                  })}
-                </span>
               </div>
             </div>
             <div className="border-b border-[var(--border)]" />

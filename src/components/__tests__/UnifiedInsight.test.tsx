@@ -13,7 +13,7 @@ const singleMatch: HistoricalMatch[] = [
       "After the 2006 pause, the S&P 500 rallied 4.2% over the following month.",
     reactions: [
       { asset: "S&P 500", direction: "up", day1Pct: 1.1, week1Pct: 2.3 },
-      { asset: "10Y Treasury", direction: "down", day1Pct: -0.8, week1Pct: -1.5 },
+      { asset: "Gold", direction: "up", day1Pct: 0.9, week1Pct: 1.8 },
     ],
   },
 ];
@@ -68,16 +68,16 @@ describe("UnifiedInsight", () => {
     expect(screen.queryAllByRole("heading", { level: 2 })).toHaveLength(1);
   });
 
-  it("shows individual match blocks with year attribution", () => {
+  it("shows a unified narrative paragraph instead of separate year blocks", () => {
     render(<UnifiedInsight matches={twoMatches} />);
-    expect(screen.getByText("2006")).toBeDefined();
-    expect(screen.getByText("2019")).toBeDefined();
+    const narrative = screen.getByText(/In similar past events/);
+    expect(narrative).toBeDefined();
   });
 
   it("shows a consolidated market reaction table with all assets", () => {
     render(<UnifiedInsight matches={twoMatches} />);
+    expect(screen.getByText("Consolidated Market Reaction")).toBeDefined();
     expect(screen.getByText("S&P 500")).toBeDefined();
-    expect(screen.getByText("10Y Treasury")).toBeDefined();
     expect(screen.getByText("Gold")).toBeDefined();
   });
 
@@ -85,7 +85,6 @@ describe("UnifiedInsight", () => {
     render(<UnifiedInsight matches={singleMatch} />);
     expect(screen.getByText("What History Tells Us")).toBeDefined();
     expect(screen.getByText("S&P 500")).toBeDefined();
-    expect(screen.getByText("10Y Treasury")).toBeDefined();
   });
 
   it("deduplicates assets that appear in multiple matches", () => {
@@ -94,23 +93,15 @@ describe("UnifiedInsight", () => {
     expect(spCells).toHaveLength(1);
   });
 
-  it("shows per-match tables when matches have contradictory directions for the same asset", () => {
+  it("always shows a single consolidated table even with contradictory data", () => {
     render(<UnifiedInsight matches={contradictoryMatches} />);
     const tables = screen.getAllByRole("table");
-    expect(tables.length).toBe(2);
-    expect(screen.queryByText("Consolidated Market Reaction")).toBeNull();
-  });
-
-  it("shows separate reaction data for each contradictory match", () => {
-    render(<UnifiedInsight matches={contradictoryMatches} />);
-    const brentCells = screen.getAllByText("Brent Crude");
-    expect(brentCells.length).toBe(2);
-    const exxonCells = screen.getAllByText("ExxonMobil");
-    expect(exxonCells.length).toBe(2);
-  });
-
-  it("still shows consolidated table when matches agree on direction", () => {
-    render(<UnifiedInsight matches={twoMatches} />);
+    expect(tables.length).toBe(1);
     expect(screen.getByText("Consolidated Market Reaction")).toBeDefined();
+  });
+
+  it("shows Key Takeaway section", () => {
+    render(<UnifiedInsight matches={twoMatches} />);
+    expect(screen.getByText("Key Takeaway")).toBeDefined();
   });
 });

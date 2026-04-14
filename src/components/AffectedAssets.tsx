@@ -123,8 +123,8 @@ function AssetCard({ asset }: { asset: ConsolidatedAsset }) {
             href={getEtoroWatchlistUrl(asset.asset)}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 inline-flex items-center justify-center border border-[var(--gray-border)] bg-card text-foreground text-[16px] font-semibold min-h-[48px] px-4 rounded-[48px]
-                       hover:bg-background active:scale-[0.98] transition-all text-center focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:outline-none"
+            className="flex-1 inline-flex items-center justify-center border border-[var(--btn-secondary-border)] bg-[var(--btn-secondary-bg)] text-[var(--btn-secondary-text)] text-[16px] font-semibold min-h-[48px] px-4 rounded-[48px]
+                       hover:bg-[var(--btn-secondary-hover)] active:scale-[0.98] transition-all text-center focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:outline-none"
           >
             Watchlist
           </a>

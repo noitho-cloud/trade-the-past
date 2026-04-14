@@ -79,45 +79,47 @@ function buildTakeaway(
   return `Mixed signals \u2014 ${topUp.asset} tended up (${formatPct(topUp.week1Pct)} wk1) while ${topDown.asset} dropped (${formatPct(topDown.week1Pct)} wk1).`;
 }
 
-function hasContradictoryReactions(matches: HistoricalMatch[]): boolean {
-  if (matches.length < 2) return false;
+function buildUnifiedNarrative(matches: HistoricalMatch[]): string {
+  if (matches.length === 1) {
+    const m = matches[0];
+    return `In a similar past event \u2014 the ${m.year} ${m.description.toLowerCase()} \u2014 ${m.insight.charAt(0).toLowerCase()}${m.insight.slice(1)}`;
+  }
 
-  const assetDirections = new Map<string, Set<string>>();
+  const eventRefs = matches
+    .map((m) => `the ${m.year} ${m.description.toLowerCase()}`)
+    .join(" and ");
 
-  for (const match of matches) {
-    for (const r of match.reactions) {
-      const sign = r.day1Pct >= 0 ? "up" : "down";
-      const existing = assetDirections.get(r.asset);
-      if (existing) {
-        existing.add(sign);
-      } else {
-        assetDirections.set(r.asset, new Set([sign]));
-      }
+  const allReactions = matches.flatMap((m) => m.reactions);
+  const assetMap = new Map<string, { sum: number; count: number }>();
+  for (const r of allReactions) {
+    const existing = assetMap.get(r.asset);
+    if (existing) {
+      existing.sum += r.week1Pct;
+      existing.count++;
+    } else {
+      assetMap.set(r.asset, { sum: r.week1Pct, count: 1 });
     }
   }
 
-  for (const directions of assetDirections.values()) {
-    if (directions.size > 1) return true;
+  const assetSummaries: string[] = [];
+  for (const [asset, data] of assetMap) {
+    const avg = data.sum / data.count;
+    const dir = avg >= 0 ? "gained" : "fell";
+    const range = allReactions
+      .filter((r) => r.asset === asset)
+      .map((r) => Math.abs(r.week1Pct));
+    const min = Math.min(...range);
+    const max = Math.max(...range);
+    if (min === max) {
+      assetSummaries.push(`${asset} ${dir} ${min.toFixed(0)}\u2013${max.toFixed(0)}% in the following month`);
+    } else {
+      assetSummaries.push(`${asset} ${dir} ${min.toFixed(0)}\u2013${max.toFixed(0)}%`);
+    }
   }
-  return false;
-}
 
-function MatchBlock({ match }: { match: HistoricalMatch }) {
-  return (
-    <div className="border-l-2 border-foreground/10 pl-4 space-y-2">
-      <div>
-        <span className="text-sm font-semibold text-foreground">{match.year}</span>
-        <span className="text-sm text-muted mx-1.5">&mdash;</span>
-        <span className="text-sm text-foreground/80">{match.description}</span>
-      </div>
-      <p className="text-[14px] leading-relaxed text-foreground/70">
-        {match.whySimilar}
-      </p>
-      <p className="text-[14px] leading-relaxed text-foreground/85 font-medium">
-        {match.insight}
-      </p>
-    </div>
-  );
+  const topAssets = assetSummaries.slice(0, 3).join(", ");
+
+  return `In similar past events \u2014 ${eventRefs} \u2014 markets showed a clear pattern. ${topAssets} in the weeks that followed.`;
 }
 
 function ConsolidatedReactionTable({ matches }: { matches: HistoricalMatch[] }) {
@@ -134,35 +136,12 @@ function ConsolidatedReactionTable({ matches }: { matches: HistoricalMatch[] }) 
   );
 }
 
-function PerMatchReactionTables({ matches }: { matches: HistoricalMatch[] }) {
-  return (
-    <div className="space-y-4">
-      {matches.map((match) => (
-        <div
-          key={`${match.year}-${match.description.slice(0, 20)}`}
-          className="bg-card rounded-[16px] border border-[var(--card-border)] shadow-[var(--card-shadow)] overflow-hidden"
-        >
-          <div className="px-4 py-2.5 border-b border-[var(--gray-border)] bg-background">
-            <span className="text-xs font-semibold tracking-wide uppercase text-muted">
-              {match.year}
-            </span>
-            <span className="text-xs text-muted ml-1.5">
-              — {match.description}
-            </span>
-          </div>
-          <MarketReactionTable reactions={match.reactions} />
-        </div>
-      ))}
-    </div>
-  );
-}
-
 export function UnifiedInsight({ matches }: { matches: HistoricalMatch[] }) {
   if (matches.length === 0) return null;
 
   const consolidated = consolidateReactions(matches);
   const takeaway = buildTakeaway(matches, consolidated);
-  const showPerMatch = hasContradictoryReactions(matches);
+  const narrative = buildUnifiedNarrative(matches);
 
   return (
     <section className="space-y-6">
@@ -173,20 +152,11 @@ export function UnifiedInsight({ matches }: { matches: HistoricalMatch[] }) {
         <div className="h-px flex-1 bg-border" />
       </div>
 
-      <div className="space-y-5">
-        {matches.map((match) => (
-          <MatchBlock
-            key={`${match.year}-${match.description.slice(0, 20)}`}
-            match={match}
-          />
-        ))}
-      </div>
+      <p className="text-[15px] leading-relaxed text-foreground/85">
+        {narrative}
+      </p>
 
-      {showPerMatch ? (
-        <PerMatchReactionTables matches={matches} />
-      ) : (
-        <ConsolidatedReactionTable matches={matches} />
-      )}
+      <ConsolidatedReactionTable matches={matches} />
 
       <div className="bg-[var(--success-bg)] border-l-4 border-[var(--etoro-green)] rounded-r-lg px-5 py-4 space-y-2">
         <h3 className="text-xs font-semibold tracking-wide uppercase text-muted flex items-center gap-1.5">

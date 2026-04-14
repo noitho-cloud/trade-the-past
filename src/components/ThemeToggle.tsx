@@ -9,7 +9,10 @@ export function ThemeToggle() {
     <button
       onClick={toggleTheme}
       aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-      className="w-8 h-8 flex items-center justify-center rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:outline-none"
+      className="w-8 h-8 flex items-center justify-center rounded-full transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:outline-none"
+      style={{ color: "var(--header-icon)" }}
+      onMouseEnter={(e) => (e.currentTarget.style.color = "var(--header-icon-hover)")}
+      onMouseLeave={(e) => (e.currentTarget.style.color = "var(--header-icon)")}
     >
       {theme === "dark" ? (
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

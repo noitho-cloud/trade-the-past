@@ -39,8 +39,14 @@
   --success-bg: #E8F5E9;
   --error-bg: #FDEDEF;
   --table-stripe: #F9F9F9;
-  --header-bg: var(--navy);
-  --header-text: var(--white);
+  --header-bg: var(--white);
+  --header-text: var(--navy);
+  --header-icon: rgba(0,0,33,0.6);
+  --header-icon-hover: var(--navy);
+  --btn-secondary-bg: var(--white);
+  --btn-secondary-text: var(--text-dark);
+  --btn-secondary-border: var(--gray-border);
+  --btn-secondary-hover: var(--gray-bg);
 
   --badge-text-rates: #0EB12E;
   --badge-text-earnings: #B45309;
@@ -69,6 +75,12 @@
   --text-dark: #FFFFFF;
   --header-bg: #000021;
   --header-text: #FFFFFF;
+  --header-icon: rgba(255,255,255,0.6);
+  --header-icon-hover: #FFFFFF;
+  --btn-secondary-bg: transparent;
+  --btn-secondary-text: #FFFFFF;
+  --btn-secondary-border: #2A2A4E;
+  --btn-secondary-hover: rgba(255,255,255,0.05);
 
   --badge-text-rates: #0EB12E;
   --badge-text-earnings: #FBBF24;
