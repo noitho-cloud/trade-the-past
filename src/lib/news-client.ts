@@ -20,26 +20,30 @@ const COUNTRY_MAP: Record<string, string[]> = {
   local: ["gb", "de", "fr"],
 };
 
+async function fetchCountry(
+  country: string,
+  apiKey: string
+): Promise<RawArticle[]> {
+  const url = `${NEWSAPI_BASE}/top-headlines?country=${country}&category=business&pageSize=20&apiKey=${apiKey}`;
+  const res = await fetch(url, { next: { revalidate: 3600 } });
+  if (!res.ok) return [];
+  const data: NewsAPIResponse = await res.json();
+  return data.status === "ok" ? data.articles : [];
+}
+
 export async function fetchHeadlines(
   scope: "global" | "local",
   apiKey: string
 ): Promise<RawArticle[]> {
   const countries = COUNTRY_MAP[scope] || COUNTRY_MAP.global;
-  const results: RawArticle[] = [];
 
-  for (const country of countries) {
-    const url = `${NEWSAPI_BASE}/top-headlines?country=${country}&category=business&pageSize=20&apiKey=${apiKey}`;
-    try {
-      const res = await fetch(url, { next: { revalidate: 3600 } });
-      if (!res.ok) continue;
-      const data: NewsAPIResponse = await res.json();
-      if (data.status === "ok") {
-        results.push(...data.articles);
-      }
-    } catch {
-      continue;
-    }
-  }
+  const settled = await Promise.allSettled(
+    countries.map((country) => fetchCountry(country, apiKey))
+  );
+
+  const results = settled.flatMap((r) =>
+    r.status === "fulfilled" ? r.value : []
+  );
 
   return deduplicateArticles(results);
 }
