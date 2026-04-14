@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import type { MarketEventSummary } from "@/lib/types";
 import { WeeklyViewClient } from "@/components/WeeklyViewClient";
@@ -17,5 +18,9 @@ async function fetchEvents(): Promise<MarketEventSummary[]> {
 
 export default async function WeeklyView() {
   const events = await fetchEvents();
-  return <WeeklyViewClient initialEvents={events} />;
+  return (
+    <Suspense>
+      <WeeklyViewClient initialEvents={events} />
+    </Suspense>
+  );
 }

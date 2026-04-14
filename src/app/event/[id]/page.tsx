@@ -30,10 +30,13 @@ export async function generateMetadata({
 
 export default async function EventDetail({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ from_scope?: string }>;
 }) {
   const { id } = await params;
+  const { from_scope } = await searchParams;
   const event = await fetchEvent(id);
 
   if (!event) {
@@ -44,7 +47,7 @@ export default async function EventDetail({
     <article className="space-y-10">
       <header className="space-y-4">
         <Link
-          href="/"
+          href={from_scope === "local" ? "/?scope=local" : "/"}
           className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors group"
         >
           <svg

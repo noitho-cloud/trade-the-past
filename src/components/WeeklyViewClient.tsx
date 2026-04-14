@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import type { MarketEventSummary } from "@/lib/types";
 import { EventTypeBadge } from "@/components/EventTypeBadge";
 import { EventImagePlaceholder } from "@/components/EventImagePlaceholder";
@@ -48,9 +49,11 @@ export function WeeklyViewClient({
 }: {
   initialEvents: MarketEventSummary[];
 }) {
-  const [scope, setScope] = useState<"global" | "local">("global");
+  const searchParams = useSearchParams();
+  const urlScope = searchParams.get("scope") === "local" ? "local" : "global";
+  const [scope, setScope] = useState<"global" | "local">(urlScope);
   const [events, setEvents] = useState(initialEvents);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(urlScope !== "global");
   const [error, setError] = useState<string | null>(null);
   const isFirstRender = useRef(true);
   const confirmedScope = useRef<"global" | "local">("global");
@@ -93,6 +96,13 @@ export function WeeklyViewClient({
     (newScope: "global" | "local") => {
       if (newScope === scope) return;
       setScope(newScope);
+      const url = new URL(window.location.href);
+      if (newScope === "local") {
+        url.searchParams.set("scope", "local");
+      } else {
+        url.searchParams.delete("scope");
+      }
+      window.history.replaceState({}, "", url.toString());
     },
     [scope]
   );
@@ -109,11 +119,14 @@ export function WeeklyViewClient({
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
+      if (urlScope !== "global") {
+        fetchScope(urlScope);
+      }
       return;
     }
 
     return fetchScope(scope);
-  }, [scope, fetchScope]);
+  }, [scope, fetchScope, urlScope]);
 
   return (
     <div className="space-y-6">
@@ -159,7 +172,7 @@ export function WeeklyViewClient({
             return (
               <Link
                 key={event.id}
-                href={`/event/${event.id}`}
+                href={`/event/${event.id}${scope === "local" ? "?from_scope=local" : ""}`}
                 className={`card-enter group block rounded-xl border transition-all duration-200 ease-out
                   ${
                     today
