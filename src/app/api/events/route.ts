@@ -7,5 +7,12 @@ export async function GET(request: NextRequest) {
     "global";
 
   const events = await getEvents(scope);
-  return NextResponse.json({ events, scope });
+  return NextResponse.json(
+    { events, scope },
+    {
+      headers: {
+        "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
+      },
+    }
+  );
 }

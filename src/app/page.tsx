@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     "This week's market-moving events paired with similar historical events and market reactions.",
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 async function fetchEvents(): Promise<MarketEventSummary[]> {
   const { getEvents } = await import("@/lib/event-service");

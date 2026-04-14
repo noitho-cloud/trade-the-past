@@ -7,7 +7,7 @@ import { UnifiedInsight } from "@/components/UnifiedInsight";
 import { AffectedAssets } from "@/components/AffectedAssets";
 import { EventHeroImage } from "@/components/EventHeroImage";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 async function fetchEvent(id: string): Promise<MarketEvent | undefined> {
   const { getEventById } = await import("@/lib/event-service");
