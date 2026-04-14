@@ -114,7 +114,7 @@ function AssetCard({ asset }: { asset: ConsolidatedAsset }) {
             href={getEtoroTradeUrl(asset.asset)}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 bg-[var(--etoro-green)] text-white text-[16px] font-semibold py-3 px-4 rounded-[48px]
+            className="flex-1 inline-flex items-center justify-center bg-[var(--etoro-green)] text-white text-[16px] font-semibold min-h-[48px] px-4 rounded-[48px]
                        hover:bg-[var(--etoro-green-hover)] active:scale-[0.98] transition-all text-center focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:ring-offset-2 focus-visible:outline-none"
           >
             Trade
@@ -123,7 +123,7 @@ function AssetCard({ asset }: { asset: ConsolidatedAsset }) {
             href={getEtoroWatchlistUrl(asset.asset)}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 border border-[var(--gray-border)] bg-card text-foreground text-[16px] font-semibold py-3 px-4 rounded-[48px]
+            className="flex-1 inline-flex items-center justify-center border border-[var(--gray-border)] bg-card text-foreground text-[16px] font-semibold min-h-[48px] px-4 rounded-[48px]
                        hover:bg-background active:scale-[0.98] transition-all text-center focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:outline-none"
           >
             Watchlist

@@ -73,4 +73,13 @@ describe("AffectedAssets", () => {
     expect(firstTradeLink!.getAttribute("href")).toContain("etoro.com/markets/");
     expect(firstTradeLink!.getAttribute("target")).toBe("_blank");
   });
+
+  it("Trade and Watchlist buttons have min-h-[48px] for correct eToro height", () => {
+    render(<AffectedAssets matches={matches} />);
+    const tradeLinks = screen.getAllByText("Trade");
+    const watchlistLinks = screen.getAllByText("Watchlist");
+    for (const el of [...tradeLinks, ...watchlistLinks]) {
+      expect(el.className).toContain("min-h-[48px]");
+    }
+  });
 });

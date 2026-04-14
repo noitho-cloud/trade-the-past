@@ -356,7 +356,7 @@ function EmptyState({
       {scope === "local" && (
         <button
           onClick={onSwitchToGlobal}
-          className="px-5 py-3 text-[16px] font-semibold rounded-[48px] bg-[var(--etoro-green)] text-white hover:bg-[var(--etoro-green-hover)] transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:ring-offset-2 focus-visible:outline-none"
+          className="inline-flex items-center justify-center px-5 min-h-[48px] text-[16px] font-semibold rounded-[48px] bg-[var(--etoro-green)] text-white hover:bg-[var(--etoro-green-hover)] transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:ring-offset-2 focus-visible:outline-none"
         >
           Switch to Global
         </button>
