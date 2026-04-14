@@ -1,7 +1,5 @@
-"use client";
-
-import { useState, useCallback, useEffect } from "react";
 import type { HistoricalMatch } from "@/lib/types";
+import { getEtoroTradeUrl, getEtoroWatchlistUrl } from "@/lib/etoro-slugs";
 
 interface ConsolidatedAsset {
   asset: string;
@@ -77,18 +75,20 @@ function PctDisplay({ value }: { value: number }) {
   );
 }
 
-function AssetCard({
-  asset,
-  onAction,
-}: {
-  asset: ConsolidatedAsset;
-  onAction: (action: string, assetName: string) => void;
-}) {
+function EtoroLabel() {
+  return (
+    <span className="text-[10px] text-muted tracking-wide">on eToro</span>
+  );
+}
+
+function AssetCard({ asset }: { asset: ConsolidatedAsset }) {
   return (
     <div className="rounded-lg border border-card-border bg-card p-4 flex flex-col gap-3 hover:border-foreground/15 transition-colors">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <h3 className="font-medium text-[15px] leading-snug">{asset.asset}</h3>
+          <h3 className="font-medium text-[15px] leading-snug">
+            {asset.asset}
+          </h3>
           <DirectionBadge direction={asset.direction} />
         </div>
       </div>
@@ -108,40 +108,36 @@ function AssetCard({
         </div>
       </div>
 
-      <div className="flex gap-2 pt-1">
-        <button
-          onClick={() => onAction("trade", asset.asset)}
-          className="flex-1 bg-foreground text-background text-xs font-medium py-2 px-3 rounded-md
-                     hover:bg-foreground/85 active:scale-[0.98] transition-all cursor-pointer"
-        >
-          Trade
-        </button>
-        <button
-          onClick={() => onAction("watchlist", asset.asset)}
-          className="flex-1 border border-foreground/20 text-foreground text-xs font-medium py-2 px-3 rounded-md
-                     hover:bg-foreground/5 active:scale-[0.98] transition-all cursor-pointer"
-        >
-          Watchlist
-        </button>
+      <div className="flex flex-col gap-1.5 pt-1">
+        <div className="flex gap-2">
+          <a
+            href={getEtoroTradeUrl(asset.asset)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 bg-foreground text-background text-xs font-medium py-2 px-3 rounded-md
+                       hover:bg-foreground/85 active:scale-[0.98] transition-all text-center"
+          >
+            Trade
+          </a>
+          <a
+            href={getEtoroWatchlistUrl()}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 border border-foreground/20 text-foreground text-xs font-medium py-2 px-3 rounded-md
+                       hover:bg-foreground/5 active:scale-[0.98] transition-all text-center"
+          >
+            Watchlist
+          </a>
+        </div>
+        <div className="text-center">
+          <EtoroLabel />
+        </div>
       </div>
     </div>
   );
 }
 
 export function AffectedAssets({ matches }: { matches: HistoricalMatch[] }) {
-  const [toast, setToast] = useState<string | null>(null);
-
-  const handleAction = useCallback((action: string, assetName: string) => {
-    const label = action === "trade" ? "Trading" : "Watchlist for";
-    setToast(`Coming soon — ${label} ${assetName} is not yet available.`);
-  }, []);
-
-  useEffect(() => {
-    if (!toast) return;
-    const timer = setTimeout(() => setToast(null), 3000);
-    return () => clearTimeout(timer);
-  }, [toast]);
-
   if (matches.length === 0) return null;
 
   const assets = consolidateAssets(matches);
@@ -158,15 +154,9 @@ export function AffectedAssets({ matches }: { matches: HistoricalMatch[] }) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {assets.map((asset) => (
-          <AssetCard key={asset.asset} asset={asset} onAction={handleAction} />
+          <AssetCard key={asset.asset} asset={asset} />
         ))}
       </div>
-
-      {toast && (
-        <div className="rounded-lg border border-border bg-card px-4 py-3 text-center text-sm text-muted animate-[fadeIn_200ms_ease-out]">
-          {toast}
-        </div>
-      )}
     </section>
   );
 }

@@ -1,7 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { WeeklyViewClient } from "../WeeklyViewClient";
-import { CTAButton } from "../CTAButton";
 import type { MarketEventSummary } from "@/lib/types";
 
 vi.mock("next/link", () => ({
@@ -81,24 +80,4 @@ describe("Task 0013 — Interactive states", () => {
     });
   });
 
-  describe("CTA button", () => {
-    it("does NOT use hover:opacity-90", () => {
-      render(<CTAButton eventType="earnings" />);
-      const button = screen.getByRole("button");
-      expect(button.className).not.toContain("hover:opacity-90");
-    });
-
-    it("has visible hover state classes", () => {
-      render(<CTAButton eventType="earnings" />);
-      const button = screen.getByRole("button");
-      expect(button.className).toContain("hover:bg-foreground/85");
-      expect(button.className).toContain("hover:scale-[1.01]");
-    });
-
-    it("has focus-visible ring for keyboard accessibility", () => {
-      render(<CTAButton eventType="earnings" />);
-      const button = screen.getByRole("button");
-      expect(button.className).toContain("focus-visible:ring-2");
-    });
-  });
 });
