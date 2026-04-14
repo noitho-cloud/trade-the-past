@@ -53,6 +53,41 @@ export function WeeklyViewClient({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const isFirstRender = useRef(true);
+  const confirmedScope = useRef<"global" | "local">("global");
+  const failedScope = useRef<"global" | "local" | null>(null);
+
+  const fetchScope = useCallback((targetScope: "global" | "local") => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    failedScope.current = null;
+
+    fetch(`/api/events?scope=${targetScope}`)
+      .then((r) => {
+        if (!r.ok) throw new Error("Failed to load events");
+        return r.json();
+      })
+      .then((data) => {
+        if (!cancelled) {
+          setEvents(data.events);
+          confirmedScope.current = targetScope;
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          failedScope.current = targetScope;
+          setScope(confirmedScope.current);
+          setError("Could not load events. Please try again.");
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleScopeChange = useCallback(
     (newScope: "global" | "local") => {
@@ -62,35 +97,23 @@ export function WeeklyViewClient({
     [scope]
   );
 
+  const handleRetry = useCallback(() => {
+    const target = failedScope.current ?? scope;
+    if (target !== scope) {
+      setScope(target);
+    } else {
+      fetchScope(target);
+    }
+  }, [fetchScope, scope]);
+
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
       return;
     }
 
-    let cancelled = false;
-    setLoading(true);
-    setError(null);
-
-    fetch(`/api/events?scope=${scope}`)
-      .then((r) => {
-        if (!r.ok) throw new Error("Failed to load events");
-        return r.json();
-      })
-      .then((data) => {
-        if (!cancelled) setEvents(data.events);
-      })
-      .catch((err) => {
-        if (!cancelled) setError(err.message);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [scope]);
+    return fetchScope(scope);
+  }, [scope, fetchScope]);
 
   return (
     <div className="space-y-6">
@@ -107,8 +130,14 @@ export function WeeklyViewClient({
       </div>
 
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
-          {error}
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 flex items-center justify-between gap-3">
+          <span>{error}</span>
+          <button
+            onClick={handleRetry}
+            className="shrink-0 px-3 py-1 text-xs font-medium rounded-md bg-red-100 hover:bg-red-200 transition-colors cursor-pointer"
+          >
+            Retry
+          </button>
         </div>
       )}
 
