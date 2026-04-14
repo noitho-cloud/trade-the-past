@@ -33,15 +33,8 @@ function consolidateReactions(matches: HistoricalMatch[]): ConsolidatedAsset[] {
   }));
 }
 
-function buildNarrative(matches: HistoricalMatch[]): string {
-  if (matches.length === 1) {
-    return `${matches[0].whySimilar} ${matches[0].insight}`;
-  }
-
-  const similarities = matches.map((m) => m.whySimilar).join(" ");
-  const insights = matches.map((m) => m.insight).join(" ");
-  return `${similarities} ${insights}`;
-}
+export { consolidateReactions };
+export type { ConsolidatedAsset };
 
 function buildTakeaway(matches: HistoricalMatch[]): string {
   if (matches.length === 1) {
@@ -85,6 +78,24 @@ function hasContradictoryReactions(matches: HistoricalMatch[]): boolean {
   return false;
 }
 
+function MatchBlock({ match }: { match: HistoricalMatch }) {
+  return (
+    <div className="border-l-2 border-foreground/10 pl-4 space-y-2">
+      <div>
+        <span className="text-sm font-semibold text-foreground">{match.year}</span>
+        <span className="text-sm text-muted mx-1.5">&mdash;</span>
+        <span className="text-sm text-foreground/80">{match.description}</span>
+      </div>
+      <p className="text-[14px] leading-relaxed text-foreground/70">
+        {match.whySimilar}
+      </p>
+      <p className="text-[14px] leading-relaxed text-foreground/85 font-medium">
+        {match.insight}
+      </p>
+    </div>
+  );
+}
+
 function ConsolidatedReactionTable({ matches }: { matches: HistoricalMatch[] }) {
   const consolidatedReactions = consolidateReactions(matches);
   return (
@@ -125,7 +136,6 @@ function PerMatchReactionTables({ matches }: { matches: HistoricalMatch[] }) {
 export function UnifiedInsight({ matches }: { matches: HistoricalMatch[] }) {
   if (matches.length === 0) return null;
 
-  const narrative = buildNarrative(matches);
   const takeaway = buildTakeaway(matches);
   const showPerMatch = hasContradictoryReactions(matches);
 
@@ -138,9 +148,14 @@ export function UnifiedInsight({ matches }: { matches: HistoricalMatch[] }) {
         <div className="h-px flex-1 bg-border" />
       </div>
 
-      <p className="text-[15px] leading-relaxed text-foreground/85">
-        {narrative}
-      </p>
+      <div className="space-y-5">
+        {matches.map((match) => (
+          <MatchBlock
+            key={`${match.year}-${match.description.slice(0, 20)}`}
+            match={match}
+          />
+        ))}
+      </div>
 
       {showPerMatch ? (
         <PerMatchReactionTables matches={matches} />
@@ -168,16 +183,6 @@ export function UnifiedInsight({ matches }: { matches: HistoricalMatch[] }) {
         <p className="text-sm font-medium leading-relaxed text-foreground/90">
           {takeaway}
         </p>
-      </div>
-
-      <div className="text-xs text-muted leading-relaxed">
-        <span className="font-medium">Based on: </span>
-        {matches.map((m, i) => (
-          <span key={`${m.year}-${m.description.slice(0, 20)}`}>
-            {m.description} ({m.year})
-            {i < matches.length - 1 ? ", " : ""}
-          </span>
-        ))}
       </div>
     </section>
   );
