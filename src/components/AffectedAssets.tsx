@@ -68,7 +68,7 @@ function PctDisplay({ value }: { value: number }) {
   const color = value >= 0 ? "text-[var(--etoro-green)]" : "text-[var(--red)]";
   const prefix = value > 0 ? "+" : "";
   return (
-    <span className={`text-sm font-semibold tabular-nums ${color}`}>
+    <span className={`text-sm etoro-nums ${color}`}>
       {prefix}
       {value.toFixed(1)}%
     </span>

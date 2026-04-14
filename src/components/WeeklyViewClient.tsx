@@ -265,7 +265,7 @@ export function WeeklyViewClient({
                           </span>
                           {event.keyReaction && (
                             <span
-                              className={`text-[11px] font-medium ml-auto ${
+                              className={`text-[11px] etoro-nums ml-auto ${
                                 event.keyReaction.direction === "up"
                                   ? "text-etoro-green"
                                   : "text-etoro-red"

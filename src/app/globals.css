@@ -127,6 +127,12 @@ body {
   animation: cardEnter 300ms ease-out both;
 }
 
+.etoro-nums {
+  font-stretch: 84%;
+  font-weight: 620;
+  font-variant-numeric: tabular-nums;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .card-enter {
     animation: none;

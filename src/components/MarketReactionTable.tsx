@@ -25,7 +25,7 @@ function PctCell({ value }: { value: number }) {
   const color = value >= 0 ? "text-[var(--etoro-green)]" : "text-[var(--red)]";
   const prefix = value > 0 ? "+" : "";
   return (
-    <td className={`px-4 py-2.5 text-right tabular-nums ${color}`}>
+    <td className={`px-4 py-2.5 text-right etoro-nums ${color}`}>
       {prefix}
       {value.toFixed(1)}%
     </td>
