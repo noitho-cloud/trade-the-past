@@ -135,8 +135,11 @@ export function WeeklyViewClient({
           <h2 className="font-serif text-3xl font-semibold tracking-tight">
             This Week
           </h2>
-          <p className="text-muted text-sm mt-1">
+          <p className="text-foreground/70 text-[15px] mt-1">
             One market-moving event per day, paired with history.
+          </p>
+          <p className="text-muted text-[13px] mt-1">
+            Select an event to see how markets reacted to similar moments in the past.
           </p>
         </div>
         <ScopeToggle scope={scope} onChange={handleScopeChange} />

@@ -165,6 +165,16 @@ describe("WeeklyViewClient", () => {
     expect(todayBadge.className).toContain("text-background");
   });
 
+  it("shows a prominent value proposition and interaction hint above events", () => {
+    render(<WeeklyViewClient initialEvents={mockEvents} />);
+    const tagline = screen.getByText(/one market-moving event per day/i);
+    expect(tagline).toBeInTheDocument();
+    expect(tagline.className).not.toContain("text-sm");
+
+    const hint = screen.getByText(/select an event/i);
+    expect(hint).toBeInTheDocument();
+  });
+
   it("renders today's badge as a pill (not ghost text)", () => {
     render(<WeeklyViewClient initialEvents={mockEvents} />);
     const todayBadge = screen.getByText("Today");
