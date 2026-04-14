@@ -68,12 +68,10 @@ describe("UnifiedInsight", () => {
     expect(screen.queryAllByRole("heading", { level: 2 })).toHaveLength(1);
   });
 
-  it("shows source attribution for all matches", () => {
+  it("shows individual match blocks with year attribution", () => {
     render(<UnifiedInsight matches={twoMatches} />);
-    const attribution = screen.getByText(/Based on:/).closest("div");
-    expect(attribution).toBeDefined();
-    expect(attribution!.textContent).toContain("2006");
-    expect(attribution!.textContent).toContain("2019");
+    expect(screen.getByText("2006")).toBeDefined();
+    expect(screen.getByText("2019")).toBeDefined();
   });
 
   it("shows a consolidated market reaction table with all assets", () => {

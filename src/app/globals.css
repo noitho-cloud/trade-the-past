@@ -5,6 +5,7 @@
   src: url("https://marketing.etorostatic.com/cache1/fonts/etoro/eToro-VF-v0.7.ttf") format("truetype-variations");
   font-weight: 100 900;
   font-stretch: 0% 100%;
+  font-display: swap;
 }
 
 :root {
