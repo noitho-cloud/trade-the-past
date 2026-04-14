@@ -40,13 +40,13 @@ export async function getEvents(
 
   const apiKey = process.env.NEWSAPI_KEY;
   if (!apiKey) {
-    return getMockEvents();
+    return getMockEvents(scope);
   }
 
   try {
     const articles = await fetchHeadlines(scope, apiKey);
     if (articles.length === 0) {
-      return getMockEvents();
+      return getMockEvents(scope);
     }
 
     const classified = classifyAndRank(articles);
@@ -67,7 +67,7 @@ export async function getEvents(
     setCache(`classified-${scope}`, top7, classifiedCache);
     return summaries;
   } catch {
-    return getMockEvents();
+    return getMockEvents(scope);
   }
 }
 

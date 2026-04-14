@@ -329,8 +329,14 @@ export const MOCK_EVENTS: MarketEvent[] = [
   },
 ];
 
-export function getMockEvents(): MarketEventSummary[] {
-  return MOCK_EVENTS.map(({ id, title, type, date, imageUrl, source }) => ({
+export function getMockEvents(
+  scope?: "global" | "local"
+): MarketEventSummary[] {
+  const filtered = scope
+    ? MOCK_EVENTS.filter((e) => e.scope === scope)
+    : MOCK_EVENTS;
+
+  return filtered.map(({ id, title, type, date, imageUrl, source }) => ({
     id,
     title,
     type,

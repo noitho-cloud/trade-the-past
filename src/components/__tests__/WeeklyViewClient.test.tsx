@@ -140,4 +140,53 @@ describe("WeeklyViewClient", () => {
       expect(screen.getByText("Deutsche Bank Faces Lawsuit")).toBeInTheDocument();
     });
   });
+
+  it("shows empty state when scope returns zero events", async () => {
+    const user = userEvent.setup();
+    (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ events: [], scope: "local" }),
+    });
+
+    render(<WeeklyViewClient initialEvents={mockEvents} />);
+    await user.click(screen.getByText("UK / DE / FR"));
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/no local events this week/i)
+      ).toBeInTheDocument();
+    });
+  });
+
+  it("empty state has a button to switch back to Global", async () => {
+    const user = userEvent.setup();
+    (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ events: [], scope: "local" }),
+    });
+
+    render(<WeeklyViewClient initialEvents={mockEvents} />);
+    await user.click(screen.getByText("UK / DE / FR"));
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/no local events this week/i)
+      ).toBeInTheDocument();
+    });
+
+    const switchButton = screen.getByRole("button", {
+      name: /switch to global/i,
+    });
+    expect(switchButton).toBeInTheDocument();
+
+    (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ events: mockEvents, scope: "global" }),
+    });
+
+    await user.click(switchButton);
+    await waitFor(() => {
+      expect(screen.getByText("Fed Holds Rates Steady")).toBeInTheDocument();
+    });
+  });
 });
