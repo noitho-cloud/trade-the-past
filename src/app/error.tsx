@@ -13,7 +13,7 @@ export default function Error({
       <span className="text-[11px] font-medium tracking-widest uppercase text-muted mb-4">
         Error
       </span>
-      <h2 className="font-serif text-2xl md:text-3xl font-semibold tracking-tight mb-3">
+      <h2 className="text-[24px] font-bold tracking-tight mb-3">
         Something went wrong
       </h2>
       <p className="text-sm text-muted max-w-sm mb-8 leading-relaxed">
@@ -23,8 +23,8 @@ export default function Error({
       <div className="flex items-center gap-4">
         <button
           onClick={reset}
-          className="text-sm font-medium bg-foreground text-background px-5 py-2.5 rounded-lg
-                     hover:opacity-90 active:scale-[0.99] transition-all cursor-pointer"
+          className="text-[16px] font-semibold bg-[var(--etoro-green)] text-white px-5 py-3 rounded-[48px]
+                     hover:bg-[var(--etoro-green-hover)] active:scale-[0.99] transition-all cursor-pointer"
         >
           Try again
         </button>

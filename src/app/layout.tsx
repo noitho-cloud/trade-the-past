@@ -1,20 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Geist } from "next/font/google";
-import { Playfair_Display } from "next/font/google";
 import { HeaderLink } from "@/components/HeaderLink";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
-  subsets: ["latin"],
-  weight: ["600"],
-});
 
 export const metadata: Metadata = {
   title: "Trade the Past",
@@ -28,23 +15,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${playfair.variable} h-full`}
-    >
+    <html lang="en" className="h-full">
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        <header className="border-b border-border bg-card/60 backdrop-blur-sm sticky top-0 z-10">
+        <header className="bg-navy sticky top-0 z-10">
           <div className="max-w-2xl mx-auto px-6 py-4 flex items-center justify-between">
             <Suspense
               fallback={
-                <span className="font-serif text-lg font-semibold tracking-tight">
+                <span className="text-lg font-bold tracking-tight text-white">
                   Trade the Past
                 </span>
               }
             >
               <HeaderLink />
             </Suspense>
-            <span className="text-[11px] tracking-widest uppercase text-muted font-medium">
+            <span className="text-[11px] tracking-widest uppercase text-white/60 font-medium">
               {new Date().toLocaleDateString("en-US", {
                 month: "short",
                 year: "numeric",
@@ -59,11 +43,11 @@ export default function RootLayout({
 
         <footer className="border-t border-border mt-auto">
           <div className="max-w-2xl mx-auto px-6 py-8 space-y-5">
-            <span className="font-serif text-sm font-semibold tracking-tight text-foreground/40">
+            <span className="text-sm font-bold tracking-tight text-foreground/40">
               Trade the Past
             </span>
             <div>
-              <h4 className="font-serif text-xs font-semibold tracking-wide uppercase text-muted/80 mb-1.5">
+              <h4 className="text-xs font-semibold tracking-wide uppercase text-muted mb-1.5">
                 How it works
               </h4>
               <p className="text-xs text-muted leading-relaxed">
@@ -75,7 +59,7 @@ export default function RootLayout({
               </p>
             </div>
             <div>
-              <h4 className="font-serif text-xs font-semibold tracking-wide uppercase text-muted/80 mb-1.5">
+              <h4 className="text-xs font-semibold tracking-wide uppercase text-muted mb-1.5">
                 Sources
               </h4>
               <p className="text-xs text-muted leading-relaxed">

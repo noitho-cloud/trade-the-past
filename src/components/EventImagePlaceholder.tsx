@@ -1,23 +1,23 @@
 import type { EventType } from "@/lib/types";
 
 const PLACEHOLDER_COLORS: Record<EventType, string> = {
-  earnings: "from-amber-100 to-amber-50",
-  layoffs: "from-rose-100 to-rose-50",
-  lawsuits: "from-violet-100 to-violet-50",
-  regulation: "from-blue-100 to-blue-50",
-  "interest-rates": "from-emerald-100 to-emerald-50",
-  geopolitical: "from-orange-100 to-orange-50",
-  "commodity-shocks": "from-stone-200 to-stone-100",
+  earnings: "from-[#E8F5E9] to-[#F1F8F2]",
+  layoffs: "from-[#FDEDEF] to-[#FEF6F7]",
+  lawsuits: "from-[#EDE7F6] to-[#F5F2FA]",
+  regulation: "from-[#E3F2FD] to-[#F0F7FE]",
+  "interest-rates": "from-[#E8F5E9] to-[#F1F8F2]",
+  geopolitical: "from-[#FFF3E0] to-[#FFF9F0]",
+  "commodity-shocks": "from-[#ECEFF1] to-[#F5F5F5]",
 };
 
 const HERO_COLORS: Record<EventType, string> = {
-  earnings: "from-amber-200/80 to-amber-100/50",
-  layoffs: "from-rose-200/80 to-rose-100/50",
-  lawsuits: "from-violet-200/80 to-violet-100/50",
-  regulation: "from-blue-200/80 to-blue-100/50",
-  "interest-rates": "from-emerald-200/80 to-emerald-100/50",
-  geopolitical: "from-orange-200/80 to-orange-100/50",
-  "commodity-shocks": "from-stone-300/70 to-stone-200/50",
+  earnings: "from-[#C8E6C9]/80 to-[#E8F5E9]/50",
+  layoffs: "from-[#FFCDD2]/80 to-[#FDEDEF]/50",
+  lawsuits: "from-[#D1C4E9]/80 to-[#EDE7F6]/50",
+  regulation: "from-[#BBDEFB]/80 to-[#E3F2FD]/50",
+  "interest-rates": "from-[#C8E6C9]/80 to-[#E8F5E9]/50",
+  geopolitical: "from-[#FFE0B2]/80 to-[#FFF3E0]/50",
+  "commodity-shocks": "from-[#CFD8DC]/70 to-[#ECEFF1]/50",
 };
 
 function PlaceholderIcon({ type, size }: { type: EventType; size: number }) {

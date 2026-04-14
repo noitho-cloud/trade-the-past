@@ -1,18 +1,23 @@
-## Feedback (URGENT — RESTYLE ENTIRE APP)
+## Feedback (URGENT — FULL eToro DESIGN SYSTEM ALIGNMENT)
 
-### Restyle the entire app to match the eToro design system
-- Read constraints.md for the full token reference
-- Load the eToro Variable font from CDN (see constraints.md for @font-face)
-- Replace ALL colors with eToro tokens: green #0EB12E, navy #000021, red #E31937, gray-bg #F5F5F5
-- Replace ALL buttons with eToro pill-shaped buttons (48px radius, green primary, white secondary)
-- Replace ALL cards with eToro card style (16px radius, 24px padding, subtle shadow)
-- Replace ALL badges with eToro badge style (fully round, 12px/600 weight)
-- Market data: green for gains, red for losses — use eToro green/red specifically
-- "Trade" button = green pill (eToro primary CTA style), "Watchlist" = white outlined pill
-- Page background: #F5F5F5
-- The app should look like it belongs inside the eToro platform
-- This is higher priority than any functional changes — the visual identity must match eToro
+### Restyle EVERYTHING to pixel-match eToro's design system
+- Read constraints.md carefully — it has the COMPLETE spec for every component
+- This is not a light touch-up — rebuild the CSS from scratch using eToro tokens
+- Implement ALL design tokens as CSS custom properties (--etoro-green, --navy, --gray-bg, etc.)
+- Load eToro Variable font from CDN, with eToro Numbers variant for market data
+- Every component must match:
+  - **Header:** 56px, white/navy bg, logo left, toggles right, bottom border
+  - **Cards:** 16px radius, 24px padding, eToro shadow, hover lift effect
+  - **Buttons:** Green pill (48px radius) for "Trade", white outlined pill for "Watchlist"
+  - **Badges:** Pill-shaped, color-coded per event type (see constraints.md for exact colors)
+  - **Tables:** Clean rows, subtle striping, uppercase headers, right-aligned numbers in green/red
+  - **Scope toggle:** eToro segmented control style — pill container, white active segment
+  - **Dark mode:** Full dark mode with user toggle (sun/moon icon), localStorage persistence
+  - **Responsive:** Mobile-first, 720px max-width desktop, sticky CTAs on mobile
+  - **Transitions:** 150ms ease on hovers, card lift, button press scale
+- Use CSS custom properties EVERYWHERE — no hardcoded hex in components
+- The app must look like it was built by eToro's product team
 
 ### Only show assets tradeable on eToro
-- Remove non-tradeable assets like "10Y Treasury", "USD Index"
-- Only show assets users can trade on eToro (stocks, indices, commodities, crypto, forex)
+- Remove "10Y Treasury", "USD Index", individual bonds
+- Only: stocks, indices, commodities, crypto, forex

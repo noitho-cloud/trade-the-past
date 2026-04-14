@@ -14,7 +14,7 @@ export function HeaderLink() {
 
   return (
     <Link href={href} className="group">
-      <h1 className="font-serif text-lg font-semibold tracking-tight">
+      <h1 className="text-lg font-bold tracking-tight text-white">
         Trade the Past
       </h1>
     </Link>

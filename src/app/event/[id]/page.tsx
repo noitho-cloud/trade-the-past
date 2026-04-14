@@ -83,7 +83,7 @@ export default async function EventDetail({
             </span>
           </div>
 
-          <h1 className="font-serif text-[28px] md:text-[32px] font-semibold leading-[1.2] tracking-tight">
+          <h1 className="text-[24px] md:text-[28px] font-bold leading-[1.2] tracking-tight">
             {event.title}
           </h1>
 
@@ -101,7 +101,7 @@ export default async function EventDetail({
           <AffectedAssets matches={event.historicalMatches} />
         </>
       ) : (
-        <section className="rounded-lg border border-card-border bg-card px-6 py-8 text-center">
+        <section className="rounded-[16px] bg-white shadow-[0_0_13px_rgba(0,0,0,0.08)] px-[var(--space-xl)] py-8 text-center">
           <p className="text-sm text-muted">
             Historical analysis is being generated. Check back shortly.
           </p>

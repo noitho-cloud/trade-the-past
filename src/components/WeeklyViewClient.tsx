@@ -11,9 +11,9 @@ import { ScopeToggle } from "@/components/ScopeToggle";
 
 function EventCardSkeleton() {
   return (
-    <div className="rounded-xl border border-card-border bg-card animate-pulse">
+    <div className="rounded-[16px] bg-white shadow-[0_0_13px_rgba(0,0,0,0.08)] animate-pulse">
       <div className="flex items-stretch">
-        <div className="w-20 shrink-0 border-r border-card-border py-4 flex flex-col items-center justify-center">
+        <div className="w-20 shrink-0 border-r border-[var(--gray-border)] py-4 flex flex-col items-center justify-center">
           <div className="h-3 w-8 bg-foreground/5 rounded" />
           <div className="h-5 w-6 bg-foreground/5 rounded mt-1" />
           <div className="h-2 w-8 bg-foreground/5 rounded mt-1" />
@@ -133,7 +133,7 @@ export function WeeklyViewClient({
     <div className="space-y-6">
       <div className="flex items-end justify-between gap-4">
         <div>
-          <h2 className="font-serif text-3xl font-semibold tracking-tight">
+          <h2 className="text-[24px] font-bold tracking-tight">
             This Week
           </h2>
           <p className="text-foreground/70 text-[15px] mt-1">
@@ -147,11 +147,11 @@ export function WeeklyViewClient({
       </div>
 
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 flex items-center justify-between gap-3">
+        <div className="rounded-[16px] border border-[var(--gray-border)] bg-[#FDEDEF] px-4 py-3 text-sm text-[var(--red)] flex items-center justify-between gap-3">
           <span>{error}</span>
           <button
             onClick={handleRetry}
-            className="shrink-0 px-3 py-1 text-xs font-medium rounded-md bg-red-100 hover:bg-red-200 transition-colors cursor-pointer"
+            className="shrink-0 px-3 py-1.5 text-xs font-semibold rounded-full bg-white border border-[var(--gray-border)] hover:bg-[var(--gray-bg)] transition-colors cursor-pointer text-[var(--text-dark)]"
           >
             Retry
           </button>
@@ -177,20 +177,20 @@ export function WeeklyViewClient({
               <Link
                 key={event.id}
                 href={`/event/${event.id}${scope === "local" ? "?from_scope=local" : ""}`}
-                className={`card-enter group block rounded-xl border transition-all duration-200 ease-out
+                className={`card-enter group block rounded-[16px] transition-all duration-200 ease-out shadow-[0_0_13px_rgba(0,0,0,0.08)]
                   ${
                     today
-                      ? "bg-card border-foreground/15 border-l-[3px] border-l-foreground shadow-sm hover:shadow-md hover:-translate-y-0.5"
-                      : "bg-card border-card-border hover:border-foreground/15 hover:shadow-md hover:-translate-y-0.5"
+                      ? "bg-white border-l-[3px] border-l-[var(--etoro-green)] hover:shadow-[0_0_20px_rgba(0,0,0,0.12)] hover:-translate-y-0.5"
+                      : "bg-white hover:shadow-[0_0_20px_rgba(0,0,0,0.12)] hover:-translate-y-0.5"
                   }`}
                 style={{ animationDelay: `${index * 60}ms` }}
               >
                 <div className="flex items-stretch">
-                  <div className="w-20 shrink-0 flex flex-col items-center justify-center border-r border-card-border py-4">
+                  <div className="w-20 shrink-0 flex flex-col items-center justify-center border-r border-[var(--gray-border)] py-4">
                     <span className="text-[11px] font-medium tracking-wide uppercase text-muted">
                       {weekday.slice(0, 3)}
                     </span>
-                    <span className="text-lg font-serif font-semibold mt-0.5">
+                    <span className="text-lg font-semibold mt-0.5">
                       {display.split(" ")[1]}
                     </span>
                     <span className="text-[10px] text-muted uppercase tracking-wider">
@@ -201,7 +201,7 @@ export function WeeklyViewClient({
                   <div className="flex-1 p-4 flex items-start gap-4">
                     <div className="flex-1 min-w-0">
                       {today && (
-                        <span className="text-[10px] font-semibold tracking-wider uppercase bg-foreground text-background px-1.5 py-0.5 rounded-sm inline-block mb-1">
+                        <span className="text-[10px] font-semibold tracking-wider uppercase bg-etoro-green text-white px-1.5 py-0.5 rounded-full inline-block mb-1">
                           Today
                         </span>
                       )}
@@ -220,8 +220,8 @@ export function WeeklyViewClient({
                           <span
                             className={`text-[11px] font-medium ml-auto ${
                               event.keyReaction.direction === "up"
-                                ? "text-emerald-600"
-                                : "text-red-500"
+                                ? "text-etoro-green"
+                                : "text-etoro-red"
                             }`}
                           >
                             {event.keyReaction.direction === "up" ? "\u25B2" : "\u25BC"}{" "}
@@ -281,7 +281,7 @@ function EmptyState({
 }) {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
-      <div className="w-12 h-12 rounded-full bg-foreground/[0.04] flex items-center justify-center mb-4">
+      <div className="w-12 h-12 rounded-full bg-[var(--gray-bg)] flex items-center justify-center mb-4">
         <svg
           width="24"
           height="24"
@@ -298,7 +298,7 @@ function EmptyState({
           <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
         </svg>
       </div>
-      <h3 className="font-serif text-lg font-semibold mb-1">
+      <h3 className="text-lg font-semibold mb-1">
         No local events this week
       </h3>
       <p className="text-muted text-sm max-w-xs mb-5">
@@ -308,7 +308,7 @@ function EmptyState({
       {scope === "local" && (
         <button
           onClick={onSwitchToGlobal}
-          className="px-4 py-2 text-sm font-medium rounded-lg bg-foreground text-background hover:bg-foreground/90 transition-colors cursor-pointer"
+          className="px-5 py-3 text-[16px] font-semibold rounded-[48px] bg-[var(--etoro-green)] text-white hover:bg-[var(--etoro-green-hover)] transition-colors cursor-pointer"
         >
           Switch to Global
         </button>

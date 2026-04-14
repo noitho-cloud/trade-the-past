@@ -3,7 +3,7 @@ import type { MarketReaction } from "@/lib/types";
 function DirectionArrow({ direction }: { direction: "up" | "down" }) {
   if (direction === "up") {
     return (
-      <span className="inline-flex items-center gap-1 text-emerald-700 font-medium">
+      <span className="inline-flex items-center gap-1 text-[var(--etoro-green)] font-medium">
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="shrink-0">
           <path d="M6 2L10 7H2L6 2Z" fill="currentColor" />
         </svg>
@@ -12,7 +12,7 @@ function DirectionArrow({ direction }: { direction: "up" | "down" }) {
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 text-red-700 font-medium">
+    <span className="inline-flex items-center gap-1 text-[var(--red)] font-medium">
       <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="shrink-0">
         <path d="M6 10L2 5H10L6 10Z" fill="currentColor" />
       </svg>
@@ -22,7 +22,7 @@ function DirectionArrow({ direction }: { direction: "up" | "down" }) {
 }
 
 function PctCell({ value }: { value: number }) {
-  const color = value >= 0 ? "text-emerald-700" : "text-red-700";
+  const color = value >= 0 ? "text-[var(--etoro-green)]" : "text-[var(--red)]";
   const prefix = value > 0 ? "+" : "";
   return (
     <td className={`px-4 py-2.5 text-right tabular-nums ${color}`}>

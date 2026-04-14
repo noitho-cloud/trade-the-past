@@ -161,8 +161,8 @@ describe("WeeklyViewClient", () => {
     render(<WeeklyViewClient initialEvents={mockEvents} />);
     const todayBadge = screen.getByText("Today");
     expect(todayBadge).toBeInTheDocument();
-    expect(todayBadge.className).toContain("bg-foreground");
-    expect(todayBadge.className).toContain("text-background");
+    expect(todayBadge.className).toContain("bg-etoro-green");
+    expect(todayBadge.className).toContain("text-white");
   });
 
   it("shows a prominent value proposition and interaction hint above events", () => {

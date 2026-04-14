@@ -13,25 +13,25 @@ export function ScopeToggle({
   const handleLocal = useCallback(() => onChange("local"), [onChange]);
 
   return (
-    <div className="inline-flex items-center bg-foreground/[0.04] rounded-lg p-0.5">
+    <div className="inline-flex items-center bg-[var(--gray-border)] rounded-full p-0.5">
       <button
         onClick={handleGlobal}
-        className={`px-3 py-1 text-xs font-medium rounded-md transition-all cursor-pointer
+        className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-all cursor-pointer
           ${
             scope === "global"
-              ? "bg-card text-foreground shadow-sm"
-              : "text-muted hover:text-foreground"
+              ? "bg-navy text-white shadow-sm"
+              : "text-[var(--gray-text)] hover:text-[var(--text-dark)]"
           }`}
       >
         Global
       </button>
       <button
         onClick={handleLocal}
-        className={`px-3 py-1 text-xs font-medium rounded-md transition-all cursor-pointer
+        className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-all cursor-pointer
           ${
             scope === "local"
-              ? "bg-card text-foreground shadow-sm"
-              : "text-muted hover:text-foreground"
+              ? "bg-navy text-white shadow-sm"
+              : "text-[var(--gray-text)] hover:text-[var(--text-dark)]"
           }`}
       >
         UK / DE / FR

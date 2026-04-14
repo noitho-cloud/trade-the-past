@@ -67,9 +67,91 @@ The app MUST follow the eToro design system exactly. Apply these tokens everywhe
 - Losses/Down/Bearish: `#E31937` (eToro red)
 - Neutral: `#6B7280` (gray)
 
+### Dark Mode
+| Light | Dark |
+|-------|------|
+| `#FFFFFF` (bg) | `#000021` (bg) |
+| `#F5F5F5` (page bg) | `#0A0A2E` (page bg) |
+| `#1A1A1A` (text) | `#FFFFFF` (text) |
+| `#6B7280` (secondary) | `#8B8BA7` (secondary) |
+| `#E5E5E5` (border) | `#2A2A4E` (border) |
+| Card: white + shadow | Dark navy + subtle dark shadow |
+| `#0EB12E` (green) | `#0EB12E` (unchanged) |
+| `#E31937` (red) | `#E31937` (unchanged) |
+
+- Default to user's system preference (`prefers-color-scheme`)
+- Persist choice in localStorage
+- Toggle in the header — sun/moon icon, clean and minimal
+
+### Responsive — Mobile & Desktop
+- Mobile-first design, scales up to desktop
+- Breakpoints: mobile (<768px), tablet (768-1024px), desktop (>1024px)
+- **Mobile (default):**
+  - Single column layout
+  - Event cards stack vertically, full width
+  - Detail page: full-width hero, stacked sections
+  - Bottom-aligned CTA buttons (sticky on scroll)
+  - Touch-friendly tap targets (min 44px)
+  - Scope toggle + dark mode toggle in a compact header
+- **Desktop:**
+  - Max content width: 720px, centered (editorial feel)
+  - Event cards can be slightly wider with more breathing room
+  - Detail page: generous whitespace, larger typography
+  - CTA buttons inline, not sticky
+  - Header expands with more spacing
+- **Both:**
+  - No horizontal scroll ever
+  - Images responsive (max-width: 100%, auto height)
+  - Tables scroll horizontally on mobile if needed
+  - Font sizes scale: use clamp() for headlines
+
+### Header / Top Bar
+- Height: 56px content area
+- Background: white (light) / #000021 (dark)
+- Logo "Trade the Past" left-aligned, 18px weight 700
+- Right side: scope toggle, dark mode toggle
+- Bottom border: 1px solid #E5E5E5 (light) / #2A2A4E (dark)
+
+### Tables (Market Reaction)
+- Clean rows, no heavy borders
+- Subtle row striping: alternate rows with #F9F9F9 (light) / #0D0D35 (dark)
+- Header row: 12px uppercase, weight 600, #6B7280 text
+- Data cells: 14px, weight 400
+- Numbers right-aligned, use eToro Numbers font (font-stretch: 84%, weight 620)
+- Green/red coloring on percentage values
+
+### Scope Toggle (Global / Local)
+- Use eToro's segmented control / group button style
+- Pill-shaped container with #E5E5E5 background
+- Active segment: white background with subtle shadow
+- Inactive: transparent, #6B7280 text
+- 36px height, 12px horizontal padding per segment
+- Radius: fully round
+
+### Event Type Badges
+- Match eToro's badge component
+- Pill-shaped, 4px 10px padding
+- 11px text, weight 600, uppercase
+- Color-coded by type:
+  - Interest rates: #0EB12E background at 10% opacity, #0EB12E text
+  - Earnings: #F59E0B background at 10% opacity, #B45309 text
+  - Regulation: #3B82F6 background at 10% opacity, #1D4ED8 text
+  - Layoffs: #E31937 background at 10% opacity, #E31937 text
+  - Geopolitical: #8B5CF6 background at 10% opacity, #6D28D9 text
+  - Commodities: #6B7280 background at 10% opacity, #374151 text
+
+### Transitions & Interactions
+- All hover/focus transitions: 150ms ease
+- Buttons: subtle scale(0.98) on press
+- Cards: slight translateY(-2px) + shadow increase on hover
+- Page transitions: fade-in 200ms
+
 ### General Rules
 - Use eToro green (#0EB12E) for ALL primary CTAs — not black
 - The "Trade" button must be green pill-shaped, matching eToro's Buy button style
-- The "Watchlist" button should be secondary (white/outlined)
-- Page background: #F5F5F5
+- The "Watchlist" button should be secondary (white/outlined, #E5E5E5 border)
+- Page background: #F5F5F5 (light) / #0A0A2E (dark)
 - No emojis anywhere in the UI
+- All interactive elements must have visible focus states (green outline)
+- Use CSS custom properties for all tokens — no hardcoded hex values in components
+- The overall feel should match eToro's product: clean, professional, confident

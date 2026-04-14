@@ -46,7 +46,7 @@ function consolidateAssets(matches: HistoricalMatch[]): ConsolidatedAsset[] {
 function DirectionBadge({ direction }: { direction: "up" | "down" }) {
   if (direction === "up") {
     return (
-      <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
+      <span className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--etoro-green)] bg-[#E8F5E9] px-2 py-0.5 rounded-full">
         <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
           <path d="M5 1L9 6H1L5 1Z" fill="currentColor" />
         </svg>
@@ -55,7 +55,7 @@ function DirectionBadge({ direction }: { direction: "up" | "down" }) {
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-700 bg-red-50 px-2 py-0.5 rounded-full">
+    <span className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--red)] bg-[#FDEDEF] px-2 py-0.5 rounded-full">
       <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
         <path d="M5 9L1 4H9L5 9Z" fill="currentColor" />
       </svg>
@@ -65,7 +65,7 @@ function DirectionBadge({ direction }: { direction: "up" | "down" }) {
 }
 
 function PctDisplay({ value }: { value: number }) {
-  const color = value >= 0 ? "text-emerald-700" : "text-red-600";
+  const color = value >= 0 ? "text-[var(--etoro-green)]" : "text-[var(--red)]";
   const prefix = value > 0 ? "+" : "";
   return (
     <span className={`text-sm font-semibold tabular-nums ${color}`}>
@@ -83,7 +83,7 @@ function EtoroLabel() {
 
 function AssetCard({ asset }: { asset: ConsolidatedAsset }) {
   return (
-    <div className="rounded-lg border border-card-border bg-card p-4 flex flex-col gap-3 hover:border-foreground/15 transition-colors">
+    <div className="rounded-[16px] bg-white p-[var(--space-xl)] flex flex-col gap-3 shadow-[0_0_13px_rgba(0,0,0,0.08)]">
       <div className="flex items-start justify-between gap-2">
         <div>
           <h3 className="font-medium text-[15px] leading-snug">
@@ -114,8 +114,8 @@ function AssetCard({ asset }: { asset: ConsolidatedAsset }) {
             href={getEtoroTradeUrl(asset.asset)}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 bg-foreground text-background text-xs font-medium py-2 px-3 rounded-md
-                       hover:bg-foreground/85 active:scale-[0.98] transition-all text-center"
+            className="flex-1 bg-[var(--etoro-green)] text-white text-[16px] font-semibold py-3 px-4 rounded-[48px]
+                       hover:bg-[var(--etoro-green-hover)] active:scale-[0.98] transition-all text-center"
           >
             Trade
           </a>
@@ -123,8 +123,8 @@ function AssetCard({ asset }: { asset: ConsolidatedAsset }) {
             href={getEtoroWatchlistUrl()}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 border border-foreground/20 text-foreground text-xs font-medium py-2 px-3 rounded-md
-                       hover:bg-foreground/5 active:scale-[0.98] transition-all text-center"
+            className="flex-1 border border-[var(--gray-border)] bg-white text-[var(--text-dark)] text-[16px] font-semibold py-3 px-4 rounded-[48px]
+                       hover:bg-[var(--gray-bg)] active:scale-[0.98] transition-all text-center"
           >
             Watchlist
           </a>
@@ -146,7 +146,7 @@ export function AffectedAssets({ matches }: { matches: HistoricalMatch[] }) {
   return (
     <section className="space-y-4">
       <div className="flex items-center gap-4">
-        <h2 className="font-serif text-xl font-semibold whitespace-nowrap">
+        <h2 className="text-[18px] font-semibold whitespace-nowrap">
           Affected Assets
         </h2>
         <div className="h-px flex-1 bg-border" />
