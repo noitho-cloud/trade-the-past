@@ -59,6 +59,31 @@ function getWeekDates(): string[] {
   return dates;
 }
 
+function MethodologyHint() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="mt-2">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="text-[12px] text-muted/70 hover:text-muted underline underline-offset-2 decoration-muted/30 hover:decoration-muted/60 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:outline-none rounded"
+      >
+        {open ? "Hide" : "How does this work?"}
+      </button>
+      <div
+        className="overflow-hidden transition-all duration-200 ease-out"
+        style={{ maxHeight: open ? "120px" : "0px", opacity: open ? 1 : 0 }}
+      >
+        <p className="text-[12px] text-muted leading-relaxed mt-2 max-w-md">
+          We aggregate headlines from major financial outlets, identify the most
+          market-moving event each day, and use historical pattern matching to
+          find similar past events. Market reaction data shows how affected
+          assets performed after each historical parallel.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function EmptyDaySlot({ dateStr }: { dateStr: string }) {
   const { weekday, display } = formatDate(dateStr);
   return (
@@ -182,6 +207,7 @@ export function WeeklyViewClient({
           <p className="text-muted text-[13px] mt-1">
             Select an event to see how markets reacted to similar moments in the past.
           </p>
+          <MethodologyHint />
         </div>
         <ScopeToggle scope={scope} onChange={handleScopeChange} />
       </div>
