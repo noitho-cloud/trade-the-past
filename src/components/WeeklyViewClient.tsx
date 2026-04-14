@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import type { MarketEventSummary } from "@/lib/types";
 import { EventTypeBadge } from "@/components/EventTypeBadge";
@@ -52,6 +52,7 @@ export function WeeklyViewClient({
   const [events, setEvents] = useState(initialEvents);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const isFirstRender = useRef(true);
 
   const handleScopeChange = useCallback(
     (newScope: "global" | "local") => {
@@ -62,7 +63,10 @@ export function WeeklyViewClient({
   );
 
   useEffect(() => {
-    if (scope === "global" && events === initialEvents) return;
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
 
     let cancelled = false;
     setLoading(true);
@@ -86,7 +90,7 @@ export function WeeklyViewClient({
     return () => {
       cancelled = true;
     };
-  }, [scope, initialEvents, events]);
+  }, [scope]);
 
   return (
     <div className="space-y-6">
