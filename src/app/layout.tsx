@@ -58,8 +58,31 @@ export default function RootLayout({
         </main>
 
         <footer className="border-t border-border mt-auto">
-          <div className="max-w-2xl mx-auto px-6 py-5">
-            <p className="text-[11px] text-muted leading-relaxed">
+          <div className="max-w-2xl mx-auto px-6 py-6 space-y-4">
+            <div>
+              <h4 className="text-[10px] font-semibold tracking-widest uppercase text-muted/70 mb-1">
+                How it works
+              </h4>
+              <p className="text-[11px] text-muted leading-relaxed">
+                Trade the Past aggregates headlines from major news sources,
+                identifies the most market-moving event each day, and uses
+                historical pattern matching to find similar past events. Market
+                reaction data shows how affected assets performed after each
+                historical parallel.
+              </p>
+            </div>
+            <div>
+              <h4 className="text-[10px] font-semibold tracking-widest uppercase text-muted/70 mb-1">
+                Sources
+              </h4>
+              <p className="text-[11px] text-muted leading-relaxed">
+                News from Reuters, Bloomberg, Financial Times, and other major
+                financial outlets. Historical data from publicly available
+                market records.
+              </p>
+            </div>
+            <hr className="border-border" />
+            <p className="text-[10px] text-muted/60 leading-relaxed">
               Historical data is illustrative and based on publicly available
               records. Past performance does not indicate future results. This
               is not financial advice.
