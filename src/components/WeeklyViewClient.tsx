@@ -176,7 +176,7 @@ export function WeeklyViewClient({
                 className={`card-enter group block rounded-xl border transition-all duration-200 ease-out
                   ${
                     today
-                      ? "bg-card border-foreground/15 shadow-sm hover:shadow-md hover:-translate-y-0.5"
+                      ? "bg-card border-foreground/15 border-l-[3px] border-l-foreground shadow-sm hover:shadow-md hover:-translate-y-0.5"
                       : "bg-card border-card-border hover:border-foreground/15 hover:shadow-md hover:-translate-y-0.5"
                   }`}
                 style={{ animationDelay: `${index * 60}ms` }}
@@ -197,7 +197,7 @@ export function WeeklyViewClient({
                   <div className="flex-1 p-4 flex items-start gap-4">
                     <div className="flex-1 min-w-0">
                       {today && (
-                        <span className="text-[10px] font-semibold tracking-widest uppercase text-foreground/40 mb-1 block">
+                        <span className="text-[10px] font-semibold tracking-wider uppercase bg-foreground text-background px-1.5 py-0.5 rounded-sm inline-block mb-1">
                           Today
                         </span>
                       )}

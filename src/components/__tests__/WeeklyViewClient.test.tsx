@@ -157,6 +157,21 @@ describe("WeeklyViewClient", () => {
     expect(chevrons.length).toBe(mockEvents.length);
   });
 
+  it("renders today's card with a prominent TODAY pill badge", () => {
+    render(<WeeklyViewClient initialEvents={mockEvents} />);
+    const todayBadge = screen.getByText("Today");
+    expect(todayBadge).toBeInTheDocument();
+    expect(todayBadge.className).toContain("bg-foreground");
+    expect(todayBadge.className).toContain("text-background");
+  });
+
+  it("renders today's badge as a pill (not ghost text)", () => {
+    render(<WeeklyViewClient initialEvents={mockEvents} />);
+    const todayBadge = screen.getByText("Today");
+    expect(todayBadge.className).toContain("rounded");
+    expect(todayBadge.className).toContain("px-");
+  });
+
   it("shows empty state when scope returns zero events", async () => {
     const user = userEvent.setup();
     (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
