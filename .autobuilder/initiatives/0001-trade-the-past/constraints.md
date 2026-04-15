@@ -83,27 +83,29 @@ The app MUST follow the eToro design system exactly. Apply these tokens everywhe
 - Persist choice in localStorage
 - Toggle in the header — sun/moon icon, clean and minimal
 
-### Responsive — Mobile & Desktop
+### Responsive — Mobile & Desktop (MANDATORY — test at every breakpoint)
 - Mobile-first design, scales up to desktop
-- Breakpoints: mobile (<768px), tablet (768-1024px), desktop (>1024px)
-- **Mobile (default):**
-  - Single column layout
-  - Event cards stack vertically, full width
-  - Detail page: full-width hero, stacked sections
-  - Bottom-aligned CTA buttons (sticky on scroll)
+- Breakpoints: 320px, 375px, 768px, 1024px, 1280px — NO breakage at ANY width
+- **Mobile (<768px):**
+  - Single column layout, all cards full width
+  - Affected asset cards MUST stack vertically (never side by side)
+  - "Trade" and "Watchlist" buttons full width
+  - Market reaction table uses horizontal scroll wrapper if needed
+  - Header: logo left, dark mode toggle right, compact
   - Touch-friendly tap targets (min 44px)
-  - Scope toggle + dark mode toggle in a compact header
-- **Desktop:**
+  - No horizontal scroll EVER on the page body
+  - Footer stacks cleanly
+- **Desktop (>1024px):**
   - Max content width: 720px, centered (editorial feel)
-  - Event cards can be slightly wider with more breathing room
-  - Detail page: generous whitespace, larger typography
-  - CTA buttons inline, not sticky
+  - Affected asset cards 2-3 per row with CSS grid
+  - Generous whitespace and padding between cards
+  - CTA buttons inline, not full width
   - Header expands with more spacing
 - **Both:**
-  - No horizontal scroll ever
-  - Images responsive (max-width: 100%, auto height)
-  - Tables scroll horizontally on mobile if needed
-  - Font sizes scale: use clamp() for headlines
+  - Images: max-width 100%, height auto
+  - Font sizes: use clamp() for headlines and section headers
+  - Scope toggle and header must not break at any width
+  - overflow-x: hidden on body/html
 
 ### Header / Top Bar
 - Height: 56px content area

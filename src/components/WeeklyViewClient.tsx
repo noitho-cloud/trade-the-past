@@ -128,10 +128,8 @@ export function WeeklyViewClient({
   const confirmedScope = useRef<"global" | "local">("global");
   const failedScope = useRef<"global" | "local" | null>(null);
 
-  const fetchScope = useCallback((targetScope: "global" | "local") => {
+  const fetchScopeData = useCallback((targetScope: "global" | "local") => {
     let cancelled = false;
-    setLoading(true);
-    setError(null);
     failedScope.current = null;
 
     fetch(`/api/events?scope=${targetScope}`)
@@ -164,6 +162,8 @@ export function WeeklyViewClient({
   const handleScopeChange = useCallback(
     (newScope: "global" | "local") => {
       if (newScope === scope) return;
+      setLoading(true);
+      setError(null);
       setScope(newScope);
       const url = new URL(window.location.href);
       if (newScope === "local") {
@@ -177,25 +177,27 @@ export function WeeklyViewClient({
   );
 
   const handleRetry = useCallback(() => {
+    setLoading(true);
+    setError(null);
     const target = failedScope.current ?? scope;
     if (target !== scope) {
       setScope(target);
     } else {
-      fetchScope(target);
+      fetchScopeData(target);
     }
-  }, [fetchScope, scope]);
+  }, [fetchScopeData, scope]);
 
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
       if (urlScope !== "global") {
-        fetchScope(urlScope);
+        return fetchScopeData(urlScope);
       }
       return;
     }
 
-    return fetchScope(scope);
-  }, [scope, fetchScope, urlScope]);
+    return fetchScopeData(scope);
+  }, [scope, fetchScopeData, urlScope]);
 
   return (
     <div className="space-y-6">
