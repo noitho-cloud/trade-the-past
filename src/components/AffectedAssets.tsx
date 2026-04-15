@@ -1,5 +1,8 @@
+"use client";
+
 import type { HistoricalMatch } from "@/lib/types";
 import { getEtoroTradeUrl, getEtoroWatchlistUrl } from "@/lib/etoro-slugs";
+import { useAuth } from "./AuthProvider";
 
 interface ConsolidatedAsset {
   asset: string;
@@ -75,7 +78,61 @@ function PctDisplay({ value }: { value: number }) {
   );
 }
 
-function AssetCard({ asset }: { asset: ConsolidatedAsset }) {
+function AssetCardButtons({ asset, isLoggedIn }: { asset: ConsolidatedAsset; isLoggedIn: boolean }) {
+  if (!isLoggedIn) {
+    return (
+      <div className="flex flex-col md:flex-row gap-2 pt-1">
+        <a
+          href={getEtoroTradeUrl(asset.asset)}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Trade on eToro"
+          className="flex-1 inline-flex flex-col items-center justify-center bg-[var(--etoro-green)] text-white font-semibold h-[48px] px-6 rounded-[48px] whitespace-nowrap
+                     hover:bg-[var(--etoro-green-hover)] active:scale-[0.98] transition-all text-center focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:ring-offset-2 focus-visible:outline-none"
+        >
+          <span className="text-[15px] leading-none">Trade</span>
+          <span className="text-[10px] font-normal opacity-80 leading-none mt-0.5">on eToro</span>
+        </a>
+        <a
+          href={getEtoroWatchlistUrl(asset.asset)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex-1 inline-flex items-center justify-center border-[1.5px] border-[var(--btn-secondary-border)] bg-[var(--btn-secondary-bg)] text-[var(--btn-secondary-text)] text-[16px] font-semibold h-[48px] px-6 rounded-[48px]
+                     hover:bg-[var(--btn-secondary-hover)] active:scale-[0.98] transition-all text-center focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:outline-none"
+        >
+          Watchlist
+        </a>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col md:flex-row gap-2 pt-1">
+      <a
+        href={getEtoroTradeUrl(asset.asset)}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Trade on eToro"
+        className="flex-1 inline-flex flex-col items-center justify-center bg-[var(--etoro-green)] text-white font-semibold h-[48px] px-6 rounded-[48px] whitespace-nowrap
+                   hover:bg-[var(--etoro-green-hover)] active:scale-[0.98] transition-all text-center focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:ring-offset-2 focus-visible:outline-none"
+      >
+        <span className="text-[15px] leading-none">Trade</span>
+        <span className="text-[10px] font-normal opacity-80 leading-none mt-0.5">on eToro</span>
+      </a>
+      <a
+        href={getEtoroWatchlistUrl(asset.asset)}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex-1 inline-flex items-center justify-center border-[1.5px] border-[var(--btn-secondary-border)] bg-[var(--btn-secondary-bg)] text-[var(--btn-secondary-text)] text-[16px] font-semibold h-[48px] px-6 rounded-[48px]
+                   hover:bg-[var(--btn-secondary-hover)] active:scale-[0.98] transition-all text-center focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:outline-none"
+      >
+        Watchlist
+      </a>
+    </div>
+  );
+}
+
+function AssetCard({ asset, isLoggedIn }: { asset: ConsolidatedAsset; isLoggedIn: boolean }) {
   return (
     <div className="rounded-[16px] bg-card border border-[var(--card-border)] p-[var(--space-xl)] flex flex-col gap-3 shadow-[var(--card-shadow)]">
       <div className="flex items-start justify-between gap-2">
@@ -102,33 +159,14 @@ function AssetCard({ asset }: { asset: ConsolidatedAsset }) {
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-2 pt-1">
-        <a
-          href={getEtoroTradeUrl(asset.asset)}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Trade on eToro"
-          className="flex-1 inline-flex flex-col items-center justify-center bg-[var(--etoro-green)] text-white font-semibold h-[48px] px-6 rounded-[48px] whitespace-nowrap
-                     hover:bg-[var(--etoro-green-hover)] active:scale-[0.98] transition-all text-center focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:ring-offset-2 focus-visible:outline-none"
-        >
-          <span className="text-[15px] leading-none">Trade</span>
-          <span className="text-[10px] font-normal opacity-80 leading-none mt-0.5">on eToro</span>
-        </a>
-        <a
-          href={getEtoroWatchlistUrl(asset.asset)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex-1 inline-flex items-center justify-center border-[1.5px] border-[var(--btn-secondary-border)] bg-[var(--btn-secondary-bg)] text-[var(--btn-secondary-text)] text-[16px] font-semibold h-[48px] px-6 rounded-[48px]
-                     hover:bg-[var(--btn-secondary-hover)] active:scale-[0.98] transition-all text-center focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:outline-none"
-        >
-          Watchlist
-        </a>
-      </div>
+      <AssetCardButtons asset={asset} isLoggedIn={isLoggedIn} />
     </div>
   );
 }
 
 export function AffectedAssets({ matches }: { matches: HistoricalMatch[] }) {
+  const { isLoggedIn } = useAuth();
+
   if (matches.length === 0) return null;
 
   const assets = consolidateAssets(matches);
@@ -145,7 +183,7 @@ export function AffectedAssets({ matches }: { matches: HistoricalMatch[] }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {assets.map((asset) => (
-          <AssetCard key={asset.asset} asset={asset} />
+          <AssetCard key={asset.asset} asset={asset} isLoggedIn={isLoggedIn} />
         ))}
       </div>
     </section>

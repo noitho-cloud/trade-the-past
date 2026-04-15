@@ -3,6 +3,8 @@ import { Suspense } from "react";
 import { HeaderLink } from "@/components/HeaderLink";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { AuthProvider } from "@/components/AuthProvider";
+import { LoginButton } from "@/components/LoginButton";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -33,6 +35,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <ThemeProvider>
+          <AuthProvider>
           <header className="bg-[var(--header-bg)] sticky top-0 z-10">
             <div className="max-w-[720px] mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
               <Suspense
@@ -43,6 +46,7 @@ export default function RootLayout({
                 <HeaderLink />
               </Suspense>
               <div className="flex items-center gap-2">
+                <LoginButton />
                 <ThemeToggle />
               </div>
             </div>
@@ -88,6 +92,7 @@ export default function RootLayout({
               </p>
             </div>
           </footer>
+        </AuthProvider>
         </ThemeProvider>
       </body>
     </html>
