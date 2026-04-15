@@ -7,14 +7,27 @@ import {
 } from "./event-classifier";
 import { getMockEvents, getMockEventById } from "./mock-data";
 import { getHistoricalMatches } from "./historical-service";
+import { findHistoricalMatches } from "./historical-db";
 import { filterTradeableReactions } from "./etoro-slugs";
-import type { MarketEvent, MarketEventSummary, HistoricalMatch } from "./types";
+import type { MarketEvent, MarketEventSummary, HistoricalMatch, KeyReaction, EventType } from "./types";
 
 function filterMatchReactions(matches: HistoricalMatch[]): HistoricalMatch[] {
   return matches.map((m) => ({
     ...m,
     reactions: filterTradeableReactions(m.reactions),
   }));
+}
+
+function getKeyReaction(title: string, type: EventType, summary: string): KeyReaction | null {
+  const matches = findHistoricalMatches(title, type, summary);
+  for (const match of matches) {
+    const tradeable = filterTradeableReactions(match.reactions);
+    if (tradeable.length > 0) {
+      const r = tradeable[0];
+      return { asset: r.asset, direction: r.direction, day1Pct: r.day1Pct };
+    }
+  }
+  return null;
 }
 
 interface CacheEntry<T> {
@@ -91,7 +104,7 @@ export async function getEvents(
       summary: e.summary || e.title,
       imageUrl: e.imageUrl,
       source: e.source,
-      keyReaction: null,
+      keyReaction: getKeyReaction(e.title, e.type, e.summary || e.title),
     }));
 
     summaries.sort((a, b) => b.date.localeCompare(a.date));
