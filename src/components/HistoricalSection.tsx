@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import type { HistoricalMatch } from "@/lib/types";
 import { UnifiedInsight } from "./UnifiedInsight";
 import { AffectedAssets } from "./AffectedAssets";
@@ -16,43 +16,43 @@ export function HistoricalSection({
 }: HistoricalSectionProps) {
   const [matches, setMatches] = useState<HistoricalMatch[]>(initialMatches);
   const [loading, setLoading] = useState(initialMatches.length === 0);
-  const [error, setError] = useState(false);
+  const [fetchError, setFetchError] = useState(false);
+  const cancelRef = useRef<(() => void) | undefined>(undefined);
+
+  const fetchMatches = useCallback(() => {
+    cancelRef.current?.();
+    let cancelled = false;
+    cancelRef.current = () => { cancelled = true; };
+
+    setFetchError(false);
+    setLoading(true);
+
+    fetch(`/api/events/${eventId}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed");
+        return res.json();
+      })
+      .then((data) => {
+        if (cancelled) return;
+        const eventMatches: HistoricalMatch[] =
+          data.event?.historicalMatches ?? [];
+        setMatches(eventMatches);
+        setLoading(false);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setFetchError(true);
+          setLoading(false);
+        }
+      });
+
+    return () => { cancelled = true; };
+  }, [eventId]);
 
   useEffect(() => {
     if (initialMatches.length > 0) return;
-
-    let cancelled = false;
-
-    async function fetchMatches() {
-      try {
-        const res = await fetch(`/api/events/${eventId}`);
-        if (!res.ok) throw new Error("Failed");
-        const data = await res.json();
-        if (cancelled) return;
-
-        const eventMatches: HistoricalMatch[] =
-          data.event?.historicalMatches ?? [];
-
-        if (eventMatches.length > 0) {
-          setMatches(eventMatches);
-          setLoading(false);
-        } else {
-          setError(true);
-          setLoading(false);
-        }
-      } catch {
-        if (!cancelled) {
-          setError(true);
-          setLoading(false);
-        }
-      }
-    }
-
-    fetchMatches();
-    return () => {
-      cancelled = true;
-    };
-  }, [eventId, initialMatches]);
+    return fetchMatches();
+  }, [initialMatches, fetchMatches]);
 
   if (loading) {
     return (
@@ -80,7 +80,31 @@ export function HistoricalSection({
     );
   }
 
-  if (error || matches.length === 0) {
+  if (fetchError) {
+    return (
+      <section
+        data-testid="historical-error"
+        className="rounded-[16px] border border-[var(--gray-border)] bg-[var(--error-bg)] px-[var(--space-xl)] py-8 text-center"
+      >
+        <p className="text-sm text-[var(--red)] font-medium mb-3">
+          Could not load historical data
+        </p>
+        <p className="text-xs text-muted mb-4">
+          Something went wrong while loading historical parallels. Please try again.
+        </p>
+        <button
+          onClick={fetchMatches}
+          className="text-sm font-semibold bg-[var(--etoro-green)] text-white px-5 py-2.5 rounded-[48px]
+                     hover:bg-[var(--etoro-green-hover)] active:scale-[0.98] transition-all cursor-pointer
+                     focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:outline-none"
+        >
+          Try again
+        </button>
+      </section>
+    );
+  }
+
+  if (matches.length === 0) {
     return (
       <section className="rounded-[16px] bg-card shadow-[var(--card-shadow)] px-[var(--space-xl)] py-8 text-center">
         <p className="text-sm text-muted">
