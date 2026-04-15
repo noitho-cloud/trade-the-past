@@ -113,6 +113,13 @@ function EmptyDaySlot({ dateStr }: { dateStr: string }) {
   );
 }
 
+const SCOPE_CACHE_TTL = 2 * 60 * 1000; // 2 minutes
+
+interface CacheEntry {
+  data: MarketEventSummary[];
+  fetchedAt: number;
+}
+
 export function WeeklyViewClient({
   initialEvents,
 }: {
@@ -127,44 +134,85 @@ export function WeeklyViewClient({
   const isFirstRender = useRef(true);
   const confirmedScope = useRef<"global" | "local">("global");
   const failedScope = useRef<"global" | "local" | null>(null);
+  const scopeCache = useRef<Map<string, CacheEntry>>(
+    new Map([["global", { data: initialEvents, fetchedAt: Date.now() }]])
+  );
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  const getCachedData = useCallback((targetScope: string): MarketEventSummary[] | null => {
+    const entry = scopeCache.current.get(targetScope);
+    if (!entry) return null;
+    if (Date.now() - entry.fetchedAt >= SCOPE_CACHE_TTL) {
+      scopeCache.current.delete(targetScope);
+      return null;
+    }
+    return entry.data;
+  }, []);
 
   const fetchScopeData = useCallback((targetScope: "global" | "local") => {
-    let cancelled = false;
     failedScope.current = null;
 
-    fetch(`/api/events?scope=${targetScope}`)
+    const cached = getCachedData(targetScope);
+    if (cached) {
+      setEvents(cached);
+      confirmedScope.current = targetScope;
+      setLoading(false);
+      return;
+    }
+
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
+    fetch(`/api/events?scope=${targetScope}`, { signal: controller.signal })
       .then((r) => {
         if (!r.ok) throw new Error("Failed to load events");
         return r.json();
       })
       .then((data) => {
-        if (!cancelled) {
+        if (!controller.signal.aborted) {
+          scopeCache.current.set(targetScope, {
+            data: data.events,
+            fetchedAt: Date.now(),
+          });
           setEvents(data.events);
           confirmedScope.current = targetScope;
         }
       })
-      .catch(() => {
-        if (!cancelled) {
+      .catch((err) => {
+        if (err instanceof DOMException && err.name === "AbortError") return;
+        if (!controller.signal.aborted) {
           failedScope.current = targetScope;
           setScope(confirmedScope.current);
           setError("Could not load events. Please try again.");
         }
       })
       .finally(() => {
-        if (!cancelled) setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       });
 
     return () => {
-      cancelled = true;
+      controller.abort();
     };
-  }, []);
+  }, [getCachedData]);
 
   const handleScopeChange = useCallback(
     (newScope: "global" | "local") => {
       if (newScope === scope) return;
-      setLoading(true);
       setError(null);
-      setScope(newScope);
+
+      const cached = getCachedData(newScope);
+      if (cached) {
+        setEvents(cached);
+        confirmedScope.current = newScope;
+        setScope(newScope);
+      } else {
+        setLoading(true);
+        setScope(newScope);
+      }
+
       const url = new URL(window.location.href);
       if (newScope === "local") {
         url.searchParams.set("scope", "local");
@@ -173,7 +221,7 @@ export function WeeklyViewClient({
       }
       window.history.replaceState({}, "", url.toString());
     },
-    [scope]
+    [scope, getCachedData]
   );
 
   const handleRetry = useCallback(() => {
@@ -183,6 +231,7 @@ export function WeeklyViewClient({
     if (target !== scope) {
       setScope(target);
     } else {
+      scopeCache.current.delete(target);
       fetchScopeData(target);
     }
   }, [fetchScopeData, scope]);
@@ -196,8 +245,9 @@ export function WeeklyViewClient({
       return;
     }
 
+    if (getCachedData(scope)) return;
     return fetchScopeData(scope);
-  }, [scope, fetchScopeData, urlScope]);
+  }, [scope, fetchScopeData, urlScope, getCachedData]);
 
   return (
     <div className="space-y-6">

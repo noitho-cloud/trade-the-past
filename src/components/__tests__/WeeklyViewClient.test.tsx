@@ -100,7 +100,7 @@ describe("WeeklyViewClient", () => {
     expect(fetchCallCount).toBe(1);
   });
 
-  it("toggles back to global without breaking", async () => {
+  it("toggles back to global without breaking (uses cache)", async () => {
     const user = userEvent.setup();
     render(<WeeklyViewClient initialEvents={mockEvents} />);
 
@@ -110,16 +110,10 @@ describe("WeeklyViewClient", () => {
       expect(screen.getByText("Deutsche Bank Faces Lawsuit")).toBeInTheDocument();
     });
 
-    // Switch back to global
-    (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve({ events: mockEvents, scope: "global" }),
-    });
-
+    // Switch back to global — uses cached initial data, no fetch needed
     await user.click(screen.getByText("Global"));
-    await waitFor(() => {
-      expect(screen.getByText("Fed Holds Rates Steady")).toBeInTheDocument();
-    });
+    expect(screen.getByText("Fed Holds Rates Steady")).toBeInTheDocument();
+    expect(fetchCallCount).toBe(1); // only the local fetch
   });
 
   it("shows loading skeleton while fetching", async () => {
@@ -240,6 +234,111 @@ describe("WeeklyViewClient", () => {
       a.getAttribute("href")?.startsWith("/event/")
     );
     expect(links).toHaveLength(1);
+  });
+
+  it("uses cached data when toggling back to a previously loaded scope", async () => {
+    const user = userEvent.setup();
+    render(<WeeklyViewClient initialEvents={mockEvents} />);
+
+    // Toggle to local — triggers a fetch
+    await user.click(screen.getByText("UK / DE / FR"));
+    await waitFor(() => {
+      expect(screen.getByText("Deutsche Bank Faces Lawsuit")).toBeInTheDocument();
+    });
+    expect(fetchCallCount).toBe(1);
+
+    // Toggle back to global — should use cached data, no fetch
+    await user.click(screen.getByText("Global"));
+    expect(screen.getByText("Fed Holds Rates Steady")).toBeInTheDocument();
+    expect(fetchCallCount).toBe(1); // no additional fetch
+
+    // No skeleton should have appeared
+    const skeletons = document.querySelectorAll(".animate-pulse");
+    expect(skeletons.length).toBe(0);
+  });
+
+  it("uses cached local data when toggling local → global → local", async () => {
+    const user = userEvent.setup();
+    render(<WeeklyViewClient initialEvents={mockEvents} />);
+
+    // Toggle to local
+    await user.click(screen.getByText("UK / DE / FR"));
+    await waitFor(() => {
+      expect(screen.getByText("Deutsche Bank Faces Lawsuit")).toBeInTheDocument();
+    });
+    expect(fetchCallCount).toBe(1);
+
+    // Toggle back to global (cached)
+    await user.click(screen.getByText("Global"));
+    expect(screen.getByText("Fed Holds Rates Steady")).toBeInTheDocument();
+
+    // Toggle to local again — should use cached local data
+    await user.click(screen.getByText("UK / DE / FR"));
+    expect(screen.getByText("Deutsche Bank Faces Lawsuit")).toBeInTheDocument();
+    expect(fetchCallCount).toBe(1); // still no additional fetch
+  });
+
+  it("refetches when cache has expired (TTL exceeded)", async () => {
+    const user = userEvent.setup();
+    const realDateNow = Date.now;
+    let fakeNow = realDateNow.call(Date);
+    vi.spyOn(Date, "now").mockImplementation(() => fakeNow);
+
+    render(<WeeklyViewClient initialEvents={mockEvents} />);
+
+    // Toggle to local
+    await user.click(screen.getByText("UK / DE / FR"));
+    await waitFor(() => {
+      expect(screen.getByText("Deutsche Bank Faces Lawsuit")).toBeInTheDocument();
+    });
+    expect(fetchCallCount).toBe(1);
+
+    // Toggle back to global
+    await user.click(screen.getByText("Global"));
+    expect(screen.getByText("Fed Holds Rates Steady")).toBeInTheDocument();
+
+    // Advance time past the 2-minute TTL
+    fakeNow += 2 * 60 * 1000 + 1;
+
+    // Toggle to local again — cache expired, should refetch
+    await user.click(screen.getByText("UK / DE / FR"));
+    await waitFor(() => {
+      expect(fetchCallCount).toBe(2);
+    });
+
+    vi.spyOn(Date, "now").mockRestore();
+  });
+
+  it("aborts the previous in-flight request when toggling rapidly", async () => {
+    const user = userEvent.setup();
+    const abortSpy = vi.fn();
+
+    const originalAbortController = globalThis.AbortController;
+    globalThis.AbortController = class extends originalAbortController {
+      abort(...args: Parameters<AbortController["abort"]>) {
+        abortSpy();
+        return super.abort(...args);
+      }
+    } as typeof AbortController;
+
+    let resolvers: Array<(value: unknown) => void> = [];
+    (fetch as ReturnType<typeof vi.fn>).mockImplementation(() => {
+      return new Promise((resolve) => {
+        resolvers.push(resolve);
+      });
+    });
+
+    render(<WeeklyViewClient initialEvents={mockEvents} />);
+
+    // Toggle to local — starts fetch 1
+    await user.click(screen.getByText("UK / DE / FR"));
+
+    // Toggle back to global immediately — should abort fetch 1
+    await user.click(screen.getByText("Global"));
+
+    expect(abortSpy).toHaveBeenCalled();
+
+    globalThis.AbortController = originalAbortController;
   });
 
   it("empty state has a button to switch back to Global", async () => {
