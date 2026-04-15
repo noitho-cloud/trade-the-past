@@ -229,16 +229,6 @@ export interface ClassifiedEvent {
   summary: string;
 }
 
-export function cleanDescription(
-  description: string | null | undefined,
-  sourceName: string,
-  title: string
-): string {
-  if (!description || !description.trim()) return title;
-  if (sourceName.toLowerCase().includes("google news")) return title;
-  return description;
-}
-
 export function classifyArticle(
   article: RawArticle
 ): { type: EventType; confidence: number } | null {
@@ -299,7 +289,7 @@ export function classifyAndRank(articles: RawArticle[]): ClassifiedEvent[] {
         imageUrl: article.urlToImage,
         source: article.source.name,
         date: article.publishedAt.split("T")[0],
-        summary: cleanDescription(article.description, article.source.name, article.title),
+        summary: article.description || article.title,
       },
       score: impactScore,
     });
@@ -326,9 +316,54 @@ export function selectTopEventPerDay(
   );
 }
 
+const STOP_WORDS = new Set([
+  "the","a","an","and","or","but","in","on","at","to","for","of","with",
+  "is","are","was","were","be","been","has","had","have","do","does","did",
+  "will","would","could","should","may","might","can","shall","it","its",
+  "this","that","these","those","from","by","as","if","not","no","so",
+  "up","out","about","into","over","after","before","between","under",
+  "says","said","new","also","more","here","why","how","what","when",
+]);
+
+function extractSignificantWords(text: string): Set<string> {
+  return new Set(
+    text
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, " ")
+      .split(/\s+/)
+      .filter((w) => w.length > 2 && !STOP_WORDS.has(w))
+  );
+}
+
+function isSimilar(a: string, b: string): boolean {
+  const wordsA = extractSignificantWords(a);
+  const wordsB = extractSignificantWords(b);
+  if (wordsA.size === 0 || wordsB.size === 0) return false;
+
+  let overlap = 0;
+  for (const w of wordsA) {
+    if (wordsB.has(w)) overlap++;
+  }
+
+  const smaller = Math.min(wordsA.size, wordsB.size);
+  return overlap / smaller >= 0.4;
+}
+
+function isDuplicate(
+  candidate: ClassifiedEvent,
+  existing: ClassifiedEvent[]
+): boolean {
+  const candidateText = `${candidate.title} ${candidate.summary || ""}`;
+  for (const e of existing) {
+    const existingText = `${e.title} ${e.summary || ""}`;
+    if (isSimilar(candidateText, existingText)) return true;
+  }
+  return false;
+}
+
 /**
- * Select a diverse set of events: spread across types, dedupe by title
- * similarity, cap any single type at maxPerType.
+ * Select a diverse set of events: spread across types, dedupe similar
+ * stories, cap any single type at maxPerType.
  */
 export function selectDiverseEvents(
   events: ClassifiedEvent[],
@@ -339,10 +374,6 @@ export function selectDiverseEvents(
   const maxPerType = Math.max(2, Math.ceil(limit / 4));
   const result: ClassifiedEvent[] = [];
   const typeCount = new Map<string, number>();
-  const usedTitles = new Set<string>();
-
-  const titleKey = (t: string) =>
-    t.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 50);
 
   const byType = new Map<string, ClassifiedEvent[]>();
   for (const e of events) {
@@ -355,23 +386,20 @@ export function selectDiverseEvents(
   for (const [, list] of byType) {
     if (result.length >= limit) break;
     const best = list[0];
-    if (best) {
+    if (best && !isDuplicate(best, result)) {
       result.push(best);
       typeCount.set(best.type, 1);
-      usedTitles.add(titleKey(best.title));
     }
   }
 
-  // Second pass: fill remaining, respecting maxPerType cap
+  // Second pass: fill remaining, respecting maxPerType and similarity
   for (const e of events) {
     if (result.length >= limit) break;
-    const tk = titleKey(e.title);
-    if (usedTitles.has(tk)) continue;
+    if (isDuplicate(e, result)) continue;
     const count = typeCount.get(e.type) || 0;
     if (count >= maxPerType) continue;
     result.push(e);
     typeCount.set(e.type, count + 1);
-    usedTitles.add(tk);
   }
 
   return result.sort(

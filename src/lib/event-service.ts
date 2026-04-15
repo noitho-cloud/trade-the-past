@@ -88,7 +88,7 @@ export async function getEvents(
       const tradeable = filterTradeableReactions(allReactions);
       const first = tradeable[0] ?? null;
       return {
-        id: `live-${i}-${e.date}`,
+        id: `live-${scope}-${i}-${e.date}`,
         title: e.title,
         type: e.type,
         date: e.date,
@@ -114,7 +114,10 @@ export async function getEventById(
   id: string
 ): Promise<MarketEvent | undefined> {
   if (id.startsWith("live-")) {
-    const allScopes: Array<"global" | "local"> = ["global", "local"];
+    let allScopes: Array<"global" | "local"> = ["global", "local"];
+    if (id.startsWith("live-local-")) {
+      allScopes = ["local", "global"];
+    }
     for (const scope of allScopes) {
       const events = await getEvents(scope);
       const summary = events.find((e) => e.id === id);

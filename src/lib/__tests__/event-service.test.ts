@@ -87,4 +87,25 @@ describe("event-service", () => {
     expect(typeof liveEvent!.keyReaction!.day1Pct).toBe("number");
     expect(["up", "down"]).toContain(liveEvent!.keyReaction!.direction);
   });
+
+  it("includes scope in live event IDs to avoid cross-scope collisions", async () => {
+    delete process.env.NEWSAPI_KEY;
+    const { fetchRSSHeadlines } = await import("../rss-client");
+    vi.mocked(fetchRSSHeadlines).mockResolvedValue([
+      {
+        title: "Fed raises interest rates by 25 basis points",
+        description: "The Federal Reserve raised rates citing inflation concerns",
+        url: "https://example.com/fed",
+        urlToImage: null,
+        publishedAt: new Date().toISOString(),
+        source: { id: null, name: "Reuters" },
+      },
+    ]);
+
+    const { getEvents } = await import("../event-service");
+    const globalEvents = await getEvents("global");
+    const globalLive = globalEvents.find((e) => e.id.startsWith("live-"));
+    expect(globalLive).toBeDefined();
+    expect(globalLive!.id).toMatch(/^live-global-/);
+  });
 });
