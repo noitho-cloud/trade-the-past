@@ -9,8 +9,18 @@ import {
 } from "@/lib/auth";
 
 export async function POST(request: Request) {
+  let body: Record<string, unknown>;
   try {
-    const { code, code_verifier } = await request.json();
+    body = await request.json();
+  } catch {
+    return NextResponse.json(
+      { error: "Invalid request body" },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const { code, code_verifier } = body as { code?: string; code_verifier?: string };
 
     if (!code || !code_verifier) {
       return NextResponse.json(
@@ -50,8 +60,10 @@ export async function POST(request: Request) {
       userId: claims.sub,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Authentication failed";
-    console.error("SSO auth error:", message);
-    return NextResponse.json({ error: message }, { status: 401 });
+    console.error("SSO auth error:", error instanceof Error ? error.message : error);
+    return NextResponse.json(
+      { error: "Authentication failed" },
+      { status: 401 }
+    );
   }
 }
