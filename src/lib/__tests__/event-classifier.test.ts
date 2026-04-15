@@ -102,9 +102,9 @@ describe("classifyArticle", () => {
   it("gives geopolitical events higher confidence than routine interest rate holds", () => {
     const geoArticle = makeArticle({
       title:
-        "Military conflict escalates as naval blockade threatens oil shipping routes",
+        "Military troops enforce naval blockade amid sanctions and missile escalation",
       description:
-        "Strait closure would block 20% of global oil supply, sparking energy crisis fears.",
+        "NATO forces deploy as retaliation threats grow, raising fears of a wider geopolitical conflict.",
     });
 
     const rateArticle = makeArticle({
@@ -125,8 +125,8 @@ describe("classifyArticle", () => {
 describe("scoreEvent", () => {
   it("scores geopolitical events from high-authority sources very high", () => {
     const article = makeArticle({
-      title: "Naval blockade of Strait of Hormuz threatens global oil supply",
-      description: "Military deployment and blockade disrupts shipping.",
+      title: "NATO naval blockade of Strait of Hormuz triggers sanctions and missile threats",
+      description: "Military troops deploy as geopolitical escalation and retaliation fears mount.",
       source: { id: "reuters", name: "Reuters" },
       publishedAt: new Date().toISOString(),
     });

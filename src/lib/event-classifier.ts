@@ -17,10 +17,33 @@ const RULES: ClassificationRule[] = [
       "quarterly results",
       "beats estimates",
       "misses estimates",
+      "tops estimates",
       "eps",
       "guidance",
       "fiscal year",
       "net income",
+      "q1 ",
+      "q2 ",
+      "q3 ",
+      "q4 ",
+      "first quarter",
+      "second quarter",
+      "third quarter",
+      "fourth quarter",
+      "raises guidance",
+      "beats expectations",
+      "report earnings",
+      "results beat",
+      "sales growth",
+      "ipo",
+      "stock jumps",
+      "stock surges",
+      "shares jump",
+      "shares surge",
+      "shares rise",
+      "shares fall",
+      "stock falls",
+      "market cap",
     ],
     weight: 1.0,
   },
@@ -36,6 +59,11 @@ const RULES: ClassificationRule[] = [
       "redundancies",
       "furlough",
       "headcount",
+      "cost cutting",
+      "cut jobs",
+      "cutting jobs",
+      "slash jobs",
+      "eliminate positions",
     ],
     weight: 1.1,
   },
@@ -44,6 +72,7 @@ const RULES: ClassificationRule[] = [
     keywords: [
       "lawsuit",
       "sued",
+      "sues",
       "litigation",
       "settlement",
       "antitrust",
@@ -53,6 +82,15 @@ const RULES: ClassificationRule[] = [
       "investigation",
       "indictment",
       "fraud",
+      "class action",
+      "court ruling",
+      "court rules",
+      "guilty",
+      "verdict",
+      "prosecution",
+      "ftc",
+      "doj",
+      "sec charges",
     ],
     weight: 1.0,
   },
@@ -98,80 +136,49 @@ const RULES: ClassificationRule[] = [
       "trade war",
       "embargo",
       "export control",
-      "conflict",
       "geopolitical",
-      "summit",
-      "diplomatic",
       "nato",
       "military",
-      "strait",
+      "strait of hormuz",
       "hormuz",
       "blockade",
       "naval",
-      "shipping",
-      "maritime",
-      "war",
       "invasion",
-      "attack",
       "missile",
-      "drone",
-      "nuclear",
-      "suez",
-      "gulf",
-      "border",
-      "closure",
-      "occupation",
-      "fleet",
-      "carrier",
-      "threat",
-      "deploy",
-      "troops",
-      "ceasefire",
       "airstrike",
-      "iran",
-      "china",
-      "russia",
-      "ukraine",
-      "taiwan",
-      "north korea",
-      "middle east",
-      "israel",
-      "gaza",
+      "nuclear",
+      "suez canal",
+      "ceasefire",
+      "troops",
       "houthi",
       "red sea",
       "south china sea",
       "pentagon",
       "weapons",
-      "arms",
+      "arms deal",
       "treaty",
-      "alliance",
       "escalation",
-      "tension",
       "retaliation",
-      "proxy",
       "insurgent",
       "coup",
-      "regime",
-      "election",
-      "trump",
-      "biden",
-      "president",
-      "prime minister",
       "un security council",
-      "g7",
-      "g20",
-      "brics",
     ],
-    weight: 1.5,
+    weight: 1.3,
   },
   {
     type: "commodity-shocks",
     keywords: [
       "oil price",
+      "oil tumbles",
+      "oil surges",
+      "oil spikes",
       "crude",
+      "brent",
       "opec",
       "commodity",
       "gold price",
+      "gold hits",
+      "gold surges",
       "rare earth",
       "supply chain",
       "shortage",
@@ -180,7 +187,6 @@ const RULES: ClassificationRule[] = [
       "copper",
       "oil supply",
       "shipping lane",
-      "route",
       "disruption",
       "supply disruption",
       "refinery",
@@ -189,10 +195,16 @@ const RULES: ClassificationRule[] = [
       "production cut",
       "fuel",
       "energy crisis",
+      "energy shock",
       "supply shock",
       "pipeline",
+      "jet fuel",
+      "gasoline",
+      "oil forecast",
+      "drilling",
+      "north sea oil",
     ],
-    weight: 1.4,
+    weight: 1.2,
   },
 ];
 
@@ -218,11 +230,11 @@ export interface ClassifiedEvent {
 }
 
 export function cleanDescription(
-  description: string | null,
+  description: string | null | undefined,
   sourceName: string,
   title: string
 ): string {
-  if (!description || description.trim() === "") return title;
+  if (!description || !description.trim()) return title;
   if (sourceName.toLowerCase().includes("google news")) return title;
   return description;
 }
@@ -242,14 +254,14 @@ export function classifyArticle(
     }
     if (matchCount === 0) continue;
 
-    const score = (Math.min(matchCount, 5) / 5) * rule.weight;
+    const score = (matchCount / rule.keywords.length) * rule.weight;
     if (score > bestScore) {
       bestScore = score;
       bestType = rule.type;
     }
   }
 
-  if (!bestType || bestScore < 0.01) return null;
+  if (!bestType || bestScore < 0.03) return null;
 
   return { type: bestType, confidence: bestScore };
 }
@@ -310,6 +322,59 @@ export function selectTopEventPerDay(
   }
 
   return Array.from(byDate.values()).sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+}
+
+/**
+ * Select a diverse set of events: spread across types, dedupe by title
+ * similarity, cap any single type at maxPerType.
+ */
+export function selectDiverseEvents(
+  events: ClassifiedEvent[],
+  limit: number
+): ClassifiedEvent[] {
+  if (events.length <= limit) return events;
+
+  const maxPerType = Math.max(2, Math.ceil(limit / 4));
+  const result: ClassifiedEvent[] = [];
+  const typeCount = new Map<string, number>();
+  const usedTitles = new Set<string>();
+
+  const titleKey = (t: string) =>
+    t.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 50);
+
+  const byType = new Map<string, ClassifiedEvent[]>();
+  for (const e of events) {
+    const list = byType.get(e.type) || [];
+    list.push(e);
+    byType.set(e.type, list);
+  }
+
+  // First pass: one from each type (round-robin)
+  for (const [, list] of byType) {
+    if (result.length >= limit) break;
+    const best = list[0];
+    if (best) {
+      result.push(best);
+      typeCount.set(best.type, 1);
+      usedTitles.add(titleKey(best.title));
+    }
+  }
+
+  // Second pass: fill remaining, respecting maxPerType cap
+  for (const e of events) {
+    if (result.length >= limit) break;
+    const tk = titleKey(e.title);
+    if (usedTitles.has(tk)) continue;
+    const count = typeCount.get(e.type) || 0;
+    if (count >= maxPerType) continue;
+    result.push(e);
+    typeCount.set(e.type, count + 1);
+    usedTitles.add(tk);
+  }
+
+  return result.sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 }
