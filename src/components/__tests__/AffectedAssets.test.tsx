@@ -50,9 +50,9 @@ describe("AffectedAssets", () => {
     expect(spElements).toHaveLength(1);
   });
 
-  it("shows Trade and Watchlist buttons for each asset", () => {
+  it("shows Trade on eToro and Watchlist buttons for each asset", () => {
     render(<AffectedAssets matches={matches} />);
-    const tradeButtons = screen.getAllByText("Trade");
+    const tradeButtons = screen.getAllByText("Trade on eToro");
     const watchlistButtons = screen.getAllByText("Watchlist");
     expect(tradeButtons.length).toBe(3);
     expect(watchlistButtons.length).toBe(3);
@@ -60,25 +60,38 @@ describe("AffectedAssets", () => {
 
   it("shows direction indicators for each asset", () => {
     render(<AffectedAssets matches={matches} />);
-    const cards = screen.getAllByText("Trade");
+    const cards = screen.getAllByText("Trade on eToro");
     expect(cards.length).toBe(3);
   });
 
   it("links Trade button to eToro", () => {
     render(<AffectedAssets matches={matches} />);
-    const tradeLinks = screen.getAllByText("Trade");
+    const tradeLinks = screen.getAllByText("Trade on eToro");
     const firstTradeLink = tradeLinks[0].closest("a");
     expect(firstTradeLink).toBeDefined();
     expect(firstTradeLink!.getAttribute("href")).toContain("etoro.com/markets/");
     expect(firstTradeLink!.getAttribute("target")).toBe("_blank");
   });
 
-  it("Trade and Watchlist buttons have min-h-[48px] for correct eToro height", () => {
+  it("Trade and Watchlist buttons have h-[48px] for correct eToro height", () => {
     render(<AffectedAssets matches={matches} />);
-    const tradeLinks = screen.getAllByText("Trade");
+    const tradeLinks = screen.getAllByText("Trade on eToro");
     const watchlistLinks = screen.getAllByText("Watchlist");
     for (const el of [...tradeLinks, ...watchlistLinks]) {
-      expect(el.className).toContain("min-h-[48px]");
+      expect(el.className).toContain("h-[48px]");
+    }
+  });
+
+  it("does not render 'on eToro' label below buttons", () => {
+    render(<AffectedAssets matches={matches} />);
+    expect(screen.queryByText("on eToro")).toBeNull();
+  });
+
+  it("Watchlist button has 1.5px border", () => {
+    render(<AffectedAssets matches={matches} />);
+    const watchlistLinks = screen.getAllByText("Watchlist");
+    for (const el of watchlistLinks) {
+      expect(el.className).toContain("border-[1.5px]");
     }
   });
 

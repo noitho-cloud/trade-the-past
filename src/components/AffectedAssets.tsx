@@ -75,12 +75,6 @@ function PctDisplay({ value }: { value: number }) {
   );
 }
 
-function EtoroLabel() {
-  return (
-    <span className="text-[10px] text-muted tracking-wide">on eToro</span>
-  );
-}
-
 function AssetCard({ asset }: { asset: ConsolidatedAsset }) {
   return (
     <div className="rounded-[16px] bg-card border border-[var(--card-border)] p-[var(--space-xl)] flex flex-col gap-3 shadow-[var(--card-shadow)]">
@@ -108,30 +102,25 @@ function AssetCard({ asset }: { asset: ConsolidatedAsset }) {
         </div>
       </div>
 
-      <div className="flex flex-col gap-1.5 pt-1">
-        <div className="flex flex-col sm:flex-row gap-2">
-          <a
-            href={getEtoroTradeUrl(asset.asset)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-1 inline-flex items-center justify-center bg-[var(--etoro-green)] text-white text-[16px] font-semibold min-h-[48px] px-4 rounded-[48px]
-                       hover:bg-[var(--etoro-green-hover)] active:scale-[0.98] transition-all text-center focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:ring-offset-2 focus-visible:outline-none"
-          >
-            Trade
-          </a>
-          <a
-            href={getEtoroWatchlistUrl(asset.asset)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-1 inline-flex items-center justify-center border border-[var(--btn-secondary-border)] bg-[var(--btn-secondary-bg)] text-[var(--btn-secondary-text)] text-[16px] font-semibold min-h-[48px] px-4 rounded-[48px]
-                       hover:bg-[var(--btn-secondary-hover)] active:scale-[0.98] transition-all text-center focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:outline-none"
-          >
-            Watchlist
-          </a>
-        </div>
-        <div className="text-center">
-          <EtoroLabel />
-        </div>
+      <div className="flex flex-col sm:flex-row gap-2 pt-1">
+        <a
+          href={getEtoroTradeUrl(asset.asset)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex-1 inline-flex items-center justify-center bg-[var(--etoro-green)] text-white text-[16px] font-semibold h-[48px] px-6 rounded-[48px]
+                     hover:bg-[var(--etoro-green-hover)] active:scale-[0.98] transition-all text-center focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:ring-offset-2 focus-visible:outline-none"
+        >
+          Trade on eToro
+        </a>
+        <a
+          href={getEtoroWatchlistUrl(asset.asset)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex-1 inline-flex items-center justify-center border-[1.5px] border-[var(--btn-secondary-border)] bg-[var(--btn-secondary-bg)] text-[var(--btn-secondary-text)] text-[16px] font-semibold h-[48px] px-6 rounded-[48px]
+                     hover:bg-[var(--btn-secondary-hover)] active:scale-[0.98] transition-all text-center focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:outline-none"
+        >
+          Watchlist
+        </a>
       </div>
     </div>
   );
