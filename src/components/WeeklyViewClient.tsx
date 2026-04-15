@@ -203,7 +203,7 @@ export function WeeklyViewClient({
     <div className="space-y-6">
       <div className="flex items-end justify-between gap-4">
         <div>
-          <h2 className="text-[24px] font-bold tracking-tight">
+          <h2 className="font-bold tracking-tight" style={{ fontSize: 'clamp(20px, 5vw, 24px)' }}>
             This Week
           </h2>
           <p className="text-foreground/70 text-[15px] mt-1">

@@ -109,7 +109,7 @@ function AssetCard({ asset }: { asset: ConsolidatedAsset }) {
       </div>
 
       <div className="flex flex-col gap-1.5 pt-1">
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <a
             href={getEtoroTradeUrl(asset.asset)}
             target="_blank"
@@ -146,7 +146,7 @@ export function AffectedAssets({ matches }: { matches: HistoricalMatch[] }) {
   return (
     <section className="space-y-4">
       <div className="flex items-center gap-4">
-        <h2 className="text-[18px] font-semibold whitespace-nowrap">
+        <h2 className="font-semibold whitespace-nowrap" style={{ fontSize: 'clamp(16px, 4vw, 18px)' }}>
           Affected Assets
         </h2>
         <div className="h-px flex-1 bg-border" />

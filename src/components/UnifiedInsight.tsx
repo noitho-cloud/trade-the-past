@@ -146,7 +146,7 @@ export function UnifiedInsight({ matches }: { matches: HistoricalMatch[] }) {
   return (
     <section className="space-y-6">
       <div className="flex items-center gap-4">
-        <h2 className="text-[18px] font-semibold whitespace-nowrap">
+        <h2 className="font-semibold whitespace-nowrap" style={{ fontSize: 'clamp(16px, 4vw, 18px)' }}>
           What History Tells Us
         </h2>
         <div className="h-px flex-1 bg-border" />

@@ -117,7 +117,7 @@ export default async function EventDetail({
             </span>
           </div>
 
-          <h1 className="text-[24px] md:text-[28px] font-bold leading-[1.2] tracking-tight">
+          <h1 className="font-bold leading-[1.2] tracking-tight" style={{ fontSize: 'clamp(20px, 5vw, 28px)' }}>
             {event.title}
           </h1>
 
