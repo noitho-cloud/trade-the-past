@@ -82,11 +82,11 @@ function buildTakeaway(
 function buildUnifiedNarrative(matches: HistoricalMatch[]): string {
   if (matches.length === 1) {
     const m = matches[0];
-    return `In a similar past event \u2014 the ${m.year} ${m.description.toLowerCase()} \u2014 ${m.insight.charAt(0).toLowerCase()}${m.insight.slice(1)}`;
+    return `In a similar past event \u2014 the ${m.year} ${m.description} \u2014 ${m.insight.charAt(0).toLowerCase()}${m.insight.slice(1)}`;
   }
 
   const eventRefs = matches
-    .map((m) => `the ${m.year} ${m.description.toLowerCase()}`)
+    .map((m) => `the ${m.year} ${m.description}`)
     .join(" and ");
 
   const allReactions = matches.flatMap((m) => m.reactions);

@@ -104,4 +104,17 @@ describe("UnifiedInsight", () => {
     render(<UnifiedInsight matches={twoMatches} />);
     expect(screen.getByText("Key Takeaway")).toBeDefined();
   });
+
+  it("preserves capitalization in the narrative for proper nouns", () => {
+    render(<UnifiedInsight matches={twoMatches} />);
+    const narrative = screen.getByText(/In similar past events/);
+    expect(narrative.textContent).toContain("Fed pauses rate hikes");
+    expect(narrative.textContent).toContain("Fed signals rate cuts");
+  });
+
+  it("preserves capitalization in single-match narrative", () => {
+    render(<UnifiedInsight matches={singleMatch} />);
+    const narrative = screen.getByText(/In a similar past event/);
+    expect(narrative.textContent).toContain("Fed pauses rate hikes");
+  });
 });
