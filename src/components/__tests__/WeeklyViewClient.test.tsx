@@ -199,6 +199,49 @@ describe("WeeklyViewClient", () => {
     });
   });
 
+  it("renders one card per unique date when API returns multiple events for the same day", () => {
+    const today = new Date().toISOString().split("T")[0];
+    const sameDayEvents: MarketEventSummary[] = [
+      {
+        id: "dup-1",
+        title: "Event A",
+        type: "earnings",
+        date: today,
+        summary: "Summary A",
+        imageUrl: null,
+        source: "Reuters",
+        keyReaction: null,
+      },
+      {
+        id: "dup-2",
+        title: "Event B",
+        type: "geopolitical",
+        date: today,
+        summary: "Summary B",
+        imageUrl: null,
+        source: "Bloomberg",
+        keyReaction: null,
+      },
+      {
+        id: "dup-3",
+        title: "Event C",
+        type: "layoffs",
+        date: today,
+        summary: "Summary C",
+        imageUrl: null,
+        source: "CNBC",
+        keyReaction: null,
+      },
+    ];
+
+    render(<WeeklyViewClient initialEvents={sameDayEvents} />);
+
+    const links = screen.getAllByRole("link").filter((a) =>
+      a.getAttribute("href")?.startsWith("/event/")
+    );
+    expect(links).toHaveLength(1);
+  });
+
   it("empty state has a button to switch back to Global", async () => {
     const user = userEvent.setup();
     (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({

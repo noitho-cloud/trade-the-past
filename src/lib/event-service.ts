@@ -2,14 +2,14 @@ import { fetchHeadlines } from "./news-client";
 import { fetchRSSHeadlines } from "./rss-client";
 import {
   classifyAndRank,
-  selectTopEventPerDay,
+  selectDiverseEvents,
   type ClassifiedEvent,
 } from "./event-classifier";
 import { getMockEvents, getMockEventById } from "./mock-data";
 import { getHistoricalMatches } from "./historical-service";
-import { findHistoricalMatches } from "./historical-db";
 import { filterTradeableReactions } from "./etoro-slugs";
-import type { MarketEvent, MarketEventSummary, HistoricalMatch, KeyReaction, EventType } from "./types";
+import { findHistoricalMatches } from "./historical-db";
+import type { MarketEvent, MarketEventSummary, HistoricalMatch } from "./types";
 
 function filterMatchReactions(matches: HistoricalMatch[]): HistoricalMatch[] {
   return matches.map((m) => ({
@@ -18,24 +18,12 @@ function filterMatchReactions(matches: HistoricalMatch[]): HistoricalMatch[] {
   }));
 }
 
-function getKeyReaction(title: string, type: EventType, summary: string): KeyReaction | null {
-  const matches = findHistoricalMatches(title, type, summary);
-  for (const match of matches) {
-    const tradeable = filterTradeableReactions(match.reactions);
-    if (tradeable.length > 0) {
-      const r = tradeable[0];
-      return { asset: r.asset, direction: r.direction, day1Pct: r.day1Pct };
-    }
-  }
-  return null;
-}
-
 interface CacheEntry<T> {
   data: T;
   expiresAt: number;
 }
 
-const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 const eventsCache = new Map<string, CacheEntry<MarketEventSummary[]>>();
 const classifiedCache = new Map<string, CacheEntry<ClassifiedEvent[]>>();
 
@@ -92,24 +80,30 @@ export async function getEvents(
     }
 
     const classified = classifyAndRank(articles);
-    const topPerDay = selectTopEventPerDay(classified);
+    const diverse = selectDiverseEvents(classified, 10);
 
-    const top7 = topPerDay.slice(0, 10);
-
-    const summaries: MarketEventSummary[] = top7.map((e, i) => ({
-      id: `live-${i}-${e.date}`,
-      title: e.title,
-      type: e.type,
-      date: e.date,
-      summary: e.summary || e.title,
-      imageUrl: e.imageUrl,
-      source: e.source,
-      keyReaction: getKeyReaction(e.title, e.type, e.summary || e.title),
-    }));
+    const summaries: MarketEventSummary[] = diverse.map((e, i) => {
+      const dbMatches = findHistoricalMatches(e.title, e.type, e.summary || e.title);
+      const allReactions = dbMatches.flatMap((m) => m.reactions);
+      const tradeable = filterTradeableReactions(allReactions);
+      const first = tradeable[0] ?? null;
+      return {
+        id: `live-${i}-${e.date}`,
+        title: e.title,
+        type: e.type,
+        date: e.date,
+        summary: e.summary || e.title,
+        imageUrl: e.imageUrl,
+        source: e.source,
+        keyReaction: first
+          ? { asset: first.asset, direction: first.direction, day1Pct: first.day1Pct }
+          : null,
+      };
+    });
 
     summaries.sort((a, b) => b.date.localeCompare(a.date));
     setCache(cacheKey, summaries, eventsCache);
-    setCache(`classified-${scope}`, top7, classifiedCache);
+    setCache(`classified-${scope}`, diverse, classifiedCache);
     return summaries;
   } catch {
     return getMockEvents(scope);

@@ -242,7 +242,7 @@ export function WeeklyViewClient({
         ) : (
           (() => {
             const eventsByDate = new Map(events.map((e) => [e.date, e]));
-            const dates = scope === "local" ? getWeekDates() : events.map((e) => e.date);
+            const dates = scope === "local" ? getWeekDates() : [...new Set(events.map((e) => e.date))];
             const currentDay = todayStr();
             return dates.map((dateStr, index) => {
               const event = eventsByDate.get(dateStr);
