@@ -217,6 +217,16 @@ export interface ClassifiedEvent {
   summary: string;
 }
 
+export function cleanDescription(
+  description: string | null,
+  sourceName: string,
+  title: string
+): string {
+  if (!description || description.trim() === "") return title;
+  if (sourceName.toLowerCase().includes("google news")) return title;
+  return description;
+}
+
 export function classifyArticle(
   article: RawArticle
 ): { type: EventType; confidence: number } | null {
@@ -277,7 +287,7 @@ export function classifyAndRank(articles: RawArticle[]): ClassifiedEvent[] {
         imageUrl: article.urlToImage,
         source: article.source.name,
         date: article.publishedAt.split("T")[0],
-        summary: article.description || article.title,
+        summary: cleanDescription(article.description, article.source.name, article.title),
       },
       score: impactScore,
     });

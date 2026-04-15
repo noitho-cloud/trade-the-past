@@ -3,6 +3,7 @@ import {
   classifyArticle,
   scoreEvent,
   classifyAndRank,
+  cleanDescription,
 } from "../event-classifier";
 import type { RawArticle } from "../news-client";
 
@@ -17,6 +18,39 @@ function makeArticle(overrides: Partial<RawArticle> = {}): RawArticle {
     ...overrides,
   };
 }
+
+describe("cleanDescription", () => {
+  it("returns title for Google News articles instead of concatenated description", () => {
+    const garbled =
+      "Citigroup beats estimates, boosted by gains in fixed income CNBCEarnings live updates Yahoo FinanceCitigroup Profit Jumps 42% Barron's";
+    const title = "Citigroup beats estimates, boosted by gains in fixed income";
+    expect(cleanDescription(garbled, "Google News", title)).toBe(title);
+  });
+
+  it("returns title for Google News regional variants", () => {
+    const desc = "Some garbled multi-source text";
+    const title = "Clean headline";
+    expect(cleanDescription(desc, "Google News UK", title)).toBe(title);
+    expect(cleanDescription(desc, "Google News Business", title)).toBe(title);
+  });
+
+  it("returns description as-is for non-Google-News articles", () => {
+    const desc = "A clean, readable summary from Reuters.";
+    const title = "Reuters headline";
+    expect(cleanDescription(desc, "Reuters", title)).toBe(desc);
+  });
+
+  it("returns title when description is null", () => {
+    const title = "Fallback headline";
+    expect(cleanDescription(null, "Reuters", title)).toBe(title);
+  });
+
+  it("returns title when description is empty string", () => {
+    const title = "Fallback headline";
+    expect(cleanDescription("", "Reuters", title)).toBe(title);
+    expect(cleanDescription("   ", "Reuters", title)).toBe(title);
+  });
+});
 
 describe("classifyArticle", () => {
   it("classifies Hormuz Strait blockade as geopolitical", () => {
