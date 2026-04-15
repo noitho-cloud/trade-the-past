@@ -22,6 +22,13 @@ export default function RootLayout({
     <html lang="en" className="h-full" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://marketing.etorostatic.com" crossOrigin="anonymous" />
+        <link
+          rel="preload"
+          href="https://marketing.etorostatic.com/cache1/fonts/etoro/eToro-VF-v0.7.ttf"
+          as="font"
+          type="font/ttf"
+          crossOrigin="anonymous"
+        />
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">

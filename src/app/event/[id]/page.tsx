@@ -90,12 +90,13 @@ export default async function EventDetail({
           <div className="flex items-center gap-3">
             <EventTypeBadge type={event.type} />
             <span className="text-xs text-muted">
-              {new Date(event.date + "T12:00:00").toLocaleDateString("en-US", {
-                weekday: "long",
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              })}
+              {(() => {
+                const WDAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+                const MOS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+                const [y,m,d] = event.date.split("-").map(Number);
+                const dt = new Date(Date.UTC(y, m-1, d, 12));
+                return `${WDAYS[dt.getUTCDay()]}, ${MOS[dt.getUTCMonth()]} ${dt.getUTCDate()}, ${dt.getUTCFullYear()}`;
+              })()}
             </span>
           </div>
 

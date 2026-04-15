@@ -32,18 +32,21 @@ function EventCardSkeleton() {
   );
 }
 
+const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
 function formatDate(dateStr: string): { weekday: string; display: string } {
-  const d = new Date(dateStr + "T12:00:00");
+  const [y, m, d] = dateStr.split("-").map(Number);
+  const date = new Date(Date.UTC(y, m - 1, d, 12, 0, 0));
   return {
-    weekday: d.toLocaleDateString("en-US", { weekday: "long" }),
-    display: d.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+    weekday: WEEKDAYS[date.getUTCDay()],
+    display: `${MONTHS[date.getUTCMonth()]} ${date.getUTCDate()}`,
   };
 }
 
-function isToday(dateStr: string): boolean {
+function todayStr(): string {
   const now = new Date();
-  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-  return dateStr === today;
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 }
 
 function getWeekDates(): string[] {
@@ -65,7 +68,7 @@ function MethodologyHint() {
     <div className="mt-2">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="text-[12px] text-muted/70 hover:text-muted underline underline-offset-2 decoration-muted/30 hover:decoration-muted/60 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:outline-none rounded"
+        className="text-[11px] text-muted/50 hover:text-muted/70 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:outline-none rounded"
       >
         {open ? "Hide" : "How does this work?"}
       </button>
@@ -238,13 +241,14 @@ export function WeeklyViewClient({
           (() => {
             const eventsByDate = new Map(events.map((e) => [e.date, e]));
             const dates = scope === "local" ? getWeekDates() : events.map((e) => e.date);
+            const currentDay = todayStr();
             return dates.map((dateStr, index) => {
               const event = eventsByDate.get(dateStr);
               if (!event) {
                 return <EmptyDaySlot key={`empty-${dateStr}`} dateStr={dateStr} />;
               }
               const { weekday, display } = formatDate(event.date);
-              const today = isToday(event.date);
+              const today = event.date === currentDay;
 
               return (
                 <Link
@@ -261,7 +265,7 @@ export function WeeklyViewClient({
                   <div className="flex items-stretch">
                     <div className="w-20 shrink-0 flex flex-col items-center justify-center border-r border-[var(--gray-border)] py-4">
                       <span className="text-[11px] font-medium tracking-wide uppercase text-muted">
-                        {weekday.slice(0, 3)}
+                        {weekday}
                       </span>
                       <span className="text-lg font-semibold mt-0.5">
                         {display.split(" ")[1]}
@@ -272,7 +276,7 @@ export function WeeklyViewClient({
                     </div>
 
                     <div className="flex-1 p-4 flex items-start gap-4">
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1 min-w-0" suppressHydrationWarning>
                         {today && (
                           <span className="text-[10px] font-semibold tracking-wider uppercase bg-etoro-green text-white px-1.5 py-0.5 rounded-full inline-block mb-1">
                             Today
