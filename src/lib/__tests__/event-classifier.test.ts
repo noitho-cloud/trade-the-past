@@ -10,6 +10,7 @@ function makeArticle(overrides: Partial<RawArticle> = {}): RawArticle {
   return {
     title: "Test headline",
     description: "Test description",
+    url: "https://example.com/test-article",
     source: { id: "reuters", name: "Reuters" },
     publishedAt: new Date().toISOString(),
     urlToImage: null,

@@ -105,7 +105,7 @@ function TradeButton({ asset }: { asset: string }) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Trade on eToro"
-      className="inline-flex flex-col items-center justify-center bg-[var(--etoro-green)] text-white font-semibold h-[44px] px-6 rounded-[48px] whitespace-nowrap
+      className="w-full inline-flex flex-col items-center justify-center bg-[var(--etoro-green)] text-white font-semibold h-[44px] px-6 rounded-[48px] whitespace-nowrap
                  hover:bg-[var(--etoro-green-hover)] active:scale-[0.98] transition-all text-center focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:ring-offset-2 focus-visible:outline-none"
     >
       <span className="text-[14px] leading-none">Trade</span>
