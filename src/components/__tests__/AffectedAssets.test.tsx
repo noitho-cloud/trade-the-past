@@ -59,7 +59,7 @@ describe("AffectedAssets", () => {
   it("shows Trade on eToro and Watchlist buttons for each asset", () => {
     render(<AffectedAssets matches={matches} />, { wrapper: Wrapper });
     const tradeButtons = screen.getAllByRole("link", { name: /trade on etoro/i });
-    const watchlistButtons = screen.getAllByText("Watchlist");
+    const watchlistButtons = screen.getAllByRole("link", { name: /add .+ to watchlist/i });
     expect(tradeButtons.length).toBe(3);
     expect(watchlistButtons.length).toBe(3);
   });
@@ -79,12 +79,16 @@ describe("AffectedAssets", () => {
     expect(firstTradeLink.getAttribute("target")).toBe("_blank");
   });
 
-  it("Trade and Watchlist buttons have h-[48px] for correct eToro height", () => {
+  it("Trade button has correct height and Watchlist star is a link", () => {
     render(<AffectedAssets matches={matches} />, { wrapper: Wrapper });
     const tradeLinks = screen.getAllByRole("link", { name: /trade on etoro/i });
-    const watchlistLinks = screen.getAllByText("Watchlist");
-    for (const el of [...tradeLinks, ...watchlistLinks]) {
-      expect(el.className).toContain("h-[48px]");
+    for (const el of tradeLinks) {
+      expect(el.className).toContain("h-[44px]");
+    }
+    const watchlistLinks = screen.getAllByRole("link", { name: /add .+ to watchlist/i });
+    for (const el of watchlistLinks) {
+      expect(el.getAttribute("href")).toContain("etoro.com");
+      expect(el.getAttribute("target")).toBe("_blank");
     }
   });
 
@@ -97,11 +101,11 @@ describe("AffectedAssets", () => {
     }
   });
 
-  it("Watchlist button has 1.5px border", () => {
+  it("Watchlist star icon renders as SVG inside each link", () => {
     render(<AffectedAssets matches={matches} />, { wrapper: Wrapper });
-    const watchlistLinks = screen.getAllByText("Watchlist");
+    const watchlistLinks = screen.getAllByRole("link", { name: /add .+ to watchlist/i });
     for (const el of watchlistLinks) {
-      expect(el.className).toContain("border-[1.5px]");
+      expect(el.querySelector("svg")).toBeTruthy();
     }
   });
 

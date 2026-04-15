@@ -1,5 +1,6 @@
 import type { HistoricalMatch, EventType } from "./types";
 import { fetchHistoricalMatches } from "./openai-client";
+import { findHistoricalMatches } from "./historical-db";
 
 const matchCache = new Map<string, HistoricalMatch[]>();
 
@@ -18,23 +19,32 @@ export async function getHistoricalMatches(
   const cached = matchCache.get(key);
   if (cached) return cached;
 
+  // Try OpenAI first if key is available
   const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    return [];
+  if (apiKey) {
+    try {
+      const matches = await fetchHistoricalMatches(
+        title,
+        type,
+        summary,
+        source,
+        apiKey
+      );
+      if (matches.length > 0) {
+        matchCache.set(key, matches);
+        return matches;
+      }
+    } catch {
+      // OpenAI failed (quota, timeout, etc.) -- fall through to built-in DB
+    }
   }
 
-  try {
-    const matches = await fetchHistoricalMatches(
-      title,
-      type,
-      summary,
-      source,
-      apiKey
-    );
+  // Built-in historical database (always available, no API needed)
+  const matches = findHistoricalMatches(title, type, summary);
 
+  if (matches.length > 0) {
     matchCache.set(key, matches);
-    return matches;
-  } catch {
-    return [];
   }
+
+  return matches;
 }
