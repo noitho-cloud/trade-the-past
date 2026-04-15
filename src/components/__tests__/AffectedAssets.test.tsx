@@ -52,7 +52,7 @@ describe("AffectedAssets", () => {
 
   it("shows Trade on eToro and Watchlist buttons for each asset", () => {
     render(<AffectedAssets matches={matches} />);
-    const tradeButtons = screen.getAllByText("Trade on eToro");
+    const tradeButtons = screen.getAllByRole("link", { name: /trade on etoro/i });
     const watchlistButtons = screen.getAllByText("Watchlist");
     expect(tradeButtons.length).toBe(3);
     expect(watchlistButtons.length).toBe(3);
@@ -60,31 +60,35 @@ describe("AffectedAssets", () => {
 
   it("shows direction indicators for each asset", () => {
     render(<AffectedAssets matches={matches} />);
-    const cards = screen.getAllByText("Trade on eToro");
+    const cards = screen.getAllByRole("link", { name: /trade on etoro/i });
     expect(cards.length).toBe(3);
   });
 
   it("links Trade button to eToro", () => {
     render(<AffectedAssets matches={matches} />);
-    const tradeLinks = screen.getAllByText("Trade on eToro");
-    const firstTradeLink = tradeLinks[0].closest("a");
+    const tradeLinks = screen.getAllByRole("link", { name: /trade on etoro/i });
+    const firstTradeLink = tradeLinks[0];
     expect(firstTradeLink).toBeDefined();
-    expect(firstTradeLink!.getAttribute("href")).toContain("etoro.com/markets/");
-    expect(firstTradeLink!.getAttribute("target")).toBe("_blank");
+    expect(firstTradeLink.getAttribute("href")).toContain("etoro.com/markets/");
+    expect(firstTradeLink.getAttribute("target")).toBe("_blank");
   });
 
   it("Trade and Watchlist buttons have h-[48px] for correct eToro height", () => {
     render(<AffectedAssets matches={matches} />);
-    const tradeLinks = screen.getAllByText("Trade on eToro");
+    const tradeLinks = screen.getAllByRole("link", { name: /trade on etoro/i });
     const watchlistLinks = screen.getAllByText("Watchlist");
     for (const el of [...tradeLinks, ...watchlistLinks]) {
       expect(el.className).toContain("h-[48px]");
     }
   });
 
-  it("does not render 'on eToro' label below buttons", () => {
+  it("does not render standalone 'on eToro' label below buttons", () => {
     render(<AffectedAssets matches={matches} />);
-    expect(screen.queryByText("on eToro")).toBeNull();
+    const onEtoroElements = screen.queryAllByText("on eToro");
+    for (const el of onEtoroElements) {
+      const parentLink = el.closest("a");
+      expect(parentLink, "'on eToro' text should only appear inside a link button").toBeTruthy();
+    }
   });
 
   it("Watchlist button has 1.5px border", () => {

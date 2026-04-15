@@ -102,15 +102,17 @@ function AssetCard({ asset }: { asset: ConsolidatedAsset }) {
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-2 pt-1">
+      <div className="flex flex-col md:flex-row gap-2 pt-1">
         <a
           href={getEtoroTradeUrl(asset.asset)}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex-1 inline-flex items-center justify-center bg-[var(--etoro-green)] text-white text-[16px] font-semibold h-[48px] px-6 rounded-[48px]
+          aria-label="Trade on eToro"
+          className="flex-1 inline-flex flex-col items-center justify-center bg-[var(--etoro-green)] text-white font-semibold h-[48px] px-6 rounded-[48px] whitespace-nowrap
                      hover:bg-[var(--etoro-green-hover)] active:scale-[0.98] transition-all text-center focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:ring-offset-2 focus-visible:outline-none"
         >
-          Trade on eToro
+          <span className="text-[15px] leading-none">Trade</span>
+          <span className="text-[10px] font-normal opacity-80 leading-none mt-0.5">on eToro</span>
         </a>
         <a
           href={getEtoroWatchlistUrl(asset.asset)}
@@ -141,7 +143,7 @@ export function AffectedAssets({ matches }: { matches: HistoricalMatch[] }) {
         <div className="h-px flex-1 bg-border" />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {assets.map((asset) => (
           <AssetCard key={asset.asset} asset={asset} />
         ))}
