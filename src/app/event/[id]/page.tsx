@@ -1,7 +1,9 @@
+import { cache } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import type { MarketEvent } from "@/lib/types";
+import type { MarketEvent, MarketEventSummary } from "@/lib/types";
 import type { Metadata } from "next";
+import { getEventById, getEvents } from "@/lib/event-service";
 import { EventTypeBadge } from "@/components/EventTypeBadge";
 import { UnifiedInsight } from "@/components/UnifiedInsight";
 import { AffectedAssets } from "@/components/AffectedAssets";
@@ -10,22 +12,19 @@ import { EventNavigation } from "@/components/EventNavigation";
 
 export const revalidate = 300;
 
-async function fetchEvent(id: string): Promise<MarketEvent | undefined> {
-  const { getEventById } = await import("@/lib/event-service");
+const fetchEvent = cache(async (id: string): Promise<MarketEvent | undefined> => {
   return getEventById(id);
-}
+});
 
-async function fetchAdjacentEvents(id: string, scope: "global" | "local") {
-  const { getEvents } = await import("@/lib/event-service");
+const fetchAdjacentEvents = cache(async (id: string, scope: "global" | "local") => {
   const events = await getEvents(scope);
   const idx = events.findIndex((e) => e.id === id);
   if (idx === -1) return { prev: null, next: null };
-  // Events are sorted descending by date — prev = newer (idx-1), next = older (idx+1)
   return {
     prev: idx > 0 ? events[idx - 1] : null,
     next: idx < events.length - 1 ? events[idx + 1] : null,
   };
-}
+});
 
 export async function generateMetadata({
   params,
@@ -50,14 +49,32 @@ export default async function EventDetail({
 }) {
   const { id } = await params;
   const { from_scope } = await searchParams;
-  const event = await fetchEvent(id);
+
+  let event: MarketEvent | undefined;
+  let prev: MarketEventSummary | null = null;
+  let next: MarketEventSummary | null = null;
+
+  if (from_scope === "global" || from_scope === "local") {
+    const [eventResult, adjacentResult] = await Promise.all([
+      fetchEvent(id),
+      fetchAdjacentEvents(id, from_scope),
+    ]);
+    event = eventResult;
+    prev = adjacentResult.prev;
+    next = adjacentResult.next;
+  } else {
+    event = await fetchEvent(id);
+    if (event) {
+      const scope: "global" | "local" = event.scope ?? "global";
+      const adjacentResult = await fetchAdjacentEvents(id, scope);
+      prev = adjacentResult.prev;
+      next = adjacentResult.next;
+    }
+  }
 
   if (!event) {
     notFound();
   }
-
-  const scope: "global" | "local" = from_scope === "local" ? "local" : (event.scope ?? "global");
-  const { prev, next } = await fetchAdjacentEvents(id, scope);
 
   return (
     <article className="space-y-10">
