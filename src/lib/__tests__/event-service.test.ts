@@ -12,12 +12,17 @@ describe("event-service", () => {
     process.env = originalEnv;
   });
 
-  it("falls back to mock data when NEWSAPI_KEY is missing", async () => {
+  it("falls back to mock data when all sources fail", async () => {
     delete process.env.NEWSAPI_KEY;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockRejectedValue(new Error("Network error"))
+    );
     const { getEvents } = await import("../event-service");
     const events = await getEvents("global");
     expect(events.length).toBeGreaterThan(0);
     expect(events[0].id).toMatch(/^evt-/);
+    vi.unstubAllGlobals();
   });
 
   it("falls back to mock data for event detail when id is not live-prefixed", async () => {

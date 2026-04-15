@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { getStoredState, getStoredCodeVerifier, clearAuthParams } from "@/lib/pkce";
 
 type CallbackState =
@@ -90,12 +91,12 @@ export default function AuthCallbackPage() {
             </div>
             <h2 className="text-lg font-semibold">Login Failed</h2>
             <p className="text-sm text-muted">{state.message}</p>
-            <a
+            <Link
               href="/"
               className="inline-flex items-center justify-center h-10 px-6 text-sm font-semibold text-white bg-[var(--etoro-green)] rounded-full hover:bg-[var(--etoro-green-hover)] transition-colors"
             >
               Back to Home
-            </a>
+            </Link>
           </>
         )}
 

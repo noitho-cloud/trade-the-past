@@ -5,8 +5,7 @@ import type { MarketEvent, MarketEventSummary } from "@/lib/types";
 import type { Metadata } from "next";
 import { getEventById, getEvents } from "@/lib/event-service";
 import { EventTypeBadge } from "@/components/EventTypeBadge";
-import { UnifiedInsight } from "@/components/UnifiedInsight";
-import { AffectedAssets } from "@/components/AffectedAssets";
+import { HistoricalSection } from "@/components/HistoricalSection";
 import { EventHeroImage } from "@/components/EventHeroImage";
 import { EventNavigation } from "@/components/EventNavigation";
 
@@ -129,18 +128,10 @@ export default async function EventDetail({
         </div>
       </header>
 
-      {event.historicalMatches.length > 0 ? (
-        <>
-          <UnifiedInsight matches={event.historicalMatches} />
-          <AffectedAssets matches={event.historicalMatches} />
-        </>
-      ) : (
-        <section className="rounded-[16px] bg-card shadow-[var(--card-shadow)] px-[var(--space-xl)] py-8 text-center">
-          <p className="text-sm text-muted">
-            Historical analysis is being generated. Check back shortly.
-          </p>
-        </section>
-      )}
+      <HistoricalSection
+        eventId={event.id}
+        initialMatches={event.historicalMatches}
+      />
 
       <EventNavigation prevEvent={prev} nextEvent={next} scope={from_scope} />
     </article>

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getEventById } from "@/lib/event-service";
 
+export const maxDuration = 30;
+
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }

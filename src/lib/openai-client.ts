@@ -54,6 +54,7 @@ export async function fetchHistoricalMatches(
       temperature: 0.3,
       max_tokens: 2000,
     }),
+    signal: AbortSignal.timeout(25000),
   });
 
   if (!res.ok) {

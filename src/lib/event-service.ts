@@ -1,4 +1,5 @@
 import { fetchHeadlines } from "./news-client";
+import { fetchRSSHeadlines } from "./rss-client";
 import {
   classifyAndRank,
   selectTopEventPerDay,
@@ -39,6 +40,31 @@ function setCache<T>(key: string, data: T, cache: Map<string, CacheEntry<T>>): v
   cache.set(key, { data, expiresAt: Date.now() + CACHE_TTL_MS });
 }
 
+async function fetchArticles(
+  scope: "global" | "local"
+): Promise<import("./news-client").RawArticle[]> {
+  // 1) Try RSS feeds first (free, no key, works everywhere)
+  try {
+    const rssArticles = await fetchRSSHeadlines(scope);
+    if (rssArticles.length > 0) return rssArticles;
+  } catch {
+    // RSS failed, try NewsAPI next
+  }
+
+  // 2) Fall back to NewsAPI if key is configured
+  const apiKey = process.env.NEWSAPI_KEY;
+  if (apiKey) {
+    try {
+      const newsApiArticles = await fetchHeadlines(scope, apiKey);
+      if (newsApiArticles.length > 0) return newsApiArticles;
+    } catch {
+      // NewsAPI also failed
+    }
+  }
+
+  return [];
+}
+
 export async function getEvents(
   scope: "global" | "local" = "global"
 ): Promise<MarketEventSummary[]> {
@@ -46,13 +72,8 @@ export async function getEvents(
   const cached = getCached(cacheKey, eventsCache);
   if (cached) return cached;
 
-  const apiKey = process.env.NEWSAPI_KEY;
-  if (!apiKey) {
-    return getMockEvents(scope);
-  }
-
   try {
-    const articles = await fetchHeadlines(scope, apiKey);
+    const articles = await fetchArticles(scope);
     if (articles.length === 0) {
       return getMockEvents(scope);
     }
@@ -60,7 +81,7 @@ export async function getEvents(
     const classified = classifyAndRank(articles);
     const topPerDay = selectTopEventPerDay(classified);
 
-    const top7 = topPerDay.slice(0, 7);
+    const top7 = topPerDay.slice(0, 10);
 
     const summaries: MarketEventSummary[] = top7.map((e, i) => ({
       id: `live-${i}-${e.date}`,

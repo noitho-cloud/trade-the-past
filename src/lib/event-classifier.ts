@@ -125,6 +125,42 @@ const RULES: ClassificationRule[] = [
       "carrier",
       "threat",
       "deploy",
+      "troops",
+      "ceasefire",
+      "airstrike",
+      "iran",
+      "china",
+      "russia",
+      "ukraine",
+      "taiwan",
+      "north korea",
+      "middle east",
+      "israel",
+      "gaza",
+      "houthi",
+      "red sea",
+      "south china sea",
+      "pentagon",
+      "weapons",
+      "arms",
+      "treaty",
+      "alliance",
+      "escalation",
+      "tension",
+      "retaliation",
+      "proxy",
+      "insurgent",
+      "coup",
+      "regime",
+      "election",
+      "trump",
+      "biden",
+      "president",
+      "prime minister",
+      "un security council",
+      "g7",
+      "g20",
+      "brics",
     ],
     weight: 1.5,
   },
@@ -196,14 +232,14 @@ export function classifyArticle(
     }
     if (matchCount === 0) continue;
 
-    const score = (matchCount / rule.keywords.length) * rule.weight;
+    const score = (Math.min(matchCount, 5) / 5) * rule.weight;
     if (score > bestScore) {
       bestScore = score;
       bestType = rule.type;
     }
   }
 
-  if (!bestType || bestScore < 0.05) return null;
+  if (!bestType || bestScore < 0.01) return null;
 
   return { type: bestType, confidence: bestScore };
 }
