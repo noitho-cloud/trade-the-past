@@ -18,12 +18,17 @@ vi.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(),
 }));
 
+function localDateStr(offsetDays = 0): string {
+  const d = new Date(Date.now() + offsetDays * 86400000);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 const mockEvents: MarketEventSummary[] = [
   {
     id: "evt-001",
     title: "Fed Holds Rates Steady",
     type: "interest-rates",
-    date: new Date().toISOString().split("T")[0],
+    date: localDateStr(0),
     summary: "The Fed held rates steady.",
     imageUrl: null,
     source: "Reuters",
@@ -33,7 +38,7 @@ const mockEvents: MarketEventSummary[] = [
     id: "evt-002",
     title: "Tesla Reports Record Q1",
     type: "earnings",
-    date: new Date(Date.now() - 86400000).toISOString().split("T")[0],
+    date: localDateStr(-1),
     summary: "Tesla delivered record vehicles.",
     imageUrl: null,
     source: "Bloomberg",
@@ -46,7 +51,7 @@ const localEvents: MarketEventSummary[] = [
     id: "evt-006",
     title: "Deutsche Bank Faces Lawsuit",
     type: "lawsuits",
-    date: new Date(Date.now() - 2 * 86400000).toISOString().split("T")[0],
+    date: localDateStr(-2),
     summary: "Deutsche Bank lawsuit filed.",
     imageUrl: null,
     source: "Handelsblatt",
@@ -194,7 +199,7 @@ describe("WeeklyViewClient", () => {
   });
 
   it("renders one card per unique date when API returns multiple events for the same day", () => {
-    const today = new Date().toISOString().split("T")[0];
+    const today = localDateStr(0);
     const sameDayEvents: MarketEventSummary[] = [
       {
         id: "dup-1",

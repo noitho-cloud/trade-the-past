@@ -81,6 +81,23 @@ describe("HistoricalSection", () => {
     expect(fetchSpy).toHaveBeenCalledTimes(2);
   });
 
+  it("passes an AbortSignal to the fetch call", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({ event: { historicalMatches: [] } }),
+        { status: 200 }
+      )
+    );
+
+    render(<HistoricalSection eventId="test-signal" initialMatches={[]} />);
+
+    await screen.findByText("No historical parallels found for this event.");
+
+    const callArgs = fetchSpy.mock.calls[0];
+    expect(callArgs[1]).toBeDefined();
+    expect(callArgs[1]!.signal).toBeInstanceOf(AbortSignal);
+  });
+
   it("renders matches directly when initialMatches is provided", () => {
     render(
       <HistoricalSection eventId="test-1" initialMatches={[mockMatch]} />

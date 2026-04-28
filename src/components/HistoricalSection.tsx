@@ -27,7 +27,7 @@ export function HistoricalSection({
     setFetchError(false);
     setLoading(true);
 
-    fetch(`/api/events/${eventId}`)
+    fetch(`/api/events/${eventId}`, { signal: AbortSignal.timeout(15000) })
       .then((res) => {
         if (!res.ok) throw new Error("Failed");
         return res.json();
