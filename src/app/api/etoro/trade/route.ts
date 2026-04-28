@@ -81,10 +81,11 @@ export async function POST(request: Request) {
       mode: isDemo !== false ? "demo" : "real",
     });
   } catch (error) {
-    logger.error("Trade execution failed", { route: "/api/etoro/trade", symbol });
+    const isTimeout = error instanceof Error && (error.name === "TimeoutError" || error.name === "AbortError");
+    logger.error("Trade execution failed", { route: "/api/etoro/trade", symbol, timeout: isTimeout });
     return NextResponse.json(
-      { error: "Failed to execute trade" },
-      { status: 502 }
+      { error: isTimeout ? "eToro API timed out — please try again" : "Failed to execute trade" },
+      { status: isTimeout ? 504 : 502 }
     );
   }
 }

@@ -49,6 +49,7 @@ export async function POST(request: Request) {
             ItemType: "Instrument",
           },
         ]),
+        signal: AbortSignal.timeout(10_000),
       }
     );
 
@@ -66,10 +67,11 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     const { logger } = await import("@/lib/logger");
-    logger.error("Watchlist add failed", { route: "/api/etoro/watchlist", symbol });
+    const isTimeout = error instanceof Error && (error.name === "TimeoutError" || error.name === "AbortError");
+    logger.error("Watchlist add failed", { route: "/api/etoro/watchlist", symbol, timeout: isTimeout });
     return NextResponse.json(
-      { error: "Failed to add to watchlist" },
-      { status: 502 }
+      { error: isTimeout ? "eToro API timed out — please try again" : "Failed to add to watchlist" },
+      { status: isTimeout ? 504 : 502 }
     );
   }
 }

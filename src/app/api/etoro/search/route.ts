@@ -39,10 +39,11 @@ export async function POST(request: Request) {
     return NextResponse.json(result);
   } catch (error) {
     const { logger } = await import("@/lib/logger");
-    logger.error("eToro search failed", { route: "/api/etoro/search", symbol });
+    const isTimeout = error instanceof Error && (error.name === "TimeoutError" || error.name === "AbortError");
+    logger.error("eToro search failed", { route: "/api/etoro/search", symbol, timeout: isTimeout });
     return NextResponse.json(
-      { error: "Failed to search instruments" },
-      { status: 502 }
+      { error: isTimeout ? "eToro API timed out — please try again" : "Failed to search instruments" },
+      { status: isTimeout ? 504 : 502 }
     );
   }
 }

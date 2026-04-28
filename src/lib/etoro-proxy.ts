@@ -29,6 +29,8 @@ export interface EtoroSearchResult {
   internalSymbolFull: string;
 }
 
+const ETORO_FETCH_TIMEOUT_MS = 10_000;
+
 export async function searchInstrument(
   keys: EtoroKeys,
   symbol: string
@@ -42,6 +44,7 @@ export async function searchInstrument(
 
   const res = await fetch(`${ETORO_API_BASE}/market-data/search?${params}`, {
     headers,
+    signal: AbortSignal.timeout(ETORO_FETCH_TIMEOUT_MS),
   });
 
   if (!res.ok) return null;
@@ -93,6 +96,7 @@ export async function executeTrade(
     method: "POST",
     headers,
     body: JSON.stringify(body),
+    signal: AbortSignal.timeout(ETORO_FETCH_TIMEOUT_MS),
   });
 
   if (!res.ok) {
