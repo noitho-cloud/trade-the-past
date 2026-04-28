@@ -12,7 +12,7 @@ import { EventNavigation } from "@/components/EventNavigation";
 export const revalidate = 300;
 
 const fetchEvent = cache(async (id: string): Promise<MarketEvent | undefined> => {
-  return getEventById(id);
+  return getEventById(id, { skipHistorical: true });
 });
 
 const fetchAdjacentEvents = cache(async (id: string, scope: "global" | "local") => {

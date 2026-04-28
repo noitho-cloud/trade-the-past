@@ -88,6 +88,21 @@ describe("event-service", () => {
     expect(["up", "down"]).toContain(liveEvent!.keyReaction!.direction);
   });
 
+  it("returns empty historicalMatches when skipHistorical is true", async () => {
+    const { getEventById } = await import("../event-service");
+    const event = await getEventById("evt-001", { skipHistorical: true });
+    expect(event).toBeDefined();
+    expect(event!.title).toBeTruthy();
+    expect(event!.historicalMatches).toEqual([]);
+  });
+
+  it("returns historicalMatches when skipHistorical is not set", async () => {
+    const { getEventById } = await import("../event-service");
+    const event = await getEventById("evt-001");
+    expect(event).toBeDefined();
+    expect(event!.historicalMatches.length).toBeGreaterThan(0);
+  });
+
   it("includes scope in live event IDs to avoid cross-scope collisions", async () => {
     delete process.env.NEWSAPI_KEY;
     const { fetchRSSHeadlines } = await import("../rss-client");

@@ -111,8 +111,11 @@ export async function getEvents(
 }
 
 export async function getEventById(
-  id: string
+  id: string,
+  options?: { skipHistorical?: boolean }
 ): Promise<MarketEvent | undefined> {
+  const skipHistorical = options?.skipHistorical ?? false;
+
   if (id.startsWith("live-")) {
     let allScopes: Array<"global" | "local"> = ["global", "local"];
     if (id.startsWith("live-local-")) {
@@ -127,18 +130,22 @@ export async function getEventById(
       const detail = classified?.find((c) => c.title === summary.title);
       const eventSummary = detail?.summary || summary.title;
 
-      const rawMatches = await getHistoricalMatches(
-        summary.title,
-        summary.type,
-        eventSummary,
-        summary.source
-      );
+      let historicalMatches: HistoricalMatch[] = [];
+      if (!skipHistorical) {
+        const rawMatches = await getHistoricalMatches(
+          summary.title,
+          summary.type,
+          eventSummary,
+          summary.source
+        );
+        historicalMatches = filterMatchReactions(rawMatches);
+      }
 
       return {
         ...summary,
         summary: eventSummary,
         scope,
-        historicalMatches: filterMatchReactions(rawMatches),
+        historicalMatches,
       };
     }
     return undefined;
@@ -148,6 +155,8 @@ export async function getEventById(
   if (!mockEvent) return undefined;
   return {
     ...mockEvent,
-    historicalMatches: filterMatchReactions(mockEvent.historicalMatches),
+    historicalMatches: skipHistorical
+      ? []
+      : filterMatchReactions(mockEvent.historicalMatches),
   };
 }
