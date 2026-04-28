@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { getEtoroKeys, searchInstrument, buildEtoroHeaders, ETORO_API_BASE } from "@/lib/etoro-proxy";
+import { applyRateLimit } from "@/lib/with-rate-limit";
 
 export async function POST(request: Request) {
+  const rateLimit = applyRateLimit(request, "etoro");
+  if (rateLimit.blocked) return rateLimit.response;
   const keys = await getEtoroKeys();
   if (!keys) {
     return NextResponse.json(

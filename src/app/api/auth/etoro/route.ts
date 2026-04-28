@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { encryptKeys, KEYS_COOKIE_NAME, KEYS_MAX_AGE } from "@/lib/auth";
+import { applyRateLimit, addRateLimitHeaders } from "@/lib/with-rate-limit";
 
 export async function POST(request: Request) {
+  const rateLimit = applyRateLimit(request, "api");
+  if (rateLimit.blocked) return rateLimit.response;
+
   let body: Record<string, unknown>;
   try {
     body = await request.json();
@@ -44,7 +48,8 @@ export async function POST(request: Request) {
       path: "/",
     });
 
-    return NextResponse.json({ success: true });
+    const response = NextResponse.json({ success: true });
+    return addRateLimitHeaders(response, rateLimit);
   } catch (error) {
     console.error("Connect error:", error instanceof Error ? error.message : error);
     return NextResponse.json(

@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getEventById } from "@/lib/event-service";
+import { applyRateLimit, addRateLimitHeaders } from "@/lib/with-rate-limit";
 
 export const maxDuration = 30;
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const rateLimit = applyRateLimit(request, "api");
+  if (rateLimit.blocked) return rateLimit.response;
+
   try {
     const { id } = await params;
     const event = await getEventById(id);
@@ -15,7 +19,7 @@ export async function GET(
       return NextResponse.json({ error: "Event not found" }, { status: 404 });
     }
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       { event },
       {
         headers: {
@@ -23,6 +27,7 @@ export async function GET(
         },
       }
     );
+    return addRateLimitHeaders(response, rateLimit);
   } catch (error) {
     console.error("Event detail API error:", error instanceof Error ? error.message : error);
     return NextResponse.json(
