@@ -6,7 +6,7 @@ deps: []
 split: false
 depth: 1
 planned: true
-executed: false
+executed: true
 ---
 
 # Add timeout to eToro proxy fetch calls to prevent hanging requests
