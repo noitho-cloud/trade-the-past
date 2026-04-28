@@ -323,6 +323,48 @@ const DB: Record<EventType, HistoricalEntry[]> = {
         { asset: "Gold", direction: "down", day1Pct: -0.5, week1Pct: -1.2 },
       ],
     },
+    {
+      description: "US kills Iranian General Soleimani in drone strike, oil spikes on retaliation fears",
+      year: 2020,
+      whySimilar:
+        "Targeted killing of a senior Iranian military commander dramatically escalated US-Iran tensions and raised fears of a broader Middle East war.",
+      insight:
+        "Oil spiked 4% and gold surged as safe haven demand soared. The initial market shock was severe but faded within two weeks as Iran's retaliation proved measured. Iran confrontation headlines create sharp but often temporary risk-off moves.",
+      tags: ["iran", "soleimani", "strike", "war", "middle east", "oil", "conflict", "retaliation", "military", "us-iran"],
+      reactions: [
+        { asset: "Oil", direction: "up", day1Pct: 3.5, week1Pct: -1.2 },
+        { asset: "Gold", direction: "up", day1Pct: 2.3, week1Pct: 3.8 },
+        { asset: "S&P 500", direction: "down", day1Pct: -0.7, week1Pct: 0.9 },
+      ],
+    },
+    {
+      description: "Iran attacks oil tankers in Gulf of Oman, oil jumps on supply fears",
+      year: 2019,
+      whySimilar:
+        "Attacks on commercial vessels near the Strait of Hormuz raised the risk of a broader conflict disrupting global oil supplies.",
+      insight:
+        "Oil jumped 4% but gains faded as no sustained disruption materialized. Iran-linked tanker incidents create a temporary risk premium that dissipates without escalation.",
+      tags: ["iran", "tanker", "attack", "gulf", "oil", "hormuz", "middle east", "shipping", "conflict", "supply threat"],
+      reactions: [
+        { asset: "Oil", direction: "up", day1Pct: 3.9, week1Pct: 1.5 },
+        { asset: "Gold", direction: "up", day1Pct: 1.1, week1Pct: 2.0 },
+        { asset: "S&P 500", direction: "down", day1Pct: -0.4, week1Pct: 0.3 },
+      ],
+    },
+    {
+      description: "Iranian Revolution triggers oil crisis, crude doubles in months",
+      year: 1979,
+      whySimilar:
+        "Political upheaval in Iran caused a major oil supply disruption, with Iranian production collapsing and global prices doubling.",
+      insight:
+        "The 1979 oil shock proved that Iran's internal instability can have global commodity impact for years. Any threat to Iranian oil production — whether internal or external — triggers outsized market reactions due to this historical precedent.",
+      tags: ["iran", "revolution", "oil crisis", "oil shock", "supply", "crude", "middle east", "opec", "energy crisis"],
+      reactions: [
+        { asset: "Oil", direction: "up", day1Pct: 8.0, week1Pct: 15.0 },
+        { asset: "Gold", direction: "up", day1Pct: 5.0, week1Pct: 12.0 },
+        { asset: "S&P 500", direction: "down", day1Pct: -2.5, week1Pct: -6.0 },
+      ],
+    },
   ],
 
   "interest-rates": [
@@ -408,6 +450,76 @@ const DB: Record<EventType, HistoricalEntry[]> = {
         { asset: "S&P 500", direction: "up", day1Pct: 0.3, week1Pct: 1.2 },
         { asset: "Bitcoin", direction: "up", day1Pct: 4.5, week1Pct: 12.3 },
         { asset: "Gold", direction: "down", day1Pct: -0.1, week1Pct: -0.3 },
+      ],
+    },
+    {
+      description: "BOJ introduces negative interest rates, shocking markets",
+      year: 2016,
+      whySimilar:
+        "Bank of Japan adopted negative rates to fight deflation, a radical monetary policy experiment that sent shockwaves through currency and bond markets.",
+      insight:
+        "USD/JPY surged 2% on the day but reversed within weeks as markets questioned whether negative rates would work. BOJ policy surprises create sharp JPY moves but the follow-through is often limited.",
+      tags: ["boj", "bank of japan", "negative rates", "japan", "yen", "jpy", "monetary policy", "deflation", "rate decision"],
+      reactions: [
+        { asset: "USD/JPY", direction: "up", day1Pct: 2.0, week1Pct: -1.5 },
+        { asset: "Nikkei 225", direction: "up", day1Pct: 2.8, week1Pct: -3.1 },
+        { asset: "Gold", direction: "up", day1Pct: 1.5, week1Pct: 4.2 },
+      ],
+    },
+    {
+      description: "BOJ adjusts yield curve control, allowing 10-year yields to rise to 1%",
+      year: 2023,
+      whySimilar:
+        "Bank of Japan loosened its yield curve control policy, signaling a gradual exit from ultra-loose monetary policy after years of stimulus.",
+      insight:
+        "Japanese government bond yields spiked and the yen strengthened 2%. BOJ YCC adjustments are de facto rate changes — they signal the end of an era of free money in Japan and ripple through global bond markets.",
+      tags: ["boj", "bank of japan", "ycc", "yield curve control", "japan", "yen", "jpy", "bond", "rate decision", "policy shift"],
+      reactions: [
+        { asset: "USD/JPY", direction: "down", day1Pct: -1.3, week1Pct: -2.8 },
+        { asset: "Nikkei 225", direction: "down", day1Pct: -1.5, week1Pct: -2.1 },
+        { asset: "Gold", direction: "up", day1Pct: 0.8, week1Pct: 1.9 },
+      ],
+    },
+    {
+      description: "BOJ raises rates for the first time in 17 years, ending negative rate era",
+      year: 2024,
+      whySimilar:
+        "Bank of Japan ended its negative interest rate policy and yield curve control, marking the end of the world's last major ultra-loose monetary experiment.",
+      insight:
+        "The yen initially strengthened but then weakened as markets realized the hike was modest. The Nikkei rallied as the move was seen as confidence in Japan's economy. BOJ normalization is bullish for Japanese equities when gradual.",
+      tags: ["boj", "bank of japan", "rate hike", "japan", "yen", "jpy", "negative rates", "normalization", "rate decision", "historic"],
+      reactions: [
+        { asset: "USD/JPY", direction: "up", day1Pct: 0.5, week1Pct: 1.2 },
+        { asset: "Nikkei 225", direction: "up", day1Pct: 0.7, week1Pct: 2.3 },
+        { asset: "Gold", direction: "up", day1Pct: 0.3, week1Pct: 1.1 },
+      ],
+    },
+    {
+      description: "Fed holds rates steady during Gulf War uncertainty, prioritizing stability",
+      year: 1991,
+      whySimilar:
+        "Central bank chose to hold rates during a geopolitical crisis, balancing inflation risks against economic uncertainty from a military conflict.",
+      insight:
+        "Markets initially sold off on war fears but rallied sharply once the ground war proved swift. Central banks holding steady during conflicts signal they won't add monetary shock on top of geopolitical shock.",
+      tags: ["fed", "hold", "steady", "war", "geopolitical", "gulf war", "conflict", "uncertainty", "rate decision", "federal reserve"],
+      reactions: [
+        { asset: "S&P 500", direction: "down", day1Pct: -1.0, week1Pct: 3.5 },
+        { asset: "Oil", direction: "up", day1Pct: 5.2, week1Pct: -8.1 },
+        { asset: "Gold", direction: "up", day1Pct: 1.8, week1Pct: -0.5 },
+      ],
+    },
+    {
+      description: "ECB holds rates despite Ukraine war inflation, prioritizing growth",
+      year: 2022,
+      whySimilar:
+        "Central bank delayed tightening during an active military conflict near its borders, weighing inflation against the risk of a war-driven recession.",
+      insight:
+        "The euro weakened as the ECB fell behind the Fed on rate hikes. Central banks that hold during wars while peers tighten tend to see currency depreciation.",
+      tags: ["ecb", "hold", "steady", "war", "ukraine", "geopolitical", "inflation", "conflict", "europe", "rate decision", "central bank"],
+      reactions: [
+        { asset: "EUR/USD", direction: "down", day1Pct: -0.8, week1Pct: -2.3 },
+        { asset: "DAX", direction: "down", day1Pct: -1.5, week1Pct: -3.8 },
+        { asset: "Gold", direction: "up", day1Pct: 1.0, week1Pct: 2.5 },
       ],
     },
   ],
@@ -587,6 +699,13 @@ const MATCH_STOP_WORDS = new Set([
   "is","are","was","were","be","been","has","had","have","its","it",
   "this","that","from","by","as","not","no","up","out","into","over",
   "says","said","new","also","more","after","before","first","most",
+  "while","will","would","could","should","may","about","than",
+]);
+
+const GENERIC_TAGS = new Set([
+  "war", "conflict", "oil", "inflation", "rates", "rate", "hold",
+  "steady", "policy", "central bank", "middle east", "supply",
+  "crisis", "demand", "market", "stocks", "economy",
 ]);
 
 function extractWords(text: string): Set<string> {
@@ -598,29 +717,40 @@ function extractWords(text: string): Set<string> {
   );
 }
 
+function tagSpecificity(tag: string): number {
+  if (GENERIC_TAGS.has(tag)) return 1;
+  if (tag.split(/\s+/).length >= 2) return 4;
+  return 2;
+}
+
 function computeRelevance(
   eventText: string,
   entry: HistoricalEntry
 ): number {
+  const lowerText = eventText.toLowerCase();
   const eventWords = extractWords(eventText);
-  const entryText = `${entry.description} ${entry.whySimilar} ${entry.insight}`;
+  const entryText = `${entry.description} ${entry.whySimilar}`;
   const entryWords = extractWords(entryText);
-  const tagSet = new Set(entry.tags.map((t) => t.toLowerCase()));
 
   let score = 0;
+  let tagMatchCount = 0;
 
-  // Tag matches in event text (strongest signal)
   for (const tag of entry.tags) {
-    if (eventText.toLowerCase().includes(tag)) score += 3;
+    const lowerTag = tag.toLowerCase();
+    if (lowerText.includes(lowerTag)) {
+      const specificity = tagSpecificity(lowerTag);
+      score += specificity;
+      tagMatchCount++;
+    }
   }
 
-  // Bidirectional word overlap between event and historical description
   let overlap = 0;
   for (const w of eventWords) {
-    if (entryWords.has(w)) overlap++;
-    if (tagSet.has(w)) overlap += 2;
+    if (entryWords.has(w) && !GENERIC_TAGS.has(w)) overlap++;
   }
-  score += overlap;
+  score += Math.min(overlap, 4);
+
+  if (tagMatchCount < 2 && score < 6) return 0;
 
   return score;
 }
@@ -635,35 +765,33 @@ export function findHistoricalMatches(
 
   const candidates: { entry: HistoricalEntry; score: number }[] = [];
 
-  // Score entries from the same type first, then other types
   for (const t of allTypes) {
     const entries = DB[t];
     if (!entries) continue;
     for (const entry of entries) {
       const relevance = computeRelevance(text, entry);
-      // Same-type entries get a bonus
-      const typeBonus = t === type ? 5 : 0;
+      if (relevance === 0) continue;
+      const typeBonus = t === type ? 4 : 0;
       candidates.push({ entry, score: relevance + typeBonus });
     }
   }
 
   candidates.sort((a, b) => b.score - a.score);
 
-  // Only return matches with meaningful relevance (score > 5 means at least 1 tag + some word overlap)
-  const minScore = 5;
-  const good = candidates.filter((c) => c.score >= minScore);
+  const MIN_SCORE = 8;
+  const good = candidates.filter((c) => c.score >= MIN_SCORE);
 
   if (good.length === 0) return [];
 
-  // Dedupe: don't return two entries about the same event
   const result: HistoricalEntry[] = [];
-  const usedYears = new Set<number>();
+  const usedDescPrefixes = new Set<string>();
 
   for (const c of good) {
     if (result.length >= 3) break;
-    if (usedYears.has(c.entry.year)) continue;
+    const prefix = c.entry.description.slice(0, 40);
+    if (usedDescPrefixes.has(prefix)) continue;
     result.push(c.entry);
-    usedYears.add(c.entry.year);
+    usedDescPrefixes.add(prefix);
   }
 
   return result.map((entry) => ({

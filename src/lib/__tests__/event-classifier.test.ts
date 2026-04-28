@@ -99,6 +99,38 @@ describe("classifyArticle", () => {
     expect(result!.type).toBe("commodity-shocks");
   });
 
+  it("classifies BOJ rate decision as interest-rates, not regulation", () => {
+    const article = makeArticle({
+      title:
+        "Bank of Japan keeps policy rate steady while raising inflation forecast on Iran war worries",
+      description:
+        "The decision to keep rates steady came in a split 6-3 vote, and was in line with Reuters-polled analysts' estimates.",
+    });
+    const result = classifyArticle(article);
+    expect(result).not.toBeNull();
+    expect(result!.type).toBe("interest-rates");
+  });
+
+  it("does not match 'ban' keyword inside 'Bank'", () => {
+    const article = makeArticle({
+      title: "Bank of England holds interest rate at 5.25%",
+      description: "Central bank keeps monetary policy unchanged.",
+    });
+    const result = classifyArticle(article);
+    expect(result).not.toBeNull();
+    expect(result!.type).toBe("interest-rates");
+  });
+
+  it("still classifies actual bans as regulation", () => {
+    const article = makeArticle({
+      title: "EU bans sale of combustion engine cars from 2035",
+      description: "New regulation mandates zero-emission vehicles only.",
+    });
+    const result = classifyArticle(article);
+    expect(result).not.toBeNull();
+    expect(result!.type).toBe("regulation");
+  });
+
   it("gives geopolitical events higher confidence than routine interest rate holds", () => {
     const geoArticle = makeArticle({
       title:
