@@ -10,13 +10,22 @@ export async function GET(request: Request) {
   const encrypted = cookieStore.get(KEYS_COOKIE_NAME)?.value;
 
   if (!encrypted) {
-    return NextResponse.json({ connected: false });
+    return addRateLimitHeaders(
+      NextResponse.json({ connected: false }),
+      rateLimit
+    );
   }
 
   try {
     decryptKeys(encrypted);
-    return NextResponse.json({ connected: true });
+    return addRateLimitHeaders(
+      NextResponse.json({ connected: true }),
+      rateLimit
+    );
   } catch {
-    return NextResponse.json({ connected: false });
+    return addRateLimitHeaders(
+      NextResponse.json({ connected: false }),
+      rateLimit
+    );
   }
 }
