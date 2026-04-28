@@ -1,5 +1,7 @@
 import type { RawArticle } from "./news-client";
 import { logger } from "./logger";
+import { get as httpsGet } from "node:https";
+import { get as httpGet } from "node:http";
 
 interface RSSItem {
   title?: string;
@@ -85,21 +87,48 @@ function getAllFeeds(scope: "global" | "local"): { url: string; source: string }
   return [...STATIC_FEEDS[scope], ...getDailySearchFeeds(scope)];
 }
 
+function nativeGet(url: string, timeoutMs: number): Promise<string | null> {
+  return new Promise((resolve) => {
+    const getter = url.startsWith("https") ? httpsGet : httpGet;
+    const req = getter(
+      url,
+      {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (compatible; TradeThePast/1.0; +https://trade-the-past.vercel.app)",
+          Accept: "application/rss+xml, application/xml, text/xml, */*",
+        },
+        timeout: timeoutMs,
+      },
+      (res) => {
+        if (!res.statusCode || res.statusCode >= 400) {
+          res.resume();
+          resolve(null);
+          return;
+        }
+        if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+          res.resume();
+          nativeGet(res.headers.location, timeoutMs).then(resolve);
+          return;
+        }
+        let data = "";
+        res.on("data", (chunk: Buffer) => (data += chunk.toString()));
+        res.on("end", () => resolve(data));
+        res.on("error", () => resolve(null));
+      }
+    );
+    req.on("error", () => resolve(null));
+    req.on("timeout", () => {
+      req.destroy();
+      resolve(null);
+    });
+  });
+}
+
 async function parseFeed(url: string): Promise<RSSFeed> {
   try {
-    const res = await fetch(url, {
-      next: { revalidate: 1800 },
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (compatible; TradeThePast/1.0; +https://trade-the-past.vercel.app)",
-        Accept: "application/rss+xml, application/xml, text/xml, */*",
-      },
-      signal: AbortSignal.timeout(8000),
-    });
-
-    if (!res.ok) return { items: [] };
-
-    const xml = await res.text();
+    const xml = await nativeGet(url, 8000);
+    if (!xml) return { items: [] };
     return parseXML(xml);
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
