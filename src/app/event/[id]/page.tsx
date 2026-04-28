@@ -122,9 +122,11 @@ export default async function EventDetail({
 
           <p className="text-sm text-muted">{event.source}</p>
 
-          <p className="text-[15px] leading-relaxed text-foreground/85">
-            {event.summary}
-          </p>
+          {event.summary?.trim().toLowerCase() !== event.title?.trim().toLowerCase() && (
+            <p className="text-[15px] leading-relaxed text-foreground/85">
+              {event.summary}
+            </p>
+          )}
         </div>
       </header>
 

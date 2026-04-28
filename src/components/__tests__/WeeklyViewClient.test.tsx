@@ -346,6 +346,42 @@ describe("WeeklyViewClient", () => {
     globalThis.AbortController = originalAbortController;
   });
 
+  it("hides summary paragraph when it duplicates the title", () => {
+    const eventsWithDupSummary: MarketEventSummary[] = [
+      {
+        id: "dup-sum-1",
+        title: "Fed Holds Rates Steady",
+        type: "interest-rates",
+        date: localDateStr(0),
+        summary: "Fed Holds Rates Steady",
+        imageUrl: null,
+        source: "Google News",
+        keyReaction: null,
+      },
+    ];
+
+    const { container } = render(
+      <WeeklyViewClient initialEvents={eventsWithDupSummary} />
+    );
+
+    const title = screen.getByText("Fed Holds Rates Steady");
+    expect(title.tagName).toBe("H3");
+
+    const summaryParagraphs = container.querySelectorAll(
+      "p.text-xs.text-muted.line-clamp-2"
+    );
+    expect(summaryParagraphs).toHaveLength(0);
+  });
+
+  it("shows summary paragraph when it differs from the title", () => {
+    render(<WeeklyViewClient initialEvents={mockEvents} />);
+
+    expect(screen.getByText("The Fed held rates steady.")).toBeInTheDocument();
+    expect(
+      screen.getByText("Tesla delivered record vehicles.")
+    ).toBeInTheDocument();
+  });
+
   it("empty state has a button to switch back to Global", async () => {
     const user = userEvent.setup();
     (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
