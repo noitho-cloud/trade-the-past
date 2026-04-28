@@ -1,4 +1,5 @@
 import type { RawArticle } from "./news-client";
+import { logger } from "./logger";
 
 interface RSSItem {
   title?: string;
@@ -85,20 +86,26 @@ function getAllFeeds(scope: "global" | "local"): { url: string; source: string }
 }
 
 async function parseFeed(url: string): Promise<RSSFeed> {
-  const res = await fetch(url, {
-    next: { revalidate: 1800 },
-    headers: {
-      "User-Agent":
-        "Mozilla/5.0 (compatible; TradeThePast/1.0; +https://trade-the-past.vercel.app)",
-      Accept: "application/rss+xml, application/xml, text/xml, */*",
-    },
-    signal: AbortSignal.timeout(8000),
-  });
+  try {
+    const res = await fetch(url, {
+      next: { revalidate: 1800 },
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (compatible; TradeThePast/1.0; +https://trade-the-past.vercel.app)",
+        Accept: "application/rss+xml, application/xml, text/xml, */*",
+      },
+      signal: AbortSignal.timeout(8000),
+    });
 
-  if (!res.ok) return { items: [] };
+    if (!res.ok) return { items: [] };
 
-  const xml = await res.text();
-  return parseXML(xml);
+    const xml = await res.text();
+    return parseXML(xml);
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    logger.warn(`RSS feed unavailable: ${url}`, { error: msg });
+    return { items: [] };
+  }
 }
 
 function parseXML(xml: string): RSSFeed {
