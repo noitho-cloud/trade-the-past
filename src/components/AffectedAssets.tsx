@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import type { HistoricalMatch } from "@/lib/types";
-import { getEtoroTradeUrl, getEtoroWatchlistUrl } from "@/lib/etoro-slugs";
-
+import { getEtoroSymbol } from "@/lib/etoro-slugs";
+import { useAuth } from "./AuthProvider";
+import { TradeDialog } from "./TradeDialog";
 
 interface ConsolidatedAsset {
   asset: string;
@@ -79,38 +81,90 @@ function PctDisplay({ value }: { value: number }) {
 }
 
 function WatchlistStar({ asset }: { asset: string }) {
+  const { isConnected, openConnectModal } = useAuth();
+  const [isAdded, setIsAdded] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  async function handleClick() {
+    if (!isConnected) {
+      openConnectModal();
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/etoro/watchlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ symbol: getEtoroSymbol(asset) }),
+      });
+      if (res.ok) {
+        setIsAdded(true);
+      }
+    } catch {
+      // silently fail — toast handled at a higher level if needed
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   return (
-    <a
-      href={getEtoroWatchlistUrl(asset)}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label={`Add ${asset} to watchlist`}
-      title="Add to watchlist"
-      className="inline-flex items-center justify-center w-9 h-9 rounded-full
-                 text-muted hover:text-[#f5a623] hover:bg-[#f5a623]/10
-                 active:scale-[0.92] transition-all
-                 focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:outline-none"
+    <button
+      onClick={handleClick}
+      disabled={isLoading || isAdded}
+      aria-label={isAdded ? `${asset} added to watchlist` : `Add ${asset} to watchlist`}
+      title={isAdded ? "Added to watchlist" : "Add to watchlist"}
+      className={`inline-flex items-center justify-center w-9 h-9 rounded-full
+                 transition-all cursor-pointer disabled:cursor-default
+                 focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:outline-none
+                 ${isAdded
+                   ? "text-[#f5a623] bg-[#f5a623]/10"
+                   : "text-muted hover:text-[#f5a623] hover:bg-[#f5a623]/10 active:scale-[0.92]"}`}
     >
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-      </svg>
-    </a>
+      {isLoading ? (
+        <span className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
+      ) : (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill={isAdded ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+        </svg>
+      )}
+    </button>
   );
 }
 
-function TradeButton({ asset }: { asset: string }) {
+function TradeButton({ asset, direction }: { asset: string; direction: "up" | "down" }) {
+  const { isConnected, openConnectModal } = useAuth();
+  const [showDialog, setShowDialog] = useState(false);
+
+  function handleClick() {
+    if (!isConnected) {
+      openConnectModal();
+      return;
+    }
+    setShowDialog(true);
+  }
+
   return (
-    <a
-      href={getEtoroTradeUrl(asset)}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="Trade on eToro"
-      className="w-full inline-flex flex-col items-center justify-center bg-[var(--etoro-green)] text-white font-semibold h-[44px] px-6 rounded-[48px] whitespace-nowrap
-                 hover:bg-[var(--etoro-green-hover)] active:scale-[0.98] transition-all text-center focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:ring-offset-2 focus-visible:outline-none"
-    >
-      <span className="text-[14px] leading-none">Trade</span>
-      <span className="text-[10px] font-normal opacity-80 leading-none mt-0.5">on eToro</span>
-    </a>
+    <>
+      <button
+        onClick={handleClick}
+        aria-label={`Trade ${asset} on eToro`}
+        className="w-full inline-flex flex-col items-center justify-center bg-[var(--etoro-green)] text-white font-semibold h-[44px] px-6 rounded-[48px] whitespace-nowrap
+                   hover:bg-[var(--etoro-green-hover)] active:scale-[0.98] transition-all text-center cursor-pointer
+                   focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:ring-offset-2 focus-visible:outline-none"
+      >
+        <span className="text-[14px] leading-none">Trade</span>
+        <span className="text-[10px] font-normal opacity-80 leading-none mt-0.5">on eToro</span>
+      </button>
+      {showDialog && (
+        <TradeDialog
+          asset={asset}
+          direction={direction}
+          symbol={getEtoroSymbol(asset)}
+          onClose={() => setShowDialog(false)}
+        />
+      )}
+    </>
   );
 }
 
@@ -143,7 +197,7 @@ function AssetCard({ asset }: { asset: ConsolidatedAsset }) {
       </div>
 
       <div className="pt-1">
-        <TradeButton asset={asset.asset} />
+        <TradeButton asset={asset.asset} direction={asset.direction} />
       </div>
     </div>
   );

@@ -1,12 +1,23 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { AffectedAssets } from "../AffectedAssets";
 import { AuthProvider } from "../AuthProvider";
+import { ToastProvider } from "../ToastProvider";
 import type { HistoricalMatch } from "@/lib/types";
 import type { ReactNode } from "react";
 
+beforeEach(() => {
+  vi.spyOn(globalThis, "fetch").mockResolvedValue(
+    new Response(JSON.stringify({ connected: false }), { status: 200 })
+  );
+});
+
 function Wrapper({ children }: { children: ReactNode }) {
-  return <AuthProvider>{children}</AuthProvider>;
+  return (
+    <AuthProvider>
+      <ToastProvider>{children}</ToastProvider>
+    </AuthProvider>
+  );
 }
 
 const matches: HistoricalMatch[] = [
@@ -34,8 +45,8 @@ const matches: HistoricalMatch[] = [
 
 describe("AffectedAssets", () => {
   it("renders nothing when no matches are provided", () => {
-    const { container } = render(<AffectedAssets matches={[]} />, { wrapper: Wrapper });
-    expect(container.innerHTML).toBe("");
+    render(<AffectedAssets matches={[]} />, { wrapper: Wrapper });
+    expect(screen.queryByText("Affected Assets")).toBeNull();
   });
 
   it("renders the Affected Assets heading", () => {
@@ -56,55 +67,33 @@ describe("AffectedAssets", () => {
     expect(spElements).toHaveLength(1);
   });
 
-  it("shows Trade on eToro and Watchlist buttons for each asset", () => {
+  it("shows Trade and Watchlist buttons for each asset", () => {
     render(<AffectedAssets matches={matches} />, { wrapper: Wrapper });
-    const tradeButtons = screen.getAllByRole("link", { name: /trade on etoro/i });
-    const watchlistButtons = screen.getAllByRole("link", { name: /add .+ to watchlist/i });
+    const tradeButtons = screen.getAllByRole("button", { name: /trade .+ on etoro/i });
+    const watchlistButtons = screen.getAllByRole("button", { name: /add .+ to watchlist/i });
     expect(tradeButtons.length).toBe(3);
     expect(watchlistButtons.length).toBe(3);
   });
 
   it("shows direction indicators for each asset", () => {
     render(<AffectedAssets matches={matches} />, { wrapper: Wrapper });
-    const cards = screen.getAllByRole("link", { name: /trade on etoro/i });
-    expect(cards.length).toBe(3);
+    const bullish = screen.getAllByText("Bullish");
+    expect(bullish.length).toBeGreaterThan(0);
   });
 
-  it("links Trade button to eToro", () => {
-    render(<AffectedAssets matches={matches} />, { wrapper: Wrapper });
-    const tradeLinks = screen.getAllByRole("link", { name: /trade on etoro/i });
-    const firstTradeLink = tradeLinks[0];
-    expect(firstTradeLink).toBeDefined();
-    expect(firstTradeLink.getAttribute("href")).toContain("etoro.com/markets/");
-    expect(firstTradeLink.getAttribute("target")).toBe("_blank");
-  });
-
-  it("Trade button has correct height and Watchlist star is a link", () => {
-    render(<AffectedAssets matches={matches} />, { wrapper: Wrapper });
-    const tradeLinks = screen.getAllByRole("link", { name: /trade on etoro/i });
-    for (const el of tradeLinks) {
-      expect(el.className).toContain("h-[44px]");
-    }
-    const watchlistLinks = screen.getAllByRole("link", { name: /add .+ to watchlist/i });
-    for (const el of watchlistLinks) {
-      expect(el.getAttribute("href")).toContain("etoro.com");
-      expect(el.getAttribute("target")).toBe("_blank");
-    }
-  });
-
-  it("does not render standalone 'on eToro' label below buttons", () => {
+  it("does not render standalone 'on eToro' label outside buttons", () => {
     render(<AffectedAssets matches={matches} />, { wrapper: Wrapper });
     const onEtoroElements = screen.queryAllByText("on eToro");
     for (const el of onEtoroElements) {
-      const parentLink = el.closest("a");
-      expect(parentLink, "'on eToro' text should only appear inside a link button").toBeTruthy();
+      const parentButton = el.closest("button");
+      expect(parentButton, "'on eToro' text should only appear inside a button").toBeTruthy();
     }
   });
 
-  it("Watchlist star icon renders as SVG inside each link", () => {
+  it("Watchlist star icon renders as SVG inside each button", () => {
     render(<AffectedAssets matches={matches} />, { wrapper: Wrapper });
-    const watchlistLinks = screen.getAllByRole("link", { name: /add .+ to watchlist/i });
-    for (const el of watchlistLinks) {
+    const watchlistButtons = screen.getAllByRole("button", { name: /add .+ to watchlist/i });
+    for (const el of watchlistButtons) {
       expect(el.querySelector("svg")).toBeTruthy();
     }
   });

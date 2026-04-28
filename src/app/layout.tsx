@@ -6,6 +6,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { AuthProvider } from "@/components/AuthProvider";
 import { LoginButton } from "@/components/LoginButton";
 import { ConnectEtoroModal } from "@/components/ConnectEtoroModal";
+import { ToastProvider } from "@/components/ToastProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -37,6 +38,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <ThemeProvider>
           <AuthProvider>
+          <ToastProvider>
           <header className="bg-[var(--header-bg)] sticky top-0 z-10">
             <div className="max-w-[720px] mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
               <Suspense
@@ -94,6 +96,7 @@ export default function RootLayout({
             </div>
           </footer>
           <ConnectEtoroModal />
+          </ToastProvider>
         </AuthProvider>
         </ThemeProvider>
       </body>

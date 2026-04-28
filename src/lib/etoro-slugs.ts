@@ -34,6 +34,46 @@ const ASSET_TO_SLUG: Record<string, string> = {
   Shell: "shel.l",
 };
 
+const ASSET_TO_SYMBOL: Record<string, string> = {
+  "S&P 500": "SPX500",
+  Gold: "GOLD",
+  Oil: "OIL",
+  "Brent Crude": "OIL",
+  "Natural Gas": "NATURALGAS",
+  TSLA: "TSLA",
+  Tesla: "TSLA",
+  "Meta (Facebook)": "META",
+  Meta: "META",
+  Microsoft: "MSFT",
+  BP: "BP.L",
+  GE: "GE",
+  "Alphabet (Google)": "GOOGL",
+  Amazon: "AMZN",
+  Salesforce: "CRM",
+  "FTSE 100": "UK100",
+  "GBP/USD": "GBPUSD",
+  "EUR/USD": "EURUSD",
+  Volkswagen: "VOW3.DE",
+  DAX: "GDAXI",
+  "Deutsche Bank": "DBK.DE",
+  TotalEnergies: "TTE.PA",
+  "CAC 40": "FCHI",
+  "Euro STOXX 50": "EUSTX50",
+  ExxonMobil: "XOM",
+  Bitcoin: "BTC",
+  Ethereum: "ETH",
+  Apple: "AAPL",
+  Nvidia: "NVDA",
+  "USD/JPY": "USDJPY",
+  Netflix: "NFLX",
+  Chevron: "CVX",
+  Shell: "SHEL.L",
+};
+
+export function getEtoroSymbol(assetName: string): string {
+  return ASSET_TO_SYMBOL[assetName] ?? assetName.toUpperCase().replace(/[^A-Z0-9.]/g, "");
+}
+
 const ETORO_BASE = "https://www.etoro.com";
 
 export function isEtoroTradeable(assetName: string): boolean {
