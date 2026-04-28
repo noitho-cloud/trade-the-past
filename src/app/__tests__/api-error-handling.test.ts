@@ -1,7 +1,17 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+
+const TEST_KEY = "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2";
 
 describe("API error handling", () => {
-  describe("/api/auth/etoro", () => {
+  beforeEach(() => {
+    vi.stubEnv("ENCRYPTION_KEY", TEST_KEY);
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  describe("/api/auth/etoro (connect)", () => {
     it("returns 400 with clean message for empty POST body", async () => {
       const { POST } = await import("@/app/api/auth/etoro/route");
       const req = new Request("http://localhost:3050/api/auth/etoro", {
@@ -27,7 +37,7 @@ describe("API error handling", () => {
       expect(json.error).toBe("Invalid request body");
     });
 
-    it("never leaks raw JS error messages like 'Unexpected end of JSON input'", async () => {
+    it("never leaks raw JS error messages", async () => {
       const { POST } = await import("@/app/api/auth/etoro/route");
       const req = new Request("http://localhost:3050/api/auth/etoro", {
         method: "POST",
@@ -50,7 +60,20 @@ describe("API error handling", () => {
       const res = await POST(req);
       expect(res.status).toBe(400);
       const json = await res.json();
-      expect(json.error).toBe("Missing code or code_verifier");
+      expect(json.error).toBe("API Key is required");
+    });
+
+    it("returns 400 when apiKey is provided but userKey is missing", async () => {
+      const { POST } = await import("@/app/api/auth/etoro/route");
+      const req = new Request("http://localhost:3050/api/auth/etoro", {
+        method: "POST",
+        body: JSON.stringify({ apiKey: "test-key" }),
+        headers: { "Content-Type": "application/json" },
+      });
+      const res = await POST(req);
+      expect(res.status).toBe(400);
+      const json = await res.json();
+      expect(json.error).toBe("User Key is required");
     });
   });
 });

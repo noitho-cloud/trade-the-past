@@ -362,8 +362,8 @@ function isDuplicate(
 }
 
 /**
- * Select a diverse set of events: spread across types, dedupe similar
- * stories, cap any single type at maxPerType.
+ * Select a diverse set of events: one per day first, then fill with
+ * type diversity, dedupe similar stories.
  */
 export function selectDiverseEvents(
   events: ClassifiedEvent[],
@@ -371,35 +371,57 @@ export function selectDiverseEvents(
 ): ClassifiedEvent[] {
   if (events.length <= limit) return events;
 
-  const maxPerType = Math.max(2, Math.ceil(limit / 4));
+  const maxPerType = Math.max(2, Math.ceil(limit / 3));
   const result: ClassifiedEvent[] = [];
   const typeCount = new Map<string, number>();
+  const dateCount = new Map<string, number>();
 
-  const byType = new Map<string, ClassifiedEvent[]>();
+  // Group by date
+  const byDate = new Map<string, ClassifiedEvent[]>();
   for (const e of events) {
-    const list = byType.get(e.type) || [];
+    const list = byDate.get(e.date) || [];
     list.push(e);
-    byType.set(e.type, list);
+    byDate.set(e.date, list);
   }
 
-  // First pass: one from each type (round-robin)
-  for (const [, list] of byType) {
+  // Sort dates newest first
+  const sortedDates = Array.from(byDate.keys()).sort(
+    (a, b) => new Date(b).getTime() - new Date(a).getTime()
+  );
+
+  // First pass: best event from each day (guarantees daily spread)
+  for (const date of sortedDates) {
     if (result.length >= limit) break;
-    const best = list[0];
-    if (best && !isDuplicate(best, result)) {
+    const dayEvents = byDate.get(date)!;
+    const best = dayEvents.find((e) => !isDuplicate(e, result));
+    if (best) {
       result.push(best);
-      typeCount.set(best.type, 1);
+      typeCount.set(best.type, (typeCount.get(best.type) || 0) + 1);
+      dateCount.set(date, 1);
     }
   }
 
-  // Second pass: fill remaining, respecting maxPerType and similarity
+  // Second pass: fill remaining with type diversity, no day gets more than 2
   for (const e of events) {
     if (result.length >= limit) break;
     if (isDuplicate(e, result)) continue;
-    const count = typeCount.get(e.type) || 0;
-    if (count >= maxPerType) continue;
+    const tCount = typeCount.get(e.type) || 0;
+    if (tCount >= maxPerType) continue;
+    const dCount = dateCount.get(e.date) || 0;
+    if (dCount >= 2) continue;
     result.push(e);
-    typeCount.set(e.type, count + 1);
+    typeCount.set(e.type, tCount + 1);
+    dateCount.set(e.date, dCount + 1);
+  }
+
+  // Third pass: if still under limit, relax day cap
+  for (const e of events) {
+    if (result.length >= limit) break;
+    if (isDuplicate(e, result)) continue;
+    const tCount = typeCount.get(e.type) || 0;
+    if (tCount >= maxPerType) continue;
+    result.push(e);
+    typeCount.set(e.type, tCount + 1);
   }
 
   return result.sort(

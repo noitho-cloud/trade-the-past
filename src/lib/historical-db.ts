@@ -153,6 +153,19 @@ const DB: Record<EventType, HistoricalEntry[]> = {
       ],
     },
     {
+      description: "ASML raises full-year guidance citing strong AI and advanced chip demand",
+      year: 2024,
+      whySimilar:
+        "Chip equipment maker lifting guidance signals sustained spending on AI infrastructure, confirming the AI buildout has legs.",
+      insight:
+        "ASML rose 5% on the guidance raise, pulling the semiconductor supply chain higher. Guidance lifts from equipment makers are more bullish than earnings beats because they signal forward demand.",
+      tags: ["asml", "guidance", "lift", "raise", "semiconductor", "chip", "ai", "demand", "strong", "equipment", "euv", "order"],
+      reactions: [
+        { asset: "Nvidia", direction: "up", day1Pct: 3.2, week1Pct: 6.8 },
+        { asset: "S&P 500", direction: "up", day1Pct: 0.8, week1Pct: 2.2 },
+      ],
+    },
+    {
       description: "Netflix adds 13 million subscribers in Q4 2023, crushing estimates",
       year: 2023,
       whySimilar:
@@ -268,6 +281,48 @@ const DB: Record<EventType, HistoricalEntry[]> = {
         { asset: "Nvidia", direction: "up", day1Pct: 12.1, week1Pct: 7.4 },
       ],
     },
+    {
+      description: "Israel-Lebanon ceasefire agreement reached after months of border conflict",
+      year: 2024,
+      whySimilar:
+        "Diplomatic resolution of an active Middle Eastern conflict, reducing regional war risk and easing energy supply fears.",
+      insight:
+        "Oil dropped 3% on the ceasefire as the risk premium unwound. Ceasefire agreements in the Middle East tend to lower oil prices quickly but the lasting effect depends on whether Iran-linked groups honor the deal.",
+      tags: ["israel", "lebanon", "ceasefire", "talks", "diplomacy", "peace", "hezbollah", "iran", "middle east", "negotiate"],
+      reactions: [
+        { asset: "Oil", direction: "down", day1Pct: -2.8, week1Pct: -4.1 },
+        { asset: "S&P 500", direction: "up", day1Pct: 0.5, week1Pct: 1.2 },
+        { asset: "Gold", direction: "down", day1Pct: -1.0, week1Pct: -2.3 },
+      ],
+    },
+    {
+      description: "Russia-Ukraine grain corridor deal mediated by Turkey eases food crisis",
+      year: 2022,
+      whySimilar:
+        "Diplomatic deal to restore disrupted commodity flows, de-escalating a key economic consequence of the conflict.",
+      insight:
+        "Wheat dropped 6% on the deal and global food stocks rallied. Markets strongly reward conflict-related supply agreements, but gains can reverse if compliance breaks down.",
+      tags: ["russia", "ukraine", "grain", "deal", "talks", "turkey", "diplomacy", "ceasefire", "negotiate", "peace", "food", "commodity"],
+      reactions: [
+        { asset: "S&P 500", direction: "up", day1Pct: 0.8, week1Pct: 1.5 },
+        { asset: "Gold", direction: "down", day1Pct: -0.7, week1Pct: -1.5 },
+        { asset: "EUR/USD", direction: "up", day1Pct: 0.4, week1Pct: 0.9 },
+      ],
+    },
+    {
+      description: "Iran nuclear deal talks resume, raising hopes of sanctions relief",
+      year: 2021,
+      whySimilar:
+        "Diplomatic engagement with Iran reducing geopolitical risk in the Middle East and potentially increasing oil supply if sanctions are eased.",
+      insight:
+        "Oil dipped 2% on hopes of increased Iranian supply. Whenever Iran diplomacy shows progress, oil markets price in additional barrels that could enter the market.",
+      tags: ["iran", "nuclear", "talks", "diplomacy", "sanctions", "deal", "negotiate", "middle east", "oil", "peace"],
+      reactions: [
+        { asset: "Oil", direction: "down", day1Pct: -2.1, week1Pct: -3.5 },
+        { asset: "S&P 500", direction: "up", day1Pct: 0.3, week1Pct: 0.8 },
+        { asset: "Gold", direction: "down", day1Pct: -0.5, week1Pct: -1.2 },
+      ],
+    },
   ],
 
   "interest-rates": [
@@ -325,6 +380,34 @@ const DB: Record<EventType, HistoricalEntry[]> = {
         { asset: "GBP/USD", direction: "down", day1Pct: -3.6, week1Pct: -1.2 },
         { asset: "FTSE 100", direction: "down", day1Pct: -1.8, week1Pct: -3.1 },
         { asset: "Gold", direction: "up", day1Pct: 1.2, week1Pct: 2.8 },
+      ],
+    },
+    {
+      description: "Fed pauses rate hikes at 5.25-5.5%, holds for 11 months",
+      year: 2023,
+      whySimilar:
+        "After aggressive tightening, the Fed held rates steady for an extended period while evaluating whether inflation would cool without further hikes.",
+      insight:
+        "S&P 500 rallied 26% during the pause period as markets anticipated the next move would be a cut. Long pauses historically signal the peak of the cycle.",
+      tags: ["fed", "hold", "pause", "stay", "steady", "unchanged", "on hold", "wait", "patient", "no change", "federal reserve"],
+      reactions: [
+        { asset: "S&P 500", direction: "up", day1Pct: 0.6, week1Pct: 2.1 },
+        { asset: "Gold", direction: "up", day1Pct: 0.4, week1Pct: 1.5 },
+        { asset: "Bitcoin", direction: "up", day1Pct: 2.1, week1Pct: 5.3 },
+      ],
+    },
+    {
+      description: "Fed holds rates at near-zero for 2 years despite inflation signals",
+      year: 2021,
+      whySimilar:
+        "Central bank maintained accommodative policy for longer than expected, fueling a debate about whether inflation would be transitory.",
+      insight:
+        "Keeping rates low for too long fueled asset bubbles. Growth stocks and crypto surged while value investors warned of an eventual reckoning.",
+      tags: ["fed", "hold", "low", "transitory", "inflation", "near-zero", "accommodative", "stay", "steady", "federal reserve"],
+      reactions: [
+        { asset: "S&P 500", direction: "up", day1Pct: 0.3, week1Pct: 1.2 },
+        { asset: "Bitcoin", direction: "up", day1Pct: 4.5, week1Pct: 12.3 },
+        { asset: "Gold", direction: "down", day1Pct: -0.1, week1Pct: -0.3 },
       ],
     },
   ],
@@ -499,12 +582,46 @@ const DB: Record<EventType, HistoricalEntry[]> = {
   ],
 };
 
-function scoreTags(eventText: string, tags: string[]): number {
-  const text = eventText.toLowerCase();
+const MATCH_STOP_WORDS = new Set([
+  "the","a","an","and","or","but","in","on","at","to","for","of","with",
+  "is","are","was","were","be","been","has","had","have","its","it",
+  "this","that","from","by","as","not","no","up","out","into","over",
+  "says","said","new","also","more","after","before","first","most",
+]);
+
+function extractWords(text: string): Set<string> {
+  return new Set(
+    text.toLowerCase()
+      .replace(/[^a-z0-9\s]/g, " ")
+      .split(/\s+/)
+      .filter((w) => w.length > 2 && !MATCH_STOP_WORDS.has(w))
+  );
+}
+
+function computeRelevance(
+  eventText: string,
+  entry: HistoricalEntry
+): number {
+  const eventWords = extractWords(eventText);
+  const entryText = `${entry.description} ${entry.whySimilar} ${entry.insight}`;
+  const entryWords = extractWords(entryText);
+  const tagSet = new Set(entry.tags.map((t) => t.toLowerCase()));
+
   let score = 0;
-  for (const tag of tags) {
-    if (text.includes(tag)) score += 1;
+
+  // Tag matches in event text (strongest signal)
+  for (const tag of entry.tags) {
+    if (eventText.toLowerCase().includes(tag)) score += 3;
   }
+
+  // Bidirectional word overlap between event and historical description
+  let overlap = 0;
+  for (const w of eventWords) {
+    if (entryWords.has(w)) overlap++;
+    if (tagSet.has(w)) overlap += 2;
+  }
+  score += overlap;
+
   return score;
 }
 
@@ -513,23 +630,43 @@ export function findHistoricalMatches(
   type: EventType,
   summary: string
 ): HistoricalMatch[] {
-  const entries = DB[type];
-  if (!entries || entries.length === 0) return [];
-
+  const allTypes = [type, ...Object.keys(DB).filter((t) => t !== type)] as EventType[];
   const text = `${title} ${summary}`;
 
-  const scored = entries
-    .map((entry) => ({
-      entry,
-      score: scoreTags(text, entry.tags),
-    }))
-    .filter((s) => s.score > 0)
-    .sort((a, b) => b.score - a.score);
+  const candidates: { entry: HistoricalEntry; score: number }[] = [];
 
-  // If no tag matches, return the top 2 by default for the type
-  const results = scored.length > 0 ? scored.slice(0, 3) : entries.slice(0, 2).map((entry) => ({ entry, score: 0 }));
+  // Score entries from the same type first, then other types
+  for (const t of allTypes) {
+    const entries = DB[t];
+    if (!entries) continue;
+    for (const entry of entries) {
+      const relevance = computeRelevance(text, entry);
+      // Same-type entries get a bonus
+      const typeBonus = t === type ? 5 : 0;
+      candidates.push({ entry, score: relevance + typeBonus });
+    }
+  }
 
-  return results.map(({ entry }) => ({
+  candidates.sort((a, b) => b.score - a.score);
+
+  // Only return matches with meaningful relevance (score > 5 means at least 1 tag + some word overlap)
+  const minScore = 5;
+  const good = candidates.filter((c) => c.score >= minScore);
+
+  if (good.length === 0) return [];
+
+  // Dedupe: don't return two entries about the same event
+  const result: HistoricalEntry[] = [];
+  const usedYears = new Set<number>();
+
+  for (const c of good) {
+    if (result.length >= 3) break;
+    if (usedYears.has(c.entry.year)) continue;
+    result.push(c.entry);
+    usedYears.add(c.entry.year);
+  }
+
+  return result.map((entry) => ({
     description: entry.description,
     year: entry.year,
     whySimilar: entry.whySimilar,

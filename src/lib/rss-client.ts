@@ -16,79 +16,73 @@ interface RSSFeed {
   title?: string;
 }
 
-const RSS_FEEDS: Record<string, { url: string; source: string }[]> = {
+function formatDate(d: Date): string {
+  return d.toISOString().split("T")[0];
+}
+
+function buildGoogleNewsSearchUrl(
+  query: string,
+  afterDate: string,
+  beforeDate: string,
+  lang: string = "en-US",
+  gl: string = "US"
+): string {
+  const q = encodeURIComponent(`${query} after:${afterDate} before:${beforeDate}`);
+  return `https://news.google.com/rss/search?q=${q}&hl=${lang}&gl=${gl}&ceid=${gl}:${lang.split("-")[0]}`;
+}
+
+function getDailySearchFeeds(scope: "global" | "local"): { url: string; source: string }[] {
+  const feeds: { url: string; source: string }[] = [];
+  const now = new Date();
+  const queries = scope === "global"
+    ? ["stocks OR earnings OR market", "oil OR gold OR commodity OR energy", "war OR sanctions OR tariff OR military", "fed OR interest rate OR inflation OR central bank"]
+    : ["UK economy OR FTSE", "Europe market OR ECB"];
+  const lang = scope === "global" ? "en-US" : "en-GB";
+  const gl = scope === "global" ? "US" : "GB";
+
+  for (let daysAgo = 0; daysAgo < 7; daysAgo++) {
+    const after = new Date(now);
+    after.setDate(after.getDate() - daysAgo - 1);
+    const before = new Date(now);
+    before.setDate(before.getDate() - daysAgo);
+
+    const afterStr = formatDate(after);
+    const beforeStr = formatDate(before);
+
+    for (const query of queries) {
+      feeds.push({
+        url: buildGoogleNewsSearchUrl(query, afterStr, beforeStr, lang, gl),
+        source: `Google News`,
+      });
+    }
+  }
+
+  return feeds;
+}
+
+const STATIC_FEEDS: Record<string, { url: string; source: string }[]> = {
   global: [
-    // Top headlines (all categories)
-    {
-      url: "https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en",
-      source: "Google News",
-    },
-    // World / geopolitical news
-    {
-      url: "https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRFp0Y1RjU0FtVnVHZ0pWVXlnQVAB?hl=en-US&gl=US&ceid=US:en",
-      source: "Google News World",
-    },
-    // Business / finance
-    {
-      url: "https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGx6TVdZU0FtVnVHZ0pWVXlnQVAB?hl=en-US&gl=US&ceid=US:en",
-      source: "Google News Business",
-    },
-    {
-      url: "https://feeds.finance.yahoo.com/rss/2.0/headline?s=^GSPC&region=US&lang=en-US",
-      source: "Yahoo Finance",
-    },
-    // CNBC top news + world
-    {
-      url: "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100003114",
-      source: "CNBC",
-    },
-    {
-      url: "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100727362",
-      source: "CNBC World",
-    },
-    // Reuters world + business
-    {
-      url: "https://www.reutersagency.com/feed/?best-topics=business-finance&post_type=best",
-      source: "Reuters",
-    },
-    {
-      url: "https://www.reutersagency.com/feed/?best-topics=political-general&post_type=best",
-      source: "Reuters World",
-    },
-    // BBC World
-    {
-      url: "https://feeds.bbci.co.uk/news/world/rss.xml",
-      source: "BBC World",
-    },
-    // Al Jazeera (strong Middle East / geopolitical coverage)
-    {
-      url: "https://www.aljazeera.com/xml/rss/all.xml",
-      source: "Al Jazeera",
-    },
+    { url: "https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en", source: "Google News" },
+    { url: "https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGx6TVdZU0FtVnVHZ0pWVXlnQVAB?hl=en-US&gl=US&ceid=US:en", source: "Google News Business" },
+    { url: "https://feeds.finance.yahoo.com/rss/2.0/headline?s=^GSPC&region=US&lang=en-US", source: "Yahoo Finance" },
+    { url: "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100003114", source: "CNBC" },
+    { url: "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100727362", source: "CNBC World" },
+    { url: "https://www.reutersagency.com/feed/?best-topics=business-finance&post_type=best", source: "Reuters" },
+    { url: "https://feeds.bbci.co.uk/news/world/rss.xml", source: "BBC World" },
+    { url: "https://www.aljazeera.com/xml/rss/all.xml", source: "Al Jazeera" },
   ],
   local: [
-    {
-      url: "https://news.google.com/rss?hl=en-GB&gl=GB&ceid=GB:en",
-      source: "Google News UK",
-    },
-    {
-      url: "https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGx6TVdZU0FtVnVHZ0pIUWlnQVAB?hl=en-GB&gl=GB&ceid=GB:en",
-      source: "Google News UK Business",
-    },
-    {
-      url: "https://feeds.bbci.co.uk/news/rss.xml",
-      source: "BBC News",
-    },
-    {
-      url: "https://feeds.bbci.co.uk/news/business/rss.xml",
-      source: "BBC Business",
-    },
-    {
-      url: "https://news.google.com/rss?hl=en&gl=DE&ceid=DE:en",
-      source: "Google News DE",
-    },
+    { url: "https://news.google.com/rss?hl=en-GB&gl=GB&ceid=GB:en", source: "Google News UK" },
+    { url: "https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGx6TVdZU0FtVnVHZ0pIUWlnQVAB?hl=en-GB&gl=GB&ceid=GB:en", source: "Google News UK Business" },
+    { url: "https://feeds.bbci.co.uk/news/rss.xml", source: "BBC News" },
+    { url: "https://feeds.bbci.co.uk/news/business/rss.xml", source: "BBC Business" },
+    { url: "https://news.google.com/rss?hl=en&gl=DE&ceid=DE:en", source: "Google News DE" },
   ],
 };
+
+function getAllFeeds(scope: "global" | "local"): { url: string; source: string }[] {
+  return [...STATIC_FEEDS[scope], ...getDailySearchFeeds(scope)];
+}
 
 async function parseFeed(url: string): Promise<RSSFeed> {
   const res = await fetch(url, {
@@ -214,7 +208,7 @@ function rssItemToArticle(
 export async function fetchRSSHeadlines(
   scope: "global" | "local"
 ): Promise<RawArticle[]> {
-  const feeds = RSS_FEEDS[scope] || RSS_FEEDS.global;
+  const feeds = getAllFeeds(scope);
 
   const results = await Promise.allSettled(
     feeds.map(async (feed) => {

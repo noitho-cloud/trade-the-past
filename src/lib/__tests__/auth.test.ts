@@ -1,45 +1,28 @@
-import { describe, it, expect } from "vitest";
-import { createSession, getSession, deleteSession } from "../auth";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-describe("Session store", () => {
-  const testUserId = "test-user-123";
+const TEST_KEY = "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2";
 
-  it("creates a session and returns a session ID", () => {
-    const sessionId = createSession(testUserId);
-    expect(sessionId).toBeDefined();
-    expect(typeof sessionId).toBe("string");
-    expect(sessionId.length).toBeGreaterThan(0);
+describe("Auth — eToro API key encryption", () => {
+  beforeEach(() => {
+    vi.stubEnv("ENCRYPTION_KEY", TEST_KEY);
   });
 
-  it("retrieves a created session", () => {
-    const sessionId = createSession(testUserId);
-    const session = getSession(sessionId);
-    expect(session).toBeDefined();
-    expect(session!.userId).toBe(testUserId);
-    expect(session!.createdAt).toBeLessThanOrEqual(Date.now());
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
-  it("stores access and refresh tokens", () => {
-    const sessionId = createSession(testUserId, "access-tok", "refresh-tok");
-    const session = getSession(sessionId);
-    expect(session!.accessToken).toBe("access-tok");
-    expect(session!.refreshToken).toBe("refresh-tok");
-    expect(session!.accessTokenExpiresAt).toBeDefined();
+  it("encrypts and decrypts eToro keys", async () => {
+    const { encryptKeys, decryptKeys } = await import("../auth");
+    const keys = { apiKey: "pub-123", userKey: "user-456" };
+    const encrypted = encryptKeys(keys);
+    expect(typeof encrypted).toBe("string");
+    expect(encrypted).not.toContain("pub-123");
+    expect(decryptKeys(encrypted)).toEqual(keys);
   });
 
-  it("returns undefined for non-existent session", () => {
-    expect(getSession("non-existent-id")).toBeUndefined();
-  });
-
-  it("deletes a session", () => {
-    const sessionId = createSession(testUserId);
-    expect(getSession(sessionId)).toBeDefined();
-    deleteSession(sessionId);
-    expect(getSession(sessionId)).toBeUndefined();
-  });
-
-  it("generates unique session IDs", () => {
-    const ids = new Set(Array.from({ length: 10 }, () => createSession(testUserId)));
-    expect(ids.size).toBe(10);
+  it("exports expected cookie constants", async () => {
+    const { KEYS_COOKIE_NAME, KEYS_MAX_AGE } = await import("../auth");
+    expect(KEYS_COOKIE_NAME).toBe("ttp_etoro_keys");
+    expect(KEYS_MAX_AGE).toBe(30 * 24 * 60 * 60);
   });
 });

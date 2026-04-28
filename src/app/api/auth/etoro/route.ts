@@ -1,12 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import {
-  exchangeCodeForTokens,
-  validateIdToken,
-  createSession,
-  SESSION_COOKIE_NAME,
-  SESSION_MAX_AGE,
-} from "@/lib/auth";
+import { encryptKeys, KEYS_COOKIE_NAME, KEYS_MAX_AGE } from "@/lib/auth";
 
 export async function POST(request: Request) {
   let body: Record<string, unknown>;
@@ -19,51 +13,43 @@ export async function POST(request: Request) {
     );
   }
 
-  try {
-    const { code, code_verifier } = body as { code?: string; code_verifier?: string };
+  const { apiKey, userKey } = body as { apiKey?: string; userKey?: string };
 
-    if (!code || !code_verifier) {
-      return NextResponse.json(
-        { error: "Missing code or code_verifier" },
-        { status: 400 }
-      );
-    }
-
-    const tokens = await exchangeCodeForTokens(code, code_verifier);
-
-    if (!tokens.id_token) {
-      return NextResponse.json(
-        { error: "No id_token in response" },
-        { status: 502 }
-      );
-    }
-
-    const claims = await validateIdToken(tokens.id_token);
-
-    const sessionId = createSession(
-      claims.sub,
-      tokens.access_token,
-      tokens.refresh_token
+  if (!apiKey || typeof apiKey !== "string" || apiKey.trim().length === 0) {
+    return NextResponse.json(
+      { error: "API Key is required" },
+      { status: 400 }
     );
+  }
+
+  if (!userKey || typeof userKey !== "string" || userKey.trim().length === 0) {
+    return NextResponse.json(
+      { error: "User Key is required" },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const encrypted = encryptKeys({
+      apiKey: apiKey.trim(),
+      userKey: userKey.trim(),
+    });
 
     const cookieStore = await cookies();
-    cookieStore.set(SESSION_COOKIE_NAME, sessionId, {
+    cookieStore.set(KEYS_COOKIE_NAME, encrypted, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: SESSION_MAX_AGE,
+      maxAge: KEYS_MAX_AGE,
       path: "/",
     });
 
-    return NextResponse.json({
-      success: true,
-      userId: claims.sub,
-    });
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("SSO auth error:", error instanceof Error ? error.message : error);
+    console.error("Connect error:", error instanceof Error ? error.message : error);
     return NextResponse.json(
-      { error: "Authentication failed" },
-      { status: 401 }
+      { error: "Failed to store credentials" },
+      { status: 500 }
     );
   }
 }

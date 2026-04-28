@@ -1,22 +1,19 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { getSession, SESSION_COOKIE_NAME } from "@/lib/auth";
+import { decryptKeys, KEYS_COOKIE_NAME } from "@/lib/auth";
 
 export async function GET() {
   const cookieStore = await cookies();
-  const sessionId = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+  const encrypted = cookieStore.get(KEYS_COOKIE_NAME)?.value;
 
-  if (!sessionId) {
-    return NextResponse.json({ authenticated: false });
+  if (!encrypted) {
+    return NextResponse.json({ connected: false });
   }
 
-  const session = getSession(sessionId);
-  if (!session) {
-    return NextResponse.json({ authenticated: false });
+  try {
+    decryptKeys(encrypted);
+    return NextResponse.json({ connected: true });
+  } catch {
+    return NextResponse.json({ connected: false });
   }
-
-  return NextResponse.json({
-    authenticated: true,
-    userId: session.userId,
-  });
 }

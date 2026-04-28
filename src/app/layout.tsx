@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { AuthProvider } from "@/components/AuthProvider";
 import { LoginButton } from "@/components/LoginButton";
+import { ConnectEtoroModal } from "@/components/ConnectEtoroModal";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -92,6 +93,7 @@ export default function RootLayout({
               </p>
             </div>
           </footer>
+          <ConnectEtoroModal />
         </AuthProvider>
         </ThemeProvider>
       </body>

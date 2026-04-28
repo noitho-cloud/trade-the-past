@@ -3,17 +3,23 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
 
 interface AuthContextValue {
-  isLoggedIn: boolean;
-  userId: string | null;
+  isConnected: boolean;
   isLoading: boolean;
-  logout: () => Promise<void>;
+  showConnectModal: boolean;
+  openConnectModal: () => void;
+  closeConnectModal: () => void;
+  connect: (apiKey: string, userKey: string) => Promise<boolean>;
+  disconnect: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue>({
-  isLoggedIn: false,
-  userId: null,
+  isConnected: false,
   isLoading: true,
-  logout: async () => {},
+  showConnectModal: false,
+  openConnectModal: () => {},
+  closeConnectModal: () => {},
+  connect: async () => false,
+  disconnect: async () => {},
 });
 
 export function useAuth() {
@@ -21,9 +27,9 @@ export function useAuth() {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [showConnectModal, setShowConnectModal] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -33,13 +39,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!res.ok) throw new Error("Session check failed");
         const data = await res.json();
         if (!cancelled) {
-          setIsLoggedIn(data.authenticated);
-          setUserId(data.userId ?? null);
+          setIsConnected(data.connected === true);
         }
       } catch {
         if (!cancelled) {
-          setIsLoggedIn(false);
-          setUserId(null);
+          setIsConnected(false);
         }
       } finally {
         if (!cancelled) setIsLoading(false);
@@ -49,17 +53,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => { cancelled = true; };
   }, []);
 
-  const logout = useCallback(async () => {
+  const connect = useCallback(async (apiKey: string, userKey: string): Promise<boolean> => {
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
-    } finally {
-      setIsLoggedIn(false);
-      setUserId(null);
+      const res = await fetch("/api/auth/etoro", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ apiKey, userKey }),
+      });
+      if (!res.ok) return false;
+      setIsConnected(true);
+      setShowConnectModal(false);
+      return true;
+    } catch {
+      return false;
     }
   }, []);
 
+  const disconnect = useCallback(async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } finally {
+      setIsConnected(false);
+    }
+  }, []);
+
+  const openConnectModal = useCallback(() => setShowConnectModal(true), []);
+  const closeConnectModal = useCallback(() => setShowConnectModal(false), []);
+
   return (
-    <AuthContext value={{ isLoggedIn, userId, isLoading, logout }}>
+    <AuthContext value={{
+      isConnected,
+      isLoading,
+      showConnectModal,
+      openConnectModal,
+      closeConnectModal,
+      connect,
+      disconnect,
+    }}>
       {children}
     </AuthContext>
   );
