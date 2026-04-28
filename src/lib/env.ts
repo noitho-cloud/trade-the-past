@@ -20,7 +20,7 @@ export function validateEnv(): EnvConfig {
     validated = true;
 
     if (!process.env.NEWSAPI_KEY) {
-      console.warn("[env] NEWSAPI_KEY not set — news fetching will not work");
+      console.warn("[env] NEWSAPI_KEY not set — NewsAPI fallback disabled (RSS primary source active)");
     }
     if (!process.env.OPENAI_API_KEY) {
       console.warn("[env] OPENAI_API_KEY not set — AI-powered historical matching disabled");

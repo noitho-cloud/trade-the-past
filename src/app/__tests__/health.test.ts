@@ -29,4 +29,18 @@ describe("/api/health", () => {
     expect(data.status).toBe("degraded");
     expect(data.env.ENCRYPTION_KEY).toBe(false);
   });
+
+  it("groups env vars into required and optional", async () => {
+    vi.stubEnv("NEWSAPI_KEY", "");
+    vi.stubEnv("OPENAI_API_KEY", "test-key");
+    vi.resetModules();
+    const { GET } = await import("@/app/api/health/route");
+    const res = await GET();
+    const data = await res.json();
+    expect(data.env.required).toBeDefined();
+    expect(data.env.optional).toBeDefined();
+    expect(data.env.required.ENCRYPTION_KEY).toBe(true);
+    expect(data.env.optional.NEWSAPI_KEY).toBe(false);
+    expect(data.env.optional.OPENAI_API_KEY).toBe(true);
+  });
 });
