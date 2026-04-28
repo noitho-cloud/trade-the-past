@@ -1,13 +1,19 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
+import { captureException } from "@/lib/error-reporter";
 
 export default function EventError({
+  error,
   reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useEffect(() => {
+    captureException(error, { boundary: "event-detail", digest: error.digest });
+  }, [error]);
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center">
       <span className="text-[11px] font-medium tracking-widest uppercase text-muted mb-4">

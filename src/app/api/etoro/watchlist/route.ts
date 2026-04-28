@@ -65,7 +65,8 @@ export async function POST(request: Request) {
       instrumentId: instrument.instrumentId,
     });
   } catch (error) {
-    console.error("Watchlist error:", error instanceof Error ? error.message : error);
+    const { logger } = await import("@/lib/logger");
+    logger.error("Watchlist add failed", { route: "/api/etoro/watchlist", symbol });
     return NextResponse.json(
       { error: "Failed to add to watchlist" },
       { status: 502 }

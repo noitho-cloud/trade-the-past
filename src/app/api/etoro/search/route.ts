@@ -38,7 +38,8 @@ export async function POST(request: Request) {
     }
     return NextResponse.json(result);
   } catch (error) {
-    console.error("eToro search error:", error instanceof Error ? error.message : error);
+    const { logger } = await import("@/lib/logger");
+    logger.error("eToro search failed", { route: "/api/etoro/search", symbol });
     return NextResponse.json(
       { error: "Failed to search instruments" },
       { status: 502 }

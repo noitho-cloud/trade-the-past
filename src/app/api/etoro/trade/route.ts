@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getEtoroKeys, searchInstrument, executeTrade } from "@/lib/etoro-proxy";
+import { logger } from "@/lib/logger";
 
 export async function POST(request: Request) {
   const keys = await getEtoroKeys();
@@ -80,7 +81,7 @@ export async function POST(request: Request) {
       mode: isDemo !== false ? "demo" : "real",
     });
   } catch (error) {
-    console.error("Trade error:", error instanceof Error ? error.message : error);
+    logger.error("Trade execution failed", { route: "/api/etoro/trade", symbol });
     return NextResponse.json(
       { error: "Failed to execute trade" },
       { status: 502 }
