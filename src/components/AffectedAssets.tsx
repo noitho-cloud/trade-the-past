@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { HistoricalMatch } from "@/lib/types";
 import { getEtoroSymbol } from "@/lib/etoro-slugs";
 import { useAuth } from "./AuthProvider";
+import { useToast } from "./ToastProvider";
 import { TradeDialog } from "./TradeDialog";
 
 interface ConsolidatedAsset {
@@ -82,6 +83,7 @@ function PctDisplay({ value }: { value: number }) {
 
 function WatchlistStar({ asset }: { asset: string }) {
   const { isConnected, openConnectModal } = useAuth();
+  const { toast } = useToast();
   const [isAdded, setIsAdded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -100,9 +102,13 @@ function WatchlistStar({ asset }: { asset: string }) {
       });
       if (res.ok) {
         setIsAdded(true);
+        toast(`${asset} added to watchlist`, "success");
+      } else {
+        const data = await res.json().catch(() => ({}));
+        toast(data.error ?? "Failed to add to watchlist", "error");
       }
     } catch {
-      // silently fail — toast handled at a higher level if needed
+      toast("Network error — could not update watchlist", "error");
     } finally {
       setIsLoading(false);
     }

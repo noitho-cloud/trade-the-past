@@ -6,7 +6,7 @@ deps: [etoro-api-key-connection]
 split: false
 depth: 1
 planned: true
-executed: false
+executed: true
 ---
 
 ## Overview
