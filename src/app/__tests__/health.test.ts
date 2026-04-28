@@ -9,15 +9,16 @@ describe("/api/health", () => {
     vi.unstubAllEnvs();
   });
 
-  it("returns healthy status with env checks", async () => {
+  it("returns healthy status and timestamp only", async () => {
     const { GET } = await import("@/app/api/health/route");
     const res = await GET();
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.status).toBe("healthy");
-    expect(data.uptime).toBeDefined();
     expect(data.timestamp).toBeDefined();
-    expect(data.env.ENCRYPTION_KEY).toBe(true);
+    expect(data).not.toHaveProperty("env");
+    expect(data).not.toHaveProperty("uptime");
+    expect(data).not.toHaveProperty("version");
   });
 
   it("returns degraded status when ENCRYPTION_KEY is missing", async () => {
@@ -27,20 +28,18 @@ describe("/api/health", () => {
     const res = await GET();
     const data = await res.json();
     expect(data.status).toBe("degraded");
-    expect(data.env.ENCRYPTION_KEY).toBe(false);
+    expect(data).not.toHaveProperty("env");
   });
 
-  it("groups env vars into required and optional", async () => {
+  it("does not expose internal env var names", async () => {
     vi.stubEnv("NEWSAPI_KEY", "");
     vi.stubEnv("OPENAI_API_KEY", "test-key");
     vi.resetModules();
     const { GET } = await import("@/app/api/health/route");
     const res = await GET();
-    const data = await res.json();
-    expect(data.env.required).toBeDefined();
-    expect(data.env.optional).toBeDefined();
-    expect(data.env.required.ENCRYPTION_KEY).toBe(true);
-    expect(data.env.optional.NEWSAPI_KEY).toBe(false);
-    expect(data.env.optional.OPENAI_API_KEY).toBe(true);
+    const body = await res.text();
+    expect(body).not.toContain("ENCRYPTION_KEY");
+    expect(body).not.toContain("NEWSAPI_KEY");
+    expect(body).not.toContain("OPENAI_API_KEY");
   });
 });
