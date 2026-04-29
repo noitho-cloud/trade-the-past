@@ -218,19 +218,22 @@ function decodeEntities(str: string): string {
 export function stripSourceSuffix(title: string): string {
   if (!title) return title;
 
-  const dashIdx = title.lastIndexOf(" - ");
-  const pipeIdx = title.lastIndexOf(" | ");
+  let result = title;
+  for (;;) {
+    const dashIdx = result.lastIndexOf(" - ");
+    const pipeIdx = result.lastIndexOf(" | ");
+    const idx = Math.max(dashIdx, pipeIdx);
+    if (idx < 0) break;
 
-  const idx = Math.max(dashIdx, pipeIdx);
-  if (idx < 0) return title;
+    const suffix = result.slice(idx + 3).trim();
+    if (suffix.split(/\s+/).length > 5) break;
 
-  const sepLen = 3;
-  const suffix = title.slice(idx + sepLen).trim();
-  const wordCount = suffix.split(/\s+/).length;
-  if (wordCount > 5) return title;
-  const stripped = title.slice(0, idx).trim();
-  if (stripped.length < 15) return title;
-  return stripped;
+    const stripped = result.slice(0, idx).trim();
+    if (stripped.length < 15) break;
+
+    result = stripped;
+  }
+  return result;
 }
 
 function rssItemToArticle(

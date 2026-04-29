@@ -178,4 +178,24 @@ describe("stripSourceSuffix", () => {
     expect(stripSourceSuffix("U.S.-Iran war - naval standoff develops | CNBC"))
       .toBe("U.S.-Iran war - naval standoff develops");
   });
+
+  it("strips cascading suffixes (pipe then dash from same source)", () => {
+    expect(stripSourceSuffix("Turkish central bank keeps key policy rate unchanged again | Daily Sabah - Daily Sabah"))
+      .toBe("Turkish central bank keeps key policy rate unchanged again");
+  });
+
+  it("strips cascading suffixes (dash then pipe)", () => {
+    expect(stripSourceSuffix("Oil prices surge on Hormuz tensions - Reuters | Reuters"))
+      .toBe("Oil prices surge on Hormuz tensions");
+  });
+
+  it("strips triple cascading suffixes", () => {
+    expect(stripSourceSuffix("ECB holds rates steady | Investing - Investing.com - Google News"))
+      .toBe("ECB holds rates steady");
+  });
+
+  it("stops stripping cascading suffixes when remaining title would be too short", () => {
+    expect(stripSourceSuffix("Rates hold | FT - Financial Times"))
+      .toBe("Rates hold | FT");
+  });
 });
