@@ -123,4 +123,30 @@ describe("event-service", () => {
     expect(globalLive).toBeDefined();
     expect(globalLive!.id).toMatch(/^live-global-/);
   });
+
+  it("warmAlternateScope warms the cache for the opposite scope", async () => {
+    delete process.env.NEWSAPI_KEY;
+    const { fetchRSSHeadlines } = await import("../rss-client");
+    vi.mocked(fetchRSSHeadlines).mockResolvedValue([
+      {
+        title: "Oil prices surge on OPEC production cut",
+        description: "Crude jumps after surprise output reduction",
+        url: "https://example.com/oil",
+        urlToImage: null,
+        publishedAt: new Date().toISOString(),
+        source: { id: null, name: "Reuters" },
+      },
+    ]);
+
+    const { warmAlternateScope, getEvents } = await import("../event-service");
+
+    await warmAlternateScope("global");
+
+    const calls = vi.mocked(fetchRSSHeadlines).mock.calls;
+    const localCall = calls.find((c) => c[0] === "local");
+    expect(localCall).toBeDefined();
+
+    const localEvents = await getEvents("local");
+    expect(localEvents.length).toBeGreaterThan(0);
+  });
 });

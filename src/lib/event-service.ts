@@ -110,6 +110,14 @@ export async function getEvents(
   }
 }
 
+export function warmAlternateScope(currentScope: "global" | "local"): void {
+  const alternate = currentScope === "global" ? "local" : "global";
+  const cached = getCached(`events-${alternate}`, eventsCache);
+  if (!cached) {
+    getEvents(alternate).catch(() => {});
+  }
+}
+
 export async function getEventById(
   id: string,
   options?: { skipHistorical?: boolean }

@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { after } from "next/server";
 import type { Metadata } from "next";
 import type { MarketEventSummary } from "@/lib/types";
 import { WeeklyViewClient } from "@/components/WeeklyViewClient";
@@ -18,6 +19,12 @@ async function fetchEvents(): Promise<MarketEventSummary[]> {
 
 export default async function WeeklyView() {
   const events = await fetchEvents();
+
+  after(async () => {
+    const { warmAlternateScope } = await import("@/lib/event-service");
+    warmAlternateScope("global");
+  });
+
   return (
     <Suspense>
       <WeeklyViewClient initialEvents={events} />
