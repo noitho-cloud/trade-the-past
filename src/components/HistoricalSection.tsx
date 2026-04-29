@@ -131,11 +131,11 @@ export function HistoricalSection({
               </h2>
               <div className="h-px flex-1 bg-border" />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div className="flex flex-wrap justify-center gap-3">
               {mentionedAssets.map((asset) => (
                 <div
                   key={asset}
-                  className="rounded-[16px] bg-card border border-[var(--card-border)] p-[var(--space-xl)] flex flex-col gap-3 shadow-[var(--card-shadow)]"
+                  className="w-full md:w-[calc(50%-6px)] lg:w-[calc(33.333%-8px)] rounded-[16px] bg-card border border-[var(--card-border)] p-[var(--space-xl)] flex flex-col gap-3 shadow-[var(--card-shadow)]"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="font-medium text-[15px] leading-snug">{asset}</h3>

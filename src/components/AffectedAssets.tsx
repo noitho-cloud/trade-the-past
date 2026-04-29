@@ -228,9 +228,11 @@ export function AffectedAssets({ matches }: { matches: HistoricalMatch[] }) {
         <div className="h-px flex-1 bg-border" />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="flex flex-wrap justify-center gap-3">
         {assets.map((asset) => (
-          <AssetCard key={asset.asset} asset={asset} />
+          <div key={asset.asset} className="w-full md:w-[calc(50%-6px)] lg:w-[calc(33.333%-8px)]">
+            <AssetCard asset={asset} />
+          </div>
         ))}
       </div>
     </section>

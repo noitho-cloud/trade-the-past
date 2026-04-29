@@ -107,4 +107,13 @@ describe("AffectedAssets", () => {
       expect(card!.className).toContain("border");
     }
   });
+
+  it("uses flexbox layout with justify-center for centering orphaned last-row cards", () => {
+    render(<AffectedAssets matches={matches} />, { wrapper: Wrapper });
+    const heading = screen.getByText("Affected Assets");
+    const section = heading.closest("section")!;
+    const grid = section.querySelector("[class*='flex-wrap']")!;
+    expect(grid).toBeTruthy();
+    expect(grid.className).toContain("justify-center");
+  });
 });
