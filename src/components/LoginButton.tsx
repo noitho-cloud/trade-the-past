@@ -36,7 +36,7 @@ export function LoginButton() {
 
   return (
     <button
-      onClick={openConnectModal}
+      onClick={() => openConnectModal()}
       className="inline-flex items-center gap-1.5 h-8 px-3 text-[12px] font-semibold text-[var(--etoro-green)] border border-[var(--etoro-green)] rounded-full
                  hover:bg-[var(--etoro-green)] hover:text-white active:scale-[0.98] transition-all cursor-pointer
                  focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:outline-none"
