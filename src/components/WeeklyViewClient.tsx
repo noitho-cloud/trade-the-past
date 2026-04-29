@@ -369,7 +369,7 @@ export function WeeklyViewClient({
                             </span>
                           </div>
                         )}
-                        <span className="text-[11px] text-muted/60 group-hover:text-muted transition-colors mt-1.5 inline-flex items-center gap-1">
+                        <span className="text-[12px] text-muted group-hover:text-[var(--etoro-green)] transition-colors mt-1.5 inline-flex items-center gap-1">
                           View analysis
                           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" className="group-hover:translate-x-0.5 transition-transform">
                             <path d="M6 4L10 8L6 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -395,7 +395,7 @@ export function WeeklyViewClient({
                         height="16"
                         viewBox="0 0 16 16"
                         fill="none"
-                        className="shrink-0 self-center text-muted/50 group-hover:text-muted group-hover:translate-x-0.5 transition-all"
+                        className="shrink-0 self-center text-muted/70 group-hover:text-muted group-hover:translate-x-0.5 transition-all"
                       >
                         <path
                           d="M6 4L10 8L6 12"
