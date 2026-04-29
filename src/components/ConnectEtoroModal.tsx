@@ -16,6 +16,7 @@ export function ConnectEtoroModal() {
     setApiKey("");
     setUserKey("");
     setError("");
+    setWarning("");
     setIsSubmitting(false);
     closeConnectModal();
   }, [closeConnectModal]);
@@ -31,14 +32,19 @@ export function ConnectEtoroModal() {
     }
   }, [showConnectModal]);
 
+  const [warning, setWarning] = useState("");
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    setWarning("");
     setIsSubmitting(true);
 
-    const success = await connect(apiKey.trim(), userKey.trim());
-    if (!success) {
-      setError("Failed to connect. Please check your keys and try again.");
+    const result = await connect(apiKey.trim(), userKey.trim());
+    if (!result.success) {
+      setError(result.error ?? "Failed to connect. Please check your keys and try again.");
+    } else if (result.warning) {
+      setWarning(result.warning);
     }
     setIsSubmitting(false);
   }
@@ -116,6 +122,10 @@ export function ConnectEtoroModal() {
 
           {error && (
             <p className="text-sm text-[var(--red)]" role="alert">{error}</p>
+          )}
+
+          {warning && (
+            <p className="text-sm text-[#f5a623]" role="status">{warning}</p>
           )}
 
           <button

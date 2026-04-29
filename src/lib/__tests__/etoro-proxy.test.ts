@@ -99,4 +99,69 @@ describe("etoro-proxy", () => {
 
     vi.unstubAllGlobals();
   });
+
+  it("validateKeys returns 'valid' when eToro responds 200", async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: () => Promise.resolve({ Items: [] }),
+    });
+    vi.stubGlobal("fetch", mockFetch);
+
+    const { validateKeys } = await import("../etoro-proxy");
+    const result = await validateKeys({ apiKey: "good-key", userKey: "good-user" });
+    expect(result).toBe("valid");
+
+    vi.unstubAllGlobals();
+  });
+
+  it("validateKeys returns 'invalid' on 401", async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 401,
+    });
+    vi.stubGlobal("fetch", mockFetch);
+
+    const { validateKeys } = await import("../etoro-proxy");
+    const result = await validateKeys({ apiKey: "bad-key", userKey: "bad-user" });
+    expect(result).toBe("invalid");
+
+    vi.unstubAllGlobals();
+  });
+
+  it("validateKeys returns 'invalid' on 403", async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 403,
+    });
+    vi.stubGlobal("fetch", mockFetch);
+
+    const { validateKeys } = await import("../etoro-proxy");
+    const result = await validateKeys({ apiKey: "bad-key", userKey: "bad-user" });
+    expect(result).toBe("invalid");
+
+    vi.unstubAllGlobals();
+  });
+
+  it("validateKeys returns 'unreachable' on network error", async () => {
+    const mockFetch = vi.fn().mockRejectedValue(new Error("Network error"));
+    vi.stubGlobal("fetch", mockFetch);
+
+    const { validateKeys } = await import("../etoro-proxy");
+    const result = await validateKeys({ apiKey: "key", userKey: "user" });
+    expect(result).toBe("unreachable");
+
+    vi.unstubAllGlobals();
+  });
+
+  it("validateKeys returns 'unreachable' on timeout", async () => {
+    const mockFetch = vi.fn().mockRejectedValue(new DOMException("Timeout", "TimeoutError"));
+    vi.stubGlobal("fetch", mockFetch);
+
+    const { validateKeys } = await import("../etoro-proxy");
+    const result = await validateKeys({ apiKey: "key", userKey: "user" });
+    expect(result).toBe("unreachable");
+
+    vi.unstubAllGlobals();
+  });
 });

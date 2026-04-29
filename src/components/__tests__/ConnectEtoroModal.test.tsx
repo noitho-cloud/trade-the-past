@@ -19,7 +19,7 @@ beforeEach(() => {
     showConnectModal: true,
     openConnectModal: vi.fn(),
     closeConnectModal: vi.fn(),
-    connect: vi.fn().mockResolvedValue(true),
+    connect: vi.fn().mockResolvedValue({ success: true }),
     disconnect: vi.fn(),
   });
 });

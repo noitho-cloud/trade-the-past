@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { encryptKeys, KEYS_COOKIE_NAME, KEYS_MAX_AGE } from "@/lib/auth";
 import { logger } from "@/lib/logger";
+import { validateKeys } from "@/lib/etoro-proxy";
 import { applyRateLimit, addRateLimitHeaders } from "@/lib/with-rate-limit";
 
 export async function POST(request: Request) {
@@ -34,11 +35,21 @@ export async function POST(request: Request) {
     );
   }
 
+  const trimmedKeys = { apiKey: apiKey.trim(), userKey: userKey.trim() };
+
+  const validation = await validateKeys(trimmedKeys);
+  if (validation === "invalid") {
+    return addRateLimitHeaders(
+      NextResponse.json(
+        { error: "Invalid API keys. Please check your keys and try again." },
+        { status: 401 }
+      ),
+      rateLimit
+    );
+  }
+
   try {
-    const encrypted = encryptKeys({
-      apiKey: apiKey.trim(),
-      userKey: userKey.trim(),
-    });
+    const encrypted = encryptKeys(trimmedKeys);
 
     const cookieStore = await cookies();
     cookieStore.set(KEYS_COOKIE_NAME, encrypted, {
@@ -49,7 +60,12 @@ export async function POST(request: Request) {
       path: "/",
     });
 
-    const response = NextResponse.json({ success: true });
+    const response = NextResponse.json({
+      success: true,
+      ...(validation === "unreachable" && {
+        warning: "Could not verify keys — you may need to reconnect if trading fails.",
+      }),
+    });
     return addRateLimitHeaders(response, rateLimit);
   } catch (error) {
     logger.error("Connect error", { route: "/api/auth/etoro", error: error instanceof Error ? error.message : String(error) });

@@ -17,6 +17,7 @@ vi.mock("@/lib/event-service", () => ({
 
 vi.mock("@/lib/etoro-proxy", () => ({
   getEtoroKeys: vi.fn().mockResolvedValue(null),
+  validateKeys: vi.fn().mockResolvedValue("valid"),
 }));
 
 describe("API routes use structured logger for errors", () => {

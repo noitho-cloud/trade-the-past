@@ -2,13 +2,19 @@
 
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
 
+export interface ConnectResult {
+  success: boolean;
+  error?: string;
+  warning?: string;
+}
+
 interface AuthContextValue {
   isConnected: boolean;
   isLoading: boolean;
   showConnectModal: boolean;
   openConnectModal: () => void;
   closeConnectModal: () => void;
-  connect: (apiKey: string, userKey: string) => Promise<boolean>;
+  connect: (apiKey: string, userKey: string) => Promise<ConnectResult>;
   disconnect: () => Promise<void>;
 }
 
@@ -18,7 +24,7 @@ const AuthContext = createContext<AuthContextValue>({
   showConnectModal: false,
   openConnectModal: () => {},
   closeConnectModal: () => {},
-  connect: async () => false,
+  connect: async () => ({ success: false }),
   disconnect: async () => {},
 });
 
@@ -53,19 +59,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => { cancelled = true; };
   }, []);
 
-  const connect = useCallback(async (apiKey: string, userKey: string): Promise<boolean> => {
+  const connect = useCallback(async (apiKey: string, userKey: string): Promise<ConnectResult> => {
     try {
       const res = await fetch("/api/auth/etoro", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ apiKey, userKey }),
       });
-      if (!res.ok) return false;
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        return { success: false, error: data.error ?? "Failed to connect" };
+      }
       setIsConnected(true);
       setShowConnectModal(false);
-      return true;
+      return { success: true, warning: data.warning };
     } catch {
-      return false;
+      return { success: false, error: "Network error — please try again" };
     }
   }, []);
 

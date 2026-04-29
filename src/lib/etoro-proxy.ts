@@ -111,4 +111,27 @@ export async function executeTrade(
   };
 }
 
+export type KeyValidationResult = "valid" | "invalid" | "unreachable";
+
+export async function validateKeys(keys: EtoroKeys): Promise<KeyValidationResult> {
+  const headers = buildEtoroHeaders(keys);
+  const params = new URLSearchParams({
+    internalSymbolFull: "AAPL",
+    fields: "instrumentId",
+    pageSize: "1",
+  });
+
+  try {
+    const res = await fetch(`${ETORO_API_BASE}/market-data/search?${params}`, {
+      headers,
+      signal: AbortSignal.timeout(ETORO_FETCH_TIMEOUT_MS),
+    });
+
+    if (res.status === 401 || res.status === 403) return "invalid";
+    return "valid";
+  } catch {
+    return "unreachable";
+  }
+}
+
 export { ETORO_API_BASE };
