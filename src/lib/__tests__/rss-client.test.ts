@@ -153,4 +153,29 @@ describe("stripSourceSuffix", () => {
   it("returns the title unchanged when it is empty", () => {
     expect(stripSourceSuffix("")).toBe("");
   });
+
+  it("strips pipe-separated publisher names like ' | Daily Sabah'", () => {
+    expect(stripSourceSuffix("Turkish central bank keeps key policy rate unchanged again | Daily Sabah"))
+      .toBe("Turkish central bank keeps key policy rate unchanged again");
+  });
+
+  it("strips pipe-separated single-word publishers like ' | Reuters'", () => {
+    expect(stripSourceSuffix("ECB holds rates steady amid uncertainty | Reuters"))
+      .toBe("ECB holds rates steady amid uncertainty");
+  });
+
+  it("does not strip pipe-separated long suffixes that look like content", () => {
+    expect(stripSourceSuffix("Markets react | and here is a very long continuation of the story"))
+      .toBe("Markets react | and here is a very long continuation of the story");
+  });
+
+  it("does not strip pipe if remaining title would be too short", () => {
+    expect(stripSourceSuffix("Short | BBC"))
+      .toBe("Short | BBC");
+  });
+
+  it("prefers the rightmost separator when both dash and pipe exist", () => {
+    expect(stripSourceSuffix("U.S.-Iran war - naval standoff develops | CNBC"))
+      .toBe("U.S.-Iran war - naval standoff develops");
+  });
 });

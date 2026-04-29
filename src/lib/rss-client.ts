@@ -217,9 +217,15 @@ function decodeEntities(str: string): string {
 
 export function stripSourceSuffix(title: string): string {
   if (!title) return title;
-  const idx = title.lastIndexOf(" - ");
+
+  const dashIdx = title.lastIndexOf(" - ");
+  const pipeIdx = title.lastIndexOf(" | ");
+
+  const idx = Math.max(dashIdx, pipeIdx);
   if (idx < 0) return title;
-  const suffix = title.slice(idx + 3).trim();
+
+  const sepLen = 3;
+  const suffix = title.slice(idx + sepLen).trim();
   const wordCount = suffix.split(/\s+/).length;
   if (wordCount > 5) return title;
   const stripped = title.slice(0, idx).trim();
