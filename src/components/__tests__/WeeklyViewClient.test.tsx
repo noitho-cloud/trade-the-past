@@ -134,7 +134,7 @@ describe("WeeklyViewClient", () => {
     await user.click(screen.getByText("UK / DE / FR"));
 
     // Skeletons should be showing while fetch is pending
-    const skeletons = document.querySelectorAll(".animate-pulse");
+    const skeletons = document.querySelectorAll(".skeleton-shimmer");
     expect(skeletons.length).toBeGreaterThan(0);
 
     // Resolve the fetch
@@ -258,7 +258,7 @@ describe("WeeklyViewClient", () => {
     expect(fetchCallCount).toBe(1); // no additional fetch
 
     // No skeleton should have appeared
-    const skeletons = document.querySelectorAll(".animate-pulse");
+    const skeletons = document.querySelectorAll(".skeleton-shimmer");
     expect(skeletons.length).toBe(0);
   });
 

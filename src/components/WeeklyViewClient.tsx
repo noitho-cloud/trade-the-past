@@ -11,7 +11,7 @@ import { ScopeToggle } from "@/components/ScopeToggle";
 
 function EventCardSkeleton() {
   return (
-    <div className="rounded-[16px] bg-card shadow-[var(--card-shadow)] animate-pulse">
+    <div className="rounded-[16px] bg-card shadow-[var(--card-shadow)] skeleton-shimmer">
       <div className="flex items-stretch">
         <div className="w-20 shrink-0 border-r border-[var(--gray-border)] py-4 flex flex-col items-center justify-center">
           <div className="h-3 w-8 bg-foreground/5 rounded" />

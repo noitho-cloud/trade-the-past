@@ -1,6 +1,6 @@
 export default function Loading() {
   return (
-    <div className="space-y-6 animate-pulse">
+    <div className="space-y-6 skeleton-shimmer">
       <div className="flex items-end justify-between gap-4">
         <div>
           <div className="h-9 w-40 bg-foreground/5 rounded" />
