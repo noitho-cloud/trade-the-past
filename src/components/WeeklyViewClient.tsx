@@ -353,7 +353,8 @@ export function WeeklyViewClient({
                           </span>
                         </div>
                         {event.keyReaction && (
-                          <div className="mt-1.5">
+                          <div className="mt-1.5 flex items-center gap-1.5">
+                            <span className="text-[10px] font-medium text-muted">Past:</span>
                             <span
                               className={`text-[13px] etoro-nums ${
                                 event.keyReaction.direction === "up"
