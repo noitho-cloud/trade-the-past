@@ -55,6 +55,7 @@ export function ConnectEtoroModal() {
     <dialog
       ref={dialogRef}
       onClose={handleClose}
+      onClick={(e) => { if (e.target === dialogRef.current) handleClose(); }}
       className="fixed inset-0 z-50 m-auto w-[calc(100%-32px)] max-w-md rounded-2xl bg-card border border-[var(--card-border)] shadow-xl p-0 backdrop:bg-black/50 backdrop:backdrop-blur-sm"
     >
       <div className="p-6 space-y-5">

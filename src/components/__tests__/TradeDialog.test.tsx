@@ -56,4 +56,26 @@ describe("TradeDialog", () => {
     expect(dollarSign).toBeTruthy();
     expect(dollarSign!.textContent).toBe("$");
   });
+
+  it("closes when backdrop (dialog element) is clicked directly", () => {
+    const onClose = vi.fn();
+    render(
+      <TradeDialog asset="Oil" direction="up" symbol="OIL" onClose={onClose} />,
+      { wrapper: Wrapper }
+    );
+    const dialog = document.querySelector("dialog")!;
+    dialog.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it("does not close when inner content is clicked", () => {
+    const onClose = vi.fn();
+    render(
+      <TradeDialog asset="Oil" direction="up" symbol="OIL" onClose={onClose} />,
+      { wrapper: Wrapper }
+    );
+    const heading = screen.getByText("Confirm Trade");
+    heading.click();
+    expect(onClose).not.toHaveBeenCalled();
+  });
 });

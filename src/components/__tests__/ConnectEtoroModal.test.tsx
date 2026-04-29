@@ -53,4 +53,40 @@ describe("ConnectEtoroModal", () => {
     expect(userKeyInput.maxLength).toBeLessThanOrEqual(200);
     expect(userKeyInput.maxLength).toBeGreaterThan(0);
   });
+
+  it("closes when backdrop (dialog element) is clicked directly", () => {
+    const closeConnectModal = vi.fn();
+    mockUseAuth.mockReturnValue({
+      isConnected: false,
+      isLoading: false,
+      showConnectModal: true,
+      openConnectModal: vi.fn(),
+      closeConnectModal,
+      connect: vi.fn().mockResolvedValue({ success: true }),
+      disconnect: vi.fn(),
+    });
+
+    render(<ConnectEtoroModal />);
+    const dialog = document.querySelector("dialog")!;
+    dialog.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    expect(closeConnectModal).toHaveBeenCalled();
+  });
+
+  it("does not close when inner content is clicked", () => {
+    const closeConnectModal = vi.fn();
+    mockUseAuth.mockReturnValue({
+      isConnected: false,
+      isLoading: false,
+      showConnectModal: true,
+      openConnectModal: vi.fn(),
+      closeConnectModal,
+      connect: vi.fn().mockResolvedValue({ success: true }),
+      disconnect: vi.fn(),
+    });
+
+    render(<ConnectEtoroModal />);
+    const heading = document.querySelector("h2")!;
+    heading.click();
+    expect(closeConnectModal).not.toHaveBeenCalled();
+  });
 });
