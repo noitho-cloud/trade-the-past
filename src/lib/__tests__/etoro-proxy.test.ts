@@ -144,6 +144,63 @@ describe("etoro-proxy", () => {
     vi.unstubAllGlobals();
   });
 
+  it("executeTrade throws EtoroAuthError on 401", async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 401,
+      text: () => Promise.resolve("Unauthorized"),
+    });
+    vi.stubGlobal("fetch", mockFetch);
+
+    const { executeTrade, EtoroAuthError } = await import("../etoro-proxy");
+    await expect(
+      executeTrade(
+        { apiKey: "bad-key", userKey: "bad-user" },
+        { instrumentId: 1, isBuy: true, amount: 100, isDemo: true }
+      )
+    ).rejects.toThrow(EtoroAuthError);
+
+    vi.unstubAllGlobals();
+  });
+
+  it("executeTrade throws EtoroAuthError on 403", async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 403,
+      text: () => Promise.resolve("Forbidden"),
+    });
+    vi.stubGlobal("fetch", mockFetch);
+
+    const { executeTrade, EtoroAuthError } = await import("../etoro-proxy");
+    await expect(
+      executeTrade(
+        { apiKey: "bad-key", userKey: "bad-user" },
+        { instrumentId: 1, isBuy: true, amount: 100, isDemo: true }
+      )
+    ).rejects.toThrow(EtoroAuthError);
+
+    vi.unstubAllGlobals();
+  });
+
+  it("executeTrade returns generic error on non-auth failure (500)", async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 500,
+      text: () => Promise.resolve("Server Error"),
+    });
+    vi.stubGlobal("fetch", mockFetch);
+
+    const { executeTrade } = await import("../etoro-proxy");
+    const result = await executeTrade(
+      { apiKey: "key", userKey: "user" },
+      { instrumentId: 1, isBuy: true, amount: 100, isDemo: true }
+    );
+    expect(result.success).toBe(false);
+    expect(result.error).toContain("500");
+
+    vi.unstubAllGlobals();
+  });
+
   it("validateKeys returns 'valid' when eToro responds 200", async () => {
     const mockFetch = vi.fn().mockResolvedValue({
       ok: true,

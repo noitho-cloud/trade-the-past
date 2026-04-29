@@ -107,6 +107,8 @@ export async function executeTrade(
     signal: AbortSignal.timeout(ETORO_FETCH_TIMEOUT_MS),
   });
 
+  if (res.status === 401 || res.status === 403) throw new EtoroAuthError();
+
   if (!res.ok) {
     await res.text().catch(() => {});
     return { success: false, error: `Trade failed (${res.status})` };
