@@ -68,7 +68,7 @@ function MethodologyHint() {
     <div className="mt-2">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="text-[11px] text-muted/50 hover:text-muted/70 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:outline-none rounded"
+        className="text-[13px] text-muted hover:text-foreground underline decoration-dotted underline-offset-2 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:outline-none rounded"
       >
         {open ? "Hide" : "How does this work?"}
       </button>
