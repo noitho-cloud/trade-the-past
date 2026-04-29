@@ -382,6 +382,33 @@ describe("WeeklyViewClient", () => {
     ).toBeInTheDocument();
   });
 
+  it("rapid scope toggling does not leave page stuck on skeletons", async () => {
+    const user = userEvent.setup();
+    let resolveLocal: ((value: unknown) => void) | null = null;
+    (fetch as ReturnType<typeof vi.fn>).mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveLocal = resolve;
+        })
+    );
+
+    render(<WeeklyViewClient initialEvents={mockEvents} />);
+
+    // Rapidly toggle: local → global → local → global
+    await user.click(screen.getByText("UK / DE / FR"));
+    await user.click(screen.getByText("Global"));
+    await user.click(screen.getByText("UK / DE / FR"));
+    await user.click(screen.getByText("Global"));
+
+    // After settling on Global (which is cached), data should be visible and no skeletons
+    await waitFor(() => {
+      expect(screen.getByText("Fed Holds Rates Steady")).toBeInTheDocument();
+    });
+
+    const skeletons = document.querySelectorAll(".skeleton-shimmer");
+    expect(skeletons.length).toBe(0);
+  });
+
   it("empty state has a button to switch back to Global", async () => {
     const user = userEvent.setup();
     (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({

@@ -209,9 +209,14 @@ export function WeeklyViewClient({
 
       const cached = getCachedData(newScope);
       if (cached) {
+        if (abortControllerRef.current) {
+          abortControllerRef.current.abort();
+          abortControllerRef.current = null;
+        }
         setEvents(cached);
         confirmedScope.current = newScope;
         setScope(newScope);
+        setLoading(false);
       } else {
         setLoading(true);
         setScope(newScope);
