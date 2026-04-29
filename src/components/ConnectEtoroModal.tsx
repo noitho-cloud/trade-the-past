@@ -95,6 +95,7 @@ export function ConnectEtoroModal() {
               onChange={(e) => setApiKey(e.target.value)}
               placeholder="Enter your Public API Key"
               required
+              maxLength={200}
               autoComplete="off"
               className="w-full h-10 px-3 rounded-lg border border-[var(--border)] bg-background text-sm
                          focus:outline-none focus:ring-2 focus:ring-[var(--etoro-green)] focus:border-transparent
@@ -113,6 +114,7 @@ export function ConnectEtoroModal() {
               onChange={(e) => setUserKey(e.target.value)}
               placeholder="Enter your User Key"
               required
+              maxLength={200}
               autoComplete="off"
               className="w-full h-10 px-3 rounded-lg border border-[var(--border)] bg-background text-sm
                          focus:outline-none focus:ring-2 focus:ring-[var(--etoro-green)] focus:border-transparent

@@ -35,6 +35,14 @@ export async function POST(request: Request) {
     );
   }
 
+  const MAX_KEY_LENGTH = 200;
+  if (apiKey.trim().length > MAX_KEY_LENGTH || userKey.trim().length > MAX_KEY_LENGTH) {
+    return NextResponse.json(
+      { error: `API keys must be ${MAX_KEY_LENGTH} characters or fewer` },
+      { status: 400 }
+    );
+  }
+
   const trimmedKeys = { apiKey: apiKey.trim(), userKey: userKey.trim() };
 
   const validation = await validateKeys(trimmedKeys);

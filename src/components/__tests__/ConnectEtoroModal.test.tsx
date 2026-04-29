@@ -39,4 +39,18 @@ describe("ConnectEtoroModal", () => {
     expect(allText).toMatch(/encrypted/i);
     expect(allText).toMatch(/secure/i);
   });
+
+  it("limits API key input length to prevent oversized payloads", () => {
+    render(<ConnectEtoroModal />);
+
+    const apiKeyInput = document.querySelector("#etoro-api-key") as HTMLInputElement;
+    const userKeyInput = document.querySelector("#etoro-user-key") as HTMLInputElement;
+
+    expect(apiKeyInput).toBeTruthy();
+    expect(userKeyInput).toBeTruthy();
+    expect(apiKeyInput.maxLength).toBeLessThanOrEqual(200);
+    expect(apiKeyInput.maxLength).toBeGreaterThan(0);
+    expect(userKeyInput.maxLength).toBeLessThanOrEqual(200);
+    expect(userKeyInput.maxLength).toBeGreaterThan(0);
+  });
 });
