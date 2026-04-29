@@ -85,6 +85,56 @@ describe("API error handling", () => {
     });
   });
 
+  describe("/api/etoro/trade amount validation", () => {
+    it("returns 400 for amount below minimum", async () => {
+      const { POST } = await import("@/app/api/etoro/trade/route");
+      const req = new Request("http://localhost:3050/api/etoro/trade", {
+        method: "POST",
+        body: JSON.stringify({ symbol: "AAPL", isBuy: true, amount: 0.5 }),
+        headers: { "Content-Type": "application/json" },
+      });
+      const res = await POST(req);
+      expect(res.status).toBe(400);
+      const json = await res.json();
+      expect(json.error).toMatch(/between/i);
+    });
+
+    it("returns 400 for amount above maximum", async () => {
+      const { POST } = await import("@/app/api/etoro/trade/route");
+      const req = new Request("http://localhost:3050/api/etoro/trade", {
+        method: "POST",
+        body: JSON.stringify({ symbol: "AAPL", isBuy: true, amount: 100000 }),
+        headers: { "Content-Type": "application/json" },
+      });
+      const res = await POST(req);
+      expect(res.status).toBe(400);
+      const json = await res.json();
+      expect(json.error).toMatch(/between/i);
+    });
+
+    it("accepts amount at minimum boundary", async () => {
+      const { POST } = await import("@/app/api/etoro/trade/route");
+      const req = new Request("http://localhost:3050/api/etoro/trade", {
+        method: "POST",
+        body: JSON.stringify({ symbol: "AAPL", isBuy: true, amount: 1 }),
+        headers: { "Content-Type": "application/json" },
+      });
+      const res = await POST(req);
+      expect(res.status).not.toBe(400);
+    });
+
+    it("accepts amount at maximum boundary", async () => {
+      const { POST } = await import("@/app/api/etoro/trade/route");
+      const req = new Request("http://localhost:3050/api/etoro/trade", {
+        method: "POST",
+        body: JSON.stringify({ symbol: "AAPL", isBuy: true, amount: 50000 }),
+        headers: { "Content-Type": "application/json" },
+      });
+      const res = await POST(req);
+      expect(res.status).not.toBe(400);
+    });
+  });
+
   describe("eToro API routes never echo user input in error messages", () => {
     const maliciousSymbol = '<script>alert("xss")</script>';
 

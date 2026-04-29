@@ -19,7 +19,17 @@ export function TradeDialog({ asset, direction, symbol, onClose }: TradeDialogPr
   const dialogRef = useRef<HTMLDialogElement>(null);
   const amountRef = useRef<HTMLInputElement>(null);
 
+  const MIN_AMOUNT = 1;
+  const MAX_AMOUNT = 50_000;
   const isBuy = direction === "up";
+  const numAmount = Number(amount);
+  const amountError =
+    amount && numAmount < MIN_AMOUNT
+      ? `Minimum amount is $${MIN_AMOUNT}`
+      : amount && numAmount > MAX_AMOUNT
+        ? `Maximum amount is $${MAX_AMOUNT.toLocaleString()}`
+        : "";
+  const isAmountValid = !!amount && numAmount >= MIN_AMOUNT && numAmount <= MAX_AMOUNT;
 
   useEffect(() => {
     dialogRef.current?.showModal();
@@ -112,13 +122,20 @@ export function TradeDialog({ asset, direction, symbol, onClose }: TradeDialogPr
             ref={amountRef}
             id="trade-amount"
             type="number"
-            min="1"
+            min={MIN_AMOUNT}
+            max={MAX_AMOUNT}
             step="1"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="w-full h-10 px-3 rounded-lg border border-[var(--border)] bg-background text-sm etoro-nums
-                       focus:outline-none focus:ring-2 focus:ring-[var(--etoro-green)] focus:border-transparent"
+            className={`w-full h-10 px-3 rounded-lg border bg-background text-sm etoro-nums
+                       focus:outline-none focus:ring-2 focus:border-transparent
+                       ${amountError
+                         ? "border-[var(--red)] focus:ring-[var(--red)]"
+                         : "border-[var(--border)] focus:ring-[var(--etoro-green)]"}`}
           />
+          {amountError && (
+            <p className="text-xs text-[var(--red)] mt-1">{amountError}</p>
+          )}
         </div>
 
         <div className="flex items-center justify-between">
@@ -160,7 +177,7 @@ export function TradeDialog({ asset, direction, symbol, onClose }: TradeDialogPr
           </button>
           <button
             onClick={handleTrade}
-            disabled={isSubmitting || !amount || Number(amount) <= 0}
+            disabled={isSubmitting || !isAmountValid}
             className={`flex-1 h-11 rounded-full text-white text-sm font-semibold transition-all cursor-pointer
                         disabled:opacity-50 disabled:cursor-not-allowed
                         active:scale-[0.98] ${

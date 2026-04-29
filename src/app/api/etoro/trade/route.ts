@@ -45,9 +45,9 @@ export async function POST(request: Request) {
     );
   }
 
-  if (typeof amount !== "number" || amount <= 0) {
+  if (typeof amount !== "number" || amount < 1 || amount > 50_000) {
     return addRateLimitHeaders(
-      NextResponse.json({ error: "Amount must be a positive number" }, { status: 400 }),
+      NextResponse.json({ error: "Amount must be between $1 and $50,000" }, { status: 400 }),
       rateLimit
     );
   }
