@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getEventById } from "@/lib/event-service";
+import { logger } from "@/lib/logger";
 import { applyRateLimit, addRateLimitHeaders } from "@/lib/with-rate-limit";
 
 export const maxDuration = 30;
@@ -29,7 +30,7 @@ export async function GET(
     );
     return addRateLimitHeaders(response, rateLimit);
   } catch (error) {
-    console.error("Event detail API error:", error instanceof Error ? error.message : error);
+    logger.error("Event detail API error", { route: "/api/events/[id]", error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to load event" },
       { status: 500 }

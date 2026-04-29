@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getEvents } from "@/lib/event-service";
+import { logger } from "@/lib/logger";
 import { applyRateLimit, addRateLimitHeaders } from "@/lib/with-rate-limit";
 
 export async function GET(request: NextRequest) {
@@ -22,7 +23,7 @@ export async function GET(request: NextRequest) {
     );
     return addRateLimitHeaders(response, rateLimit);
   } catch (error) {
-    console.error("Events API error:", error instanceof Error ? error.message : error);
+    logger.error("Events API error", { route: "/api/events", error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to load events" },
       { status: 500 }

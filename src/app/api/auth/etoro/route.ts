@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { encryptKeys, KEYS_COOKIE_NAME, KEYS_MAX_AGE } from "@/lib/auth";
+import { logger } from "@/lib/logger";
 import { applyRateLimit, addRateLimitHeaders } from "@/lib/with-rate-limit";
 
 export async function POST(request: Request) {
@@ -51,7 +52,7 @@ export async function POST(request: Request) {
     const response = NextResponse.json({ success: true });
     return addRateLimitHeaders(response, rateLimit);
   } catch (error) {
-    console.error("Connect error:", error instanceof Error ? error.message : error);
+    logger.error("Connect error", { route: "/api/auth/etoro", error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to store credentials" },
       { status: 500 }
