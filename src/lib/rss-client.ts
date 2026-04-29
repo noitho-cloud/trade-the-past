@@ -226,7 +226,7 @@ export function stripSourceSuffix(title: string): string {
     if (idx < 0) break;
 
     const suffix = result.slice(idx + 3).trim();
-    if (suffix.split(/\s+/).length > 5) break;
+    if (suffix.split(/\s+/).length > 10) break;
 
     const stripped = result.slice(0, idx).trim();
     if (stripped.length < 15) break;

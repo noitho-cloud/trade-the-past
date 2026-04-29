@@ -145,9 +145,14 @@ describe("stripSourceSuffix", () => {
       .toBe("U.S.-Iran war evolves into naval standoff");
   });
 
-  it("does not strip long suffixes that look like content (more than 5 words)", () => {
-    expect(stripSourceSuffix("Market update - and here is a very long continuation of the story"))
-      .toBe("Market update - and here is a very long continuation of the story");
+  it("strips long institutional source names up to 10 words", () => {
+    expect(stripSourceSuffix("The Day in Trade: Industry questions alleged UK-EU SPS agreement benefits - The Chartered Institute of Export & International Trade"))
+      .toBe("The Day in Trade: Industry questions alleged UK-EU SPS agreement benefits");
+  });
+
+  it("does not strip suffixes longer than 10 words that look like content", () => {
+    expect(stripSourceSuffix("Market update - and here is a very long continuation of the story that keeps going on and on"))
+      .toBe("Market update - and here is a very long continuation of the story that keeps going on and on");
   });
 
   it("returns the title unchanged when it is empty", () => {
@@ -165,8 +170,8 @@ describe("stripSourceSuffix", () => {
   });
 
   it("does not strip pipe-separated long suffixes that look like content", () => {
-    expect(stripSourceSuffix("Markets react | and here is a very long continuation of the story"))
-      .toBe("Markets react | and here is a very long continuation of the story");
+    expect(stripSourceSuffix("Markets react | and here is a very long continuation of the story that keeps going on and on"))
+      .toBe("Markets react | and here is a very long continuation of the story that keeps going on and on");
   });
 
   it("does not strip pipe if remaining title would be too short", () => {
