@@ -188,7 +188,7 @@ const DB: Record<EventType, HistoricalEntry[]> = {
         "Full-scale military invasion disrupting energy supplies and triggering sanctions, causing commodity spikes and market sell-offs.",
       insight:
         "Oil spiked 30% in weeks while European stocks fell sharply. Gold surged as a safe haven. Wars involving major commodity exporters cause immediate supply shock pricing.",
-      tags: ["russia", "ukraine", "war", "invasion", "energy", "gas", "europe", "sanctions", "nato"],
+      tags: ["russia", "ukraine", "war", "invasion", "energy", "gas", "europe", "sanctions", "nato", "airline", "aviation", "fuel cost"],
       reactions: [
         { asset: "Oil", direction: "up", day1Pct: 7.8, week1Pct: 18.5 },
         { asset: "Gold", direction: "up", day1Pct: 3.2, week1Pct: 6.4 },
@@ -203,7 +203,7 @@ const DB: Record<EventType, HistoricalEntry[]> = {
         "Military action threatening the world's most critical oil chokepoint, through which 20% of global oil flows.",
       insight:
         "Oil prices jumped 4% on each incident. Hormuz Strait threats create an immediate risk premium on crude but tend to fade within weeks if no sustained blockade materializes.",
-      tags: ["iran", "hormuz", "strait", "oil", "tanker", "gulf", "middle east", "shipping", "blockade"],
+      tags: ["iran", "hormuz", "strait", "oil", "tanker", "gulf", "middle east", "shipping", "blockade", "airline", "aviation", "fuel cost"],
       reactions: [
         { asset: "Oil", direction: "up", day1Pct: 4.1, week1Pct: 6.2 },
         { asset: "Brent Crude", direction: "up", day1Pct: 3.8, week1Pct: 5.9 },
@@ -642,7 +642,7 @@ const DB: Record<EventType, HistoricalEntry[]> = {
         "Extreme demand collapse combined with storage overflow causing unprecedented commodity price dislocation.",
       insight:
         "The negative print was a storage/logistics anomaly, not a true price signal. Oil recovered to $30 within a month. Extreme commodity dislocations tend to mean-revert rapidly once the physical constraint resolves.",
-      tags: ["oil", "negative", "price crash", "demand", "storage", "covid", "pandemic", "crude"],
+      tags: ["oil", "negative", "price crash", "demand", "storage", "covid", "pandemic", "crude", "airline", "aviation", "fuel cost"],
       reactions: [
         { asset: "Oil", direction: "down", day1Pct: -43.0, week1Pct: 19.0 },
         { asset: "ExxonMobil", direction: "down", day1Pct: -4.7, week1Pct: 8.2 },
@@ -656,7 +656,7 @@ const DB: Record<EventType, HistoricalEntry[]> = {
         "Coordinated supply restriction by major oil producers to prop up prices amid demand uncertainty.",
       insight:
         "Oil jumped 6% immediately. OPEC surprise cuts create sharp one-day moves, but the longer-term impact depends on whether demand can absorb the higher prices.",
-      tags: ["opec", "oil", "production cut", "supply", "saudi", "crude", "brent", "barrel"],
+      tags: ["opec", "oil", "production cut", "supply", "saudi", "crude", "brent", "barrel", "airline", "aviation", "fuel cost"],
       reactions: [
         { asset: "Oil", direction: "up", day1Pct: 6.3, week1Pct: 4.1 },
         { asset: "Brent Crude", direction: "up", day1Pct: 5.8, week1Pct: 3.9 },
@@ -675,6 +675,76 @@ const DB: Record<EventType, HistoricalEntry[]> = {
         { asset: "Natural Gas", direction: "up", day1Pct: 12.3, week1Pct: 28.1 },
         { asset: "DAX", direction: "down", day1Pct: -2.8, week1Pct: -6.3 },
         { asset: "EUR/USD", direction: "down", day1Pct: -1.1, week1Pct: -3.2 },
+      ],
+    },
+    {
+      description: "Post-COVID jet fuel shortage spikes prices 100%+ as refineries lag travel rebound",
+      year: 2022,
+      whySimilar:
+        "Refinery closures during COVID reduced capacity. When travel demand surged back, jet fuel prices spiked over 100%, squeezing airline margins.",
+      insight:
+        "Airlines like Southwest and United saw stock drops of 10-15% as fuel costs ate into margins. Carriers with fuel hedges outperformed. Jet fuel shortages hit airlines harder than crude price moves because refineries are the bottleneck.",
+      tags: ["jet fuel", "airline", "shortage", "refinery", "travel", "supply chain", "aviation", "flight", "fuel cost", "covid"],
+      reactions: [
+        { asset: "Oil", direction: "up", day1Pct: 3.5, week1Pct: 6.2 },
+        { asset: "S&P 500", direction: "down", day1Pct: -0.8, week1Pct: -2.1 },
+        { asset: "ExxonMobil", direction: "up", day1Pct: 2.1, week1Pct: 4.3 },
+      ],
+    },
+    {
+      description: "Oil spikes to $147/barrel, airlines devastated — multiple carriers go bankrupt",
+      year: 2008,
+      whySimilar:
+        "Oil hit record highs amid speculation and supply fears, pushing airline fuel costs to unsustainable levels. Multiple carriers filed for bankruptcy.",
+      insight:
+        "Aloha Airlines, ATA Airlines, and Frontier Airlines all filed for bankruptcy. Fuel hedging became the dividing line between survivors and casualties. Airlines without hedges saw costs double in months.",
+      tags: ["oil spike", "airline", "fuel cost", "bankruptcy", "hedging", "aviation", "jet fuel", "flight", "crude", "record"],
+      reactions: [
+        { asset: "Oil", direction: "up", day1Pct: 4.8, week1Pct: 8.3 },
+        { asset: "S&P 500", direction: "down", day1Pct: -1.9, week1Pct: -4.7 },
+        { asset: "Gold", direction: "up", day1Pct: 2.1, week1Pct: 5.3 },
+      ],
+    },
+    {
+      description: "Gulf War oil shock doubles prices as Iraq invades Kuwait — Pan Am goes bankrupt",
+      year: 1990,
+      whySimilar:
+        "Iraq's invasion of Kuwait caused oil prices to double from $17 to $35/barrel. Airlines cut routes and raised fares; Pan Am went bankrupt partly due to soaring fuel costs.",
+      insight:
+        "Oil doubled in weeks and airlines were immediate casualties. Pan Am, already weakened, went bankrupt. The Gulf War proved that oil shocks from Middle East conflicts hit airlines first and hardest.",
+      tags: ["gulf war", "oil", "airline", "fuel cost", "kuwait", "iraq", "aviation", "jet fuel", "flight", "bankruptcy", "pan am"],
+      reactions: [
+        { asset: "Oil", direction: "up", day1Pct: 10.5, week1Pct: 32.0 },
+        { asset: "S&P 500", direction: "down", day1Pct: -2.3, week1Pct: -6.8 },
+        { asset: "Gold", direction: "up", day1Pct: 3.2, week1Pct: 7.5 },
+      ],
+    },
+    {
+      description: "Eyjafjallajökull volcano ash cloud grounds flights across Europe for a week",
+      year: 2010,
+      whySimilar:
+        "Volcanic ash cloud forced closure of European airspace for 6 days. Airlines lost an estimated $1.7 billion. A global stress test for aviation infrastructure.",
+      insight:
+        "Airlines lost $1.7B in revenue but stocks recovered within two weeks as the disruption was temporary. Supply-side aviation shocks from natural events cause sharp but short-lived market impacts.",
+      tags: ["volcano", "ash", "airline", "grounded", "europe", "disruption", "aviation", "flight", "travel", "airspace"],
+      reactions: [
+        { asset: "S&P 500", direction: "down", day1Pct: -0.3, week1Pct: 0.8 },
+        { asset: "Oil", direction: "down", day1Pct: -1.5, week1Pct: -2.8 },
+        { asset: "EUR/USD", direction: "down", day1Pct: -0.7, week1Pct: -1.4 },
+      ],
+    },
+    {
+      description: "Jet fuel crack spread spikes to record, squeezing airline profitability",
+      year: 2023,
+      whySimilar:
+        "Refinery margins on jet fuel hit records as diesel and jet fuel demand outpaced refining capacity, directly squeezing airline operating costs.",
+      insight:
+        "Airlines with fuel surcharges or hedges weathered the spike better. The crack spread widening showed that even when crude is stable, refinery bottlenecks can create outsized jet fuel price moves.",
+      tags: ["jet fuel", "crack spread", "refinery", "margin", "airline", "aviation", "fuel cost", "flight", "diesel"],
+      reactions: [
+        { asset: "Oil", direction: "up", day1Pct: 1.8, week1Pct: 3.2 },
+        { asset: "S&P 500", direction: "down", day1Pct: -0.4, week1Pct: -1.1 },
+        { asset: "ExxonMobil", direction: "up", day1Pct: 1.5, week1Pct: 2.8 },
       ],
     },
     {

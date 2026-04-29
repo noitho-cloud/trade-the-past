@@ -91,4 +91,52 @@ describe("findHistoricalMatches", () => {
     );
     expect(hasTradeWar).toBe(true);
   });
+
+  it("jet fuel bidding war matches airline/fuel historical entries", () => {
+    const matches = findHistoricalMatches(
+      "Jet fuel bidding war breaks out as airlines confront global stress test",
+      "commodity-shocks",
+      "Airlines are scrambling for jet fuel as refinery output falls short of demand"
+    );
+
+    expect(matches.length).toBeGreaterThan(0);
+    const descriptions = matches.map((m) => m.description.toLowerCase());
+    const hasAirlineOrFuel = descriptions.some(
+      (d) =>
+        d.includes("jet fuel") ||
+        d.includes("airline") ||
+        d.includes("oil") ||
+        d.includes("aviation")
+    );
+    expect(hasAirlineOrFuel).toBe(true);
+  });
+
+  it("airline fuel cost headlines match commodity-shock entries", () => {
+    const matches = findHistoricalMatches(
+      "Airlines face rising fuel costs as oil prices surge past $100",
+      "commodity-shocks",
+      "Major carriers warn of fare hikes as jet fuel prices hit multi-year highs"
+    );
+
+    expect(matches.length).toBeGreaterThan(0);
+  });
+
+  it("jet fuel shortage matches aviation disruption entries", () => {
+    const matches = findHistoricalMatches(
+      "Jet fuel shortages are hitting the European travel market",
+      "commodity-shocks",
+      "Refinery closures and pipeline disruptions are squeezing jet fuel supply across Europe"
+    );
+
+    expect(matches.length).toBeGreaterThan(0);
+    const descriptions = matches.map((m) => m.description.toLowerCase());
+    const hasFuelOrAviation = descriptions.some(
+      (d) =>
+        d.includes("jet fuel") ||
+        d.includes("airline") ||
+        d.includes("oil") ||
+        d.includes("volcano")
+    );
+    expect(hasFuelOrAviation).toBe(true);
+  });
 });
