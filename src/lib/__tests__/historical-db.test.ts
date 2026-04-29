@@ -57,14 +57,14 @@ describe("findHistoricalMatches", () => {
     expect(hasIranEntry).toBe(true);
   });
 
-  it("filters out low-quality matches — returns empty for vague text", () => {
+  it("vague text still returns fallback matches from the event type", () => {
     const matches = findHistoricalMatches(
       "Markets move on various factors",
       "earnings",
       "Several things happened today that affected stock prices"
     );
 
-    expect(matches.length).toBe(0);
+    expect(matches.length).toBeGreaterThan(0);
   });
 
   it("returns at most 3 matches", () => {
@@ -116,6 +116,50 @@ describe("findHistoricalMatches", () => {
       "Airlines face rising fuel costs as oil prices surge past $100",
       "commodity-shocks",
       "Major carriers warn of fare hikes as jet fuel prices hit multi-year highs"
+    );
+
+    expect(matches.length).toBeGreaterThan(0);
+  });
+
+  it("BOJ acronym title matches BOJ entries via synonym expansion", () => {
+    const matches = findHistoricalMatches(
+      "BOJ keeps interest rates steady, lifts inflation forecast",
+      "interest-rates",
+      "The central bank held rates steady in a widely expected decision"
+    );
+
+    expect(matches.length).toBeGreaterThan(0);
+    const descriptions = matches.map((m) => m.description.toLowerCase());
+    const hasBOJ = descriptions.some(
+      (d) => d.includes("boj") || d.includes("bank of japan")
+    );
+    expect(hasBOJ).toBe(true);
+  });
+
+  it("Turkish central bank matches emerging market entries", () => {
+    const matches = findHistoricalMatches(
+      "Turkish central bank keeps key policy rate unchanged again",
+      "interest-rates",
+      "The CBRT held its benchmark rate at 50% as expected"
+    );
+
+    expect(matches.length).toBeGreaterThan(0);
+    const descriptions = matches.map((m) => m.description.toLowerCase());
+    const hasTurkeyOrEM = descriptions.some(
+      (d) =>
+        d.includes("turkey") ||
+        d.includes("cbrt") ||
+        d.includes("emerging") ||
+        d.includes("lira")
+    );
+    expect(hasTurkeyOrEM).toBe(true);
+  });
+
+  it("never returns an empty array", () => {
+    const matches = findHistoricalMatches(
+      "Something completely unrelated to anything",
+      "interest-rates",
+      "No keywords match at all"
     );
 
     expect(matches.length).toBeGreaterThan(0);

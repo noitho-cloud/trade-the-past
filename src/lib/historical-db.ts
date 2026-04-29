@@ -509,6 +509,62 @@ const DB: Record<EventType, HistoricalEntry[]> = {
       ],
     },
     {
+      description: "CBRT raises rates from 8.5% to 45% in aggressive hiking cycle after Erdogan policy reversal",
+      year: 2023,
+      whySimilar:
+        "Turkey's central bank embarked on one of the most aggressive rate hiking cycles in history after President Erdogan reversed his unorthodox low-rate policy.",
+      insight:
+        "The lira stabilized and Turkish stocks rallied 15% as orthodox policy restored investor confidence. Emerging market central banks that embrace orthodoxy after prolonged unorthodox policy tend to see sharp asset recovery.",
+      tags: ["turkey", "turkish", "cbrt", "rate hike", "emerging market", "lira", "inflation", "erdogan", "rate decision"],
+      reactions: [
+        { asset: "USD/JPY", direction: "down", day1Pct: -0.2, week1Pct: -0.5 },
+        { asset: "S&P 500", direction: "up", day1Pct: 0.3, week1Pct: 0.8 },
+        { asset: "Gold", direction: "down", day1Pct: -0.4, week1Pct: -1.1 },
+      ],
+    },
+    {
+      description: "Erdogan fires Turkey's central bank governor for raising rates, lira crashes 15%",
+      year: 2021,
+      whySimilar:
+        "Political interference in monetary policy destroyed central bank credibility, triggering an immediate currency crisis.",
+      insight:
+        "The lira crashed 15% overnight. When political leaders fire central bankers for tightening, it signals loss of institutional independence — the worst possible signal for currency stability.",
+      tags: ["turkey", "turkish", "cbrt", "rate", "governor fired", "lira", "political interference", "erdogan", "emerging market", "rate decision"],
+      reactions: [
+        { asset: "EUR/USD", direction: "up", day1Pct: 0.3, week1Pct: 0.6 },
+        { asset: "S&P 500", direction: "down", day1Pct: -0.2, week1Pct: -0.5 },
+        { asset: "Gold", direction: "up", day1Pct: 0.8, week1Pct: 1.5 },
+      ],
+    },
+    {
+      description: "Argentina's central bank raises rates to 133% to fight 140% inflation",
+      year: 2023,
+      whySimilar:
+        "Extreme rate hike in response to hyperinflation, reflecting a currency in freefall and an economy in crisis.",
+      insight:
+        "The peso continued falling despite triple-digit rates. When inflation is above 100%, rate hikes alone cannot stabilize — markets look for fiscal reform and political change instead.",
+      tags: ["argentina", "emerging market", "hyperinflation", "rate hike", "peso", "inflation", "central bank", "rate decision"],
+      reactions: [
+        { asset: "S&P 500", direction: "down", day1Pct: -0.1, week1Pct: 0.2 },
+        { asset: "Gold", direction: "up", day1Pct: 0.3, week1Pct: 0.9 },
+        { asset: "Bitcoin", direction: "up", day1Pct: 1.2, week1Pct: 2.8 },
+      ],
+    },
+    {
+      description: "Brazil's central bank raises Selic rate to 13.75% in one of the most aggressive hiking cycles globally",
+      year: 2022,
+      whySimilar:
+        "Brazil led the global tightening cycle, raising rates months before the Fed, as emerging market inflation surged post-COVID.",
+      insight:
+        "Brazilian stocks rallied as the aggressive hikes were seen as proactive. EM central banks that tighten early and decisively tend to see their currencies and equities outperform peers.",
+      tags: ["brazil", "selic", "rate hike", "emerging market", "inflation", "bcb", "central bank", "rate decision"],
+      reactions: [
+        { asset: "S&P 500", direction: "down", day1Pct: -0.3, week1Pct: -0.7 },
+        { asset: "Gold", direction: "up", day1Pct: 0.5, week1Pct: 1.3 },
+        { asset: "EUR/USD", direction: "down", day1Pct: -0.2, week1Pct: -0.6 },
+      ],
+    },
+    {
       description: "ECB holds rates despite Ukraine war inflation, prioritizing growth",
       year: 2022,
       whySimilar:
@@ -778,6 +834,39 @@ const GENERIC_TAGS = new Set([
   "crisis", "demand", "market", "stocks", "economy",
 ]);
 
+const SYNONYM_MAP: Record<string, string[]> = {
+  "boj": ["bank of japan", "japan", "yen", "jpy", "nikkei"],
+  "bank of japan": ["boj", "japan", "yen", "jpy"],
+  "fed": ["federal reserve", "powell", "fomc"],
+  "federal reserve": ["fed", "powell", "fomc"],
+  "ecb": ["european central bank", "europe", "euro"],
+  "european central bank": ["ecb", "europe", "euro"],
+  "cbrt": ["turkish central bank", "turkey", "turkish", "lira"],
+  "turkish central bank": ["cbrt", "turkey", "turkish", "lira"],
+  "turkey": ["turkish", "cbrt", "lira"],
+  "turkish": ["turkey", "cbrt", "lira"],
+  "bcb": ["brazil central bank", "brazil", "selic", "real"],
+  "argentina": ["argentine", "peso", "bcra"],
+  "keeps steady": ["hold", "pause", "unchanged", "on hold"],
+  "keeps rates steady": ["hold", "pause", "unchanged", "rate decision"],
+  "unchanged": ["hold", "steady", "pause", "on hold"],
+  "rate unchanged": ["hold", "steady", "rate decision", "pause"],
+  "holds": ["hold", "steady", "pause", "unchanged"],
+  "rate hike": ["raises rates", "tightening", "hawkish"],
+  "rate cut": ["cuts rates", "easing", "dovish"],
+};
+
+function expandWithSynonyms(text: string): string {
+  const lower = text.toLowerCase();
+  const extras: string[] = [];
+  for (const [trigger, synonyms] of Object.entries(SYNONYM_MAP)) {
+    if (lower.includes(trigger)) {
+      extras.push(...synonyms);
+    }
+  }
+  return extras.length > 0 ? `${text} ${extras.join(" ")}` : text;
+}
+
 function extractWords(text: string): Set<string> {
   return new Set(
     text.toLowerCase()
@@ -797,8 +886,9 @@ function computeRelevance(
   eventText: string,
   entry: HistoricalEntry
 ): number {
-  const lowerText = eventText.toLowerCase();
-  const eventWords = extractWords(eventText);
+  const expanded = expandWithSynonyms(eventText);
+  const lowerText = expanded.toLowerCase();
+  const eventWords = extractWords(expanded);
   const entryText = `${entry.description} ${entry.whySimilar}`;
   const entryWords = extractWords(entryText);
 
@@ -851,12 +941,12 @@ export function findHistoricalMatches(
   const MIN_SCORE = 8;
   const good = candidates.filter((c) => c.score >= MIN_SCORE);
 
-  if (good.length === 0) return [];
+  const pool = good.length > 0 ? good : getFallbackCandidates(type);
 
   const result: HistoricalEntry[] = [];
   const usedDescPrefixes = new Set<string>();
 
-  for (const c of good) {
+  for (const c of pool) {
     if (result.length >= 3) break;
     const prefix = c.entry.description.slice(0, 40);
     if (usedDescPrefixes.has(prefix)) continue;
@@ -871,4 +961,21 @@ export function findHistoricalMatches(
     insight: entry.insight,
     reactions: entry.reactions,
   }));
+}
+
+function getFallbackCandidates(
+  type: EventType
+): { entry: HistoricalEntry; score: number }[] {
+  const entries = DB[type];
+  if (!entries || entries.length === 0) {
+    const allEntries = Object.values(DB).flat();
+    return allEntries
+      .sort((a, b) => b.year - a.year)
+      .slice(0, 2)
+      .map((entry) => ({ entry, score: 1 }));
+  }
+  return [...entries]
+    .sort((a, b) => b.year - a.year)
+    .slice(0, 2)
+    .map((entry) => ({ entry, score: 1 }));
 }
