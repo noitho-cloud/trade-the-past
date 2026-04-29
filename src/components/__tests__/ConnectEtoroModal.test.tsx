@@ -1,8 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import { ConnectEtoroModal } from "../ConnectEtoroModal";
 import { useAuth } from "../AuthProvider";
-import type { ReactNode } from "react";
 
 vi.mock("../AuthProvider", () => ({
   useAuth: vi.fn(),
