@@ -61,6 +61,21 @@ describe("HistoricalSection", () => {
     expect(screen.getByRole("button", { name: /add tesla to watchlist/i })).toBeDefined();
   });
 
+  it("does not show directional badge on mentioned asset cards when no historical data", () => {
+    render(
+      <HistoricalSection
+        eventId="test-1"
+        matches={[]}
+        eventTitle="Tesla stock surges after earnings beat"
+        eventSummary="Tesla reported record deliveries."
+      />,
+      { wrapper: Wrapper }
+    );
+
+    expect(screen.queryByText("Bullish")).toBeNull();
+    expect(screen.queryByText("Bearish")).toBeNull();
+  });
+
   it("shows browse link when no tradeable assets mentioned", () => {
     render(
       <HistoricalSection

@@ -5,7 +5,7 @@ import { useToast } from "./ToastProvider";
 
 interface TradeDialogProps {
   asset: string;
-  direction: "up" | "down";
+  direction: "up" | "down" | "neutral";
   symbol: string;
   onClose: () => void;
 }
@@ -21,7 +21,7 @@ export function TradeDialog({ asset, direction, symbol, onClose }: TradeDialogPr
 
   const MIN_AMOUNT = 1;
   const MAX_AMOUNT = 50_000;
-  const isBuy = direction === "up";
+  const isBuy = direction !== "down";
   const numAmount = Number(amount);
   const amountError =
     amount && numAmount < MIN_AMOUNT
@@ -101,16 +101,24 @@ export function TradeDialog({ asset, direction, symbol, onClose }: TradeDialogPr
         <div className="rounded-xl bg-[var(--gray-bg)] p-4 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium">{asset}</span>
-            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-              isBuy
-                ? "text-[var(--etoro-green)] bg-[var(--success-bg)]"
-                : "text-[var(--red)] bg-[var(--error-bg)]"
-            }`}>
-              {isBuy ? "Buy (Bullish)" : "Sell (Bearish)"}
-            </span>
+            {direction === "neutral" ? (
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full text-muted bg-[var(--gray-bg)] border border-[var(--border)]">
+                Market Order
+              </span>
+            ) : (
+              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                isBuy
+                  ? "text-[var(--etoro-green)] bg-[var(--success-bg)]"
+                  : "text-[var(--red)] bg-[var(--error-bg)]"
+              }`}>
+                {isBuy ? "Buy (Bullish)" : "Sell (Bearish)"}
+              </span>
+            )}
           </div>
           <p className="text-xs text-muted">
-            Based on historical patterns, this asset tends to move {direction} after similar events.
+            {direction === "neutral"
+              ? "No historical pattern data available. Trade based on your own analysis."
+              : `Based on historical patterns, this asset tends to move ${direction} after similar events.`}
           </p>
         </div>
 

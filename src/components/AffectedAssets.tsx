@@ -142,7 +142,7 @@ export function WatchlistStar({ asset }: { asset: string }) {
   );
 }
 
-export function TradeButton({ asset, direction }: { asset: string; direction: "up" | "down" }) {
+export function TradeButton({ asset, direction }: { asset: string; direction: "up" | "down" | "neutral" }) {
   const { isConnected, openConnectModal } = useAuth();
   const [showDialog, setShowDialog] = useState(false);
 

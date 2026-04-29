@@ -142,7 +142,7 @@ export function HistoricalSection({
                     <WatchlistStar asset={asset} />
                   </div>
                   <div className="pt-1">
-                    <TradeButton asset={asset} direction="up" />
+                    <TradeButton asset={asset} direction="neutral" />
                   </div>
                 </div>
               ))}
