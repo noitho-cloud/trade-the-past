@@ -49,10 +49,10 @@ export function MarketReactionTable({
               Direction
             </th>
             <th className="text-right px-4 py-2 text-xs font-semibold tracking-wide uppercase text-muted">
-              Day 1
+              1 Day After
             </th>
             <th className="text-right px-4 py-2 text-xs font-semibold tracking-wide uppercase text-muted">
-              Week 1
+              1 Week After
             </th>
           </tr>
         </thead>

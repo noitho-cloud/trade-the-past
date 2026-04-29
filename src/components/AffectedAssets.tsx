@@ -190,13 +190,13 @@ function AssetCard({ asset }: { asset: ConsolidatedAsset }) {
       <div className="flex gap-4">
         <div>
           <span className="text-[10px] font-semibold tracking-wider uppercase text-muted block">
-            Day 1
+            1 Day After
           </span>
           <PctDisplay value={asset.day1Pct} />
         </div>
         <div>
           <span className="text-[10px] font-semibold tracking-wider uppercase text-muted block">
-            Week 1
+            1 Week After
           </span>
           <PctDisplay value={asset.week1Pct} />
         </div>
