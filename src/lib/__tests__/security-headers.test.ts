@@ -38,4 +38,45 @@ describe("next.config security headers", () => {
       "max-age="
     );
   });
+
+  it("includes Content-Security-Policy header", async () => {
+    const result = await nextConfig.headers!();
+    const catchAll = result.find(
+      (r: { source: string }) =>
+        r.source === "/:path*" || r.source === "/(.*)"
+    );
+    const headerMap = new Map(
+      catchAll!.headers.map((h: { key: string; value: string }) => [
+        h.key.toLowerCase(),
+        h.value,
+      ])
+    );
+
+    const csp = headerMap.get("content-security-policy");
+    expect(csp).toBeDefined();
+    expect(csp).toContain("default-src 'self'");
+    expect(csp).toContain("font-src 'self' https://marketing.etorostatic.com");
+    expect(csp).toContain("frame-ancestors 'none'");
+    expect(csp).toContain("connect-src 'self'");
+  });
+
+  it("includes Permissions-Policy header", async () => {
+    const result = await nextConfig.headers!();
+    const catchAll = result.find(
+      (r: { source: string }) =>
+        r.source === "/:path*" || r.source === "/(.*)"
+    );
+    const headerMap = new Map(
+      catchAll!.headers.map((h: { key: string; value: string }) => [
+        h.key.toLowerCase(),
+        h.value,
+      ])
+    );
+
+    const pp = headerMap.get("permissions-policy");
+    expect(pp).toBeDefined();
+    expect(pp).toContain("camera=()");
+    expect(pp).toContain("microphone=()");
+    expect(pp).toContain("geolocation=()");
+  });
 });
