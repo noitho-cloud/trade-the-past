@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { HeaderLink } from "@/components/HeaderLink";
+import Script from "next/script";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import { ThemeScript } from "@/components/ThemeScript";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { AuthProvider } from "@/components/AuthProvider";
 import { LoginButton } from "@/components/LoginButton";
 import { ConnectEtoroModal } from "@/components/ConnectEtoroModal";
 import { ToastProvider } from "@/components/ToastProvider";
 import "./globals.css";
+
+const THEME_INIT = `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}})()`;
 
 export const metadata: Metadata = {
   title: {
@@ -35,9 +37,9 @@ export default function RootLayout({
           type="font/ttf"
           crossOrigin="anonymous"
         />
+        <Script id="theme-init" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
       </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        <ThemeScript />
         <ThemeProvider>
           <AuthProvider>
           <ToastProvider>
