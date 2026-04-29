@@ -126,21 +126,29 @@ export function TradeDialog({ asset, direction, symbol, onClose }: TradeDialogPr
           <label htmlFor="trade-amount" className="text-sm font-medium">
             Amount (USD)
           </label>
-          <input
-            ref={amountRef}
-            id="trade-amount"
-            type="number"
-            min={MIN_AMOUNT}
-            max={MAX_AMOUNT}
-            step="1"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            className={`w-full h-10 px-3 rounded-lg border bg-background text-sm etoro-nums
-                       focus:outline-none focus:ring-2 focus:border-transparent
-                       ${amountError
-                         ? "border-[var(--red)] focus:ring-[var(--red)]"
-                         : "border-[var(--border)] focus:ring-[var(--etoro-green)]"}`}
-          />
+          <div className="relative">
+            <span
+              aria-hidden="true"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted etoro-nums pointer-events-none select-none"
+            >
+              $
+            </span>
+            <input
+              ref={amountRef}
+              id="trade-amount"
+              type="number"
+              min={MIN_AMOUNT}
+              max={MAX_AMOUNT}
+              step="1"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              className={`w-full h-10 pl-7 pr-3 rounded-lg border bg-background text-sm etoro-nums
+                         focus:outline-none focus:ring-2 focus:border-transparent
+                         ${amountError
+                           ? "border-[var(--red)] focus:ring-[var(--red)]"
+                           : "border-[var(--border)] focus:ring-[var(--etoro-green)]"}`}
+            />
+          </div>
           {amountError && (
             <p className="text-xs text-[var(--red)] mt-1">{amountError}</p>
           )}

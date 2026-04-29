@@ -44,4 +44,16 @@ describe("TradeDialog", () => {
     expect(screen.queryByText(/based on historical patterns/i)).toBeNull();
     expect(screen.getByText(/no historical pattern data/i)).toBeDefined();
   });
+
+  it("shows inline dollar sign prefix in the amount input", () => {
+    render(
+      <TradeDialog asset="Oil" direction="up" symbol="OIL" onClose={vi.fn()} />,
+      { wrapper: Wrapper }
+    );
+    const input = screen.getByLabelText("Amount (USD)");
+    const wrapper = input.parentElement!;
+    const dollarSign = wrapper.querySelector("[aria-hidden='true']");
+    expect(dollarSign).toBeTruthy();
+    expect(dollarSign!.textContent).toBe("$");
+  });
 });
