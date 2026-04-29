@@ -18,11 +18,18 @@ describe("layout.tsx font preload", () => {
     expect(layoutSource).toContain('crossOrigin="anonymous"');
   });
 
-  it("places the preload link before any script tags", () => {
+  it("places the preload link before the ThemeScript component", () => {
     const preloadIndex = layoutSource.indexOf('rel="preload"');
-    const scriptIndex = layoutSource.indexOf("dangerouslySetInnerHTML");
+    const themeScriptIndex = layoutSource.indexOf("<ThemeScript");
     expect(preloadIndex).toBeGreaterThan(-1);
-    expect(scriptIndex).toBeGreaterThan(-1);
-    expect(preloadIndex).toBeLessThan(scriptIndex);
+    expect(themeScriptIndex).toBeGreaterThan(-1);
+    expect(preloadIndex).toBeLessThan(themeScriptIndex);
+  });
+
+  it("uses ThemeScript component via useServerInsertedHTML instead of raw script tag", () => {
+    expect(layoutSource).toContain('from "@/components/ThemeScript"');
+    expect(layoutSource).toContain("<ThemeScript");
+    expect(layoutSource).not.toMatch(/<script\s+dangerouslySetInnerHTML/);
+    expect(layoutSource).not.toMatch(/dangerouslySetInnerHTML/);
   });
 });

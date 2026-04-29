@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { HeaderLink } from "@/components/HeaderLink";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { ThemeScript } from "@/components/ThemeScript";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { AuthProvider } from "@/components/AuthProvider";
 import { LoginButton } from "@/components/LoginButton";
@@ -17,8 +18,6 @@ export const metadata: Metadata = {
   description:
     "Today's market events paired with historical parallels and market reactions.",
 };
-
-const themeScript = `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}})()`;
 
 export default function RootLayout({
   children,
@@ -36,9 +35,9 @@ export default function RootLayout({
           type="font/ttf"
           crossOrigin="anonymous"
         />
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
+        <ThemeScript />
         <ThemeProvider>
           <AuthProvider>
           <ToastProvider>
