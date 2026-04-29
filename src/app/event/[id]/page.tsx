@@ -1,11 +1,11 @@
-import { cache } from "react";
+import { cache, Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import type { MarketEvent, MarketEventSummary } from "@/lib/types";
+import type { MarketEvent, MarketEventSummary, HistoricalMatch } from "@/lib/types";
 import type { Metadata } from "next";
-import { getEventById, getEvents } from "@/lib/event-service";
+import { getEventById, getEvents, getEventHistoricalMatches } from "@/lib/event-service";
 import { EventTypeBadge } from "@/components/EventTypeBadge";
-import { HistoricalSection } from "@/components/HistoricalSection";
+import { HistoricalSection, HistoricalSkeleton } from "@/components/HistoricalSection";
 import { EventHeroImage } from "@/components/EventHeroImage";
 import { EventNavigation } from "@/components/EventNavigation";
 
@@ -37,6 +37,28 @@ export async function generateMetadata({
     title: event.title,
     description: event.summary,
   };
+}
+
+async function HistoricalDataLoader({
+  eventId,
+  title,
+  type,
+  summary,
+  source,
+}: {
+  eventId: string;
+  title: string;
+  type: MarketEvent["type"];
+  summary: string;
+  source: string;
+}) {
+  let matches: HistoricalMatch[] | null;
+  try {
+    matches = await getEventHistoricalMatches(title, type, summary, source);
+  } catch {
+    matches = null;
+  }
+  return <HistoricalSection eventId={eventId} matches={matches} />;
 }
 
 export default async function EventDetail({
@@ -130,10 +152,15 @@ export default async function EventDetail({
         </div>
       </header>
 
-      <HistoricalSection
-        eventId={event.id}
-        initialMatches={event.historicalMatches}
-      />
+      <Suspense fallback={<HistoricalSkeleton />}>
+        <HistoricalDataLoader
+          eventId={event.id}
+          title={event.title}
+          type={event.type}
+          summary={event.summary}
+          source={event.source}
+        />
+      </Suspense>
 
       <EventNavigation prevEvent={prev} nextEvent={next} scope={from_scope} />
     </article>

@@ -19,69 +19,59 @@ beforeEach(() => {
 });
 
 describe("HistoricalSection", () => {
-  it("shows empty state when initialMatches is empty and API returns no matches", async () => {
-    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
-      new Response(
-        JSON.stringify({ event: { historicalMatches: [] } }),
-        { status: 200 }
-      )
+  it("renders matches when provided", () => {
+    render(
+      <HistoricalSection eventId="test-1" matches={[mockMatch]} />
     );
 
-    render(<HistoricalSection eventId="test-1" initialMatches={[]} />);
-
-    const emptyMsg = await screen.findByText(
-      "No historical parallels found for this event."
-    );
-    expect(emptyMsg).toBeDefined();
+    expect(screen.getByText("What History Tells Us")).toBeDefined();
   });
 
-  it("shows error state with retry button when API fetch fails", async () => {
-    vi.spyOn(globalThis, "fetch").mockRejectedValueOnce(
-      new Error("Network error")
+  it("shows empty state when matches is empty array", () => {
+    render(
+      <HistoricalSection eventId="test-1" matches={[]} />
     );
 
-    render(<HistoricalSection eventId="test-1" initialMatches={[]} />);
+    expect(
+      screen.getByText("No historical parallels found for this event.")
+    ).toBeDefined();
+  });
 
-    const errorMsg = await screen.findByText("Could not load historical data");
-    expect(errorMsg).toBeDefined();
+  it("shows error state with retry button when matches is null", () => {
+    render(
+      <HistoricalSection eventId="test-1" matches={null} />
+    );
+
+    expect(
+      screen.getByText("Could not load historical data")
+    ).toBeDefined();
 
     const retryBtn = screen.getByRole("button", { name: /try again/i });
     expect(retryBtn).toBeDefined();
   });
 
-  it("shows error state when API returns non-OK status", async () => {
-    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
-      new Response("Internal Server Error", { status: 500 })
-    );
-
-    render(<HistoricalSection eventId="test-1" initialMatches={[]} />);
-
-    const errorMsg = await screen.findByText("Could not load historical data");
-    expect(errorMsg).toBeDefined();
-  });
-
-  it("retry button re-fetches data", async () => {
-    const fetchSpy = vi.spyOn(globalThis, "fetch");
-
-    fetchSpy.mockRejectedValueOnce(new Error("Network error"));
-
-    render(<HistoricalSection eventId="test-1" initialMatches={[]} />);
-
-    const retryBtn = await screen.findByRole("button", { name: /try again/i });
-
-    fetchSpy.mockResolvedValueOnce(
+  it("retry button fetches data and renders matches on success", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
       new Response(
         JSON.stringify({ event: { historicalMatches: [mockMatch] } }),
         { status: 200 }
       )
     );
 
+    render(
+      <HistoricalSection eventId="test-1" matches={null} />
+    );
+
+    const retryBtn = screen.getByRole("button", { name: /try again/i });
     await userEvent.click(retryBtn);
 
-    expect(fetchSpy).toHaveBeenCalledTimes(2);
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    expect(fetchSpy.mock.calls[0][0]).toBe("/api/events/test-1");
+
+    await screen.findByText("What History Tells Us");
   });
 
-  it("passes an AbortSignal to the fetch call", async () => {
+  it("retry passes an AbortSignal to the fetch call", async () => {
     const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
       new Response(
         JSON.stringify({ event: { historicalMatches: [] } }),
@@ -89,7 +79,12 @@ describe("HistoricalSection", () => {
       )
     );
 
-    render(<HistoricalSection eventId="test-signal" initialMatches={[]} />);
+    render(
+      <HistoricalSection eventId="test-retry-signal" matches={null} />
+    );
+
+    const retryBtn = screen.getByRole("button", { name: /try again/i });
+    await userEvent.click(retryBtn);
 
     await screen.findByText("No historical parallels found for this event.");
 
@@ -98,11 +93,18 @@ describe("HistoricalSection", () => {
     expect(callArgs[1]!.signal).toBeInstanceOf(AbortSignal);
   });
 
-  it("renders matches directly when initialMatches is provided", () => {
-    render(
-      <HistoricalSection eventId="test-1" initialMatches={[mockMatch]} />
+  it("retry shows error again when fetch fails", async () => {
+    vi.spyOn(globalThis, "fetch").mockRejectedValueOnce(
+      new Error("Network error")
     );
 
-    expect(screen.getByText("What History Tells Us")).toBeDefined();
+    render(
+      <HistoricalSection eventId="test-1" matches={null} />
+    );
+
+    const retryBtn = screen.getByRole("button", { name: /try again/i });
+    await userEvent.click(retryBtn);
+
+    await screen.findByText("Could not load historical data");
   });
 });

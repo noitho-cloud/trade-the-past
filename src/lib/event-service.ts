@@ -11,7 +11,7 @@ import { filterTradeableReactions } from "./etoro-slugs";
 import { findHistoricalMatches } from "./historical-db";
 import type { MarketEvent, MarketEventSummary, HistoricalMatch } from "./types";
 
-function filterMatchReactions(matches: HistoricalMatch[]): HistoricalMatch[] {
+export function filterMatchReactions(matches: HistoricalMatch[]): HistoricalMatch[] {
   return matches.map((m) => ({
     ...m,
     reactions: filterTradeableReactions(m.reactions),
@@ -159,4 +159,14 @@ export async function getEventById(
       ? []
       : filterMatchReactions(mockEvent.historicalMatches),
   };
+}
+
+export async function getEventHistoricalMatches(
+  title: string,
+  type: import("./types").EventType,
+  summary: string,
+  source: string
+): Promise<HistoricalMatch[]> {
+  const rawMatches = await getHistoricalMatches(title, type, summary, source);
+  return filterMatchReactions(rawMatches);
 }
