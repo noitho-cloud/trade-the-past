@@ -1,7 +1,7 @@
 import { cache, Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import type { MarketEvent, MarketEventSummary, HistoricalMatch } from "@/lib/types";
+import type { MarketEvent, HistoricalMatch } from "@/lib/types";
 import type { Metadata } from "next";
 import { getEventById, getEvents, getEventHistoricalMatches } from "@/lib/event-service";
 import { EventTypeBadge } from "@/components/EventTypeBadge";
@@ -76,10 +76,6 @@ export default async function EventDetail({
   const { id } = await params;
   const { from_scope } = await searchParams;
 
-  let event: MarketEvent | undefined;
-  let prev: MarketEventSummary | null = null;
-  let next: MarketEventSummary | null = null;
-
   const scope: "global" | "local" =
     from_scope === "global" || from_scope === "local"
       ? from_scope
@@ -89,9 +85,9 @@ export default async function EventDetail({
     fetchEvent(id),
     fetchAdjacentEvents(id, scope),
   ]);
-  event = eventResult;
-  prev = adjacentResult.prev;
-  next = adjacentResult.next;
+  const event = eventResult;
+  const prev = adjacentResult.prev;
+  const next = adjacentResult.next;
 
   if (!event) {
     notFound();

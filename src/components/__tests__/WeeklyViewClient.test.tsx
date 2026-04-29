@@ -384,12 +384,8 @@ describe("WeeklyViewClient", () => {
 
   it("rapid scope toggling does not leave page stuck on skeletons", async () => {
     const user = userEvent.setup();
-    let resolveLocal: ((value: unknown) => void) | null = null;
     (fetch as ReturnType<typeof vi.fn>).mockImplementation(
-      () =>
-        new Promise((resolve) => {
-          resolveLocal = resolve;
-        })
+      () => new Promise(() => {})
     );
 
     render(<WeeklyViewClient initialEvents={mockEvents} />);

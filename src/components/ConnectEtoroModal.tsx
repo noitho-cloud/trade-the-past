@@ -9,6 +9,7 @@ export function ConnectEtoroModal() {
   const [userKey, setUserKey] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [warning, setWarning] = useState("");
   const dialogRef = useRef<HTMLDialogElement>(null);
   const apiKeyRef = useRef<HTMLInputElement>(null);
 
@@ -31,8 +32,6 @@ export function ConnectEtoroModal() {
       dialog.close();
     }
   }, [showConnectModal]);
-
-  const [warning, setWarning] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
