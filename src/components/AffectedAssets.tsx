@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import type { HistoricalMatch } from "@/lib/types";
 import { getEtoroSymbol } from "@/lib/etoro-slugs";
 import { useAuth } from "./AuthProvider";
@@ -86,6 +86,7 @@ function WatchlistStar({ asset }: { asset: string }) {
   const { toast } = useToast();
   const [isAdded, setIsAdded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const inFlightRef = useRef(false);
 
   async function handleClick() {
     if (!isConnected) {
@@ -93,6 +94,8 @@ function WatchlistStar({ asset }: { asset: string }) {
       return;
     }
 
+    if (inFlightRef.current) return;
+    inFlightRef.current = true;
     setIsLoading(true);
     try {
       const res = await fetch("/api/etoro/watchlist", {
@@ -111,6 +114,7 @@ function WatchlistStar({ asset }: { asset: string }) {
       toast("Network error — could not update watchlist", "error");
     } finally {
       setIsLoading(false);
+      inFlightRef.current = false;
     }
   }
 
