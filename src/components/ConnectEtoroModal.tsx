@@ -125,7 +125,7 @@ export function ConnectEtoroModal() {
           )}
 
           {warning && (
-            <p className="text-sm text-[#f5a623]" role="status">{warning}</p>
+            <p className="text-sm text-[var(--amber)]" role="status">{warning}</p>
           )}
 
           <button

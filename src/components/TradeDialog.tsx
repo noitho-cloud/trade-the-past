@@ -183,7 +183,7 @@ export function TradeDialog({ asset, direction, symbol, onClose }: TradeDialogPr
                         active:scale-[0.98] ${
                           isDemo
                             ? "bg-[var(--etoro-green)] hover:bg-[var(--etoro-green-hover)]"
-                            : "bg-[var(--red)] hover:bg-[#c71530]"
+                            : "bg-[var(--red)] hover:bg-[var(--red-hover)]"
                         }`}
           >
             {isSubmitting ? (

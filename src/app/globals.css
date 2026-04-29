@@ -17,6 +17,8 @@
   --gray-border: #E5E5E5;
   --gray-text: #6B7280;
   --red: #E31937;
+  --red-hover: #c71530;
+  --amber: #f5a623;
   --text-dark: #1A1A1A;
 
   --space-xs: 4px;
@@ -81,6 +83,9 @@
   --btn-secondary-text: #F5F5F5;
   --btn-secondary-border: #3D3D3D;
   --btn-secondary-hover: rgba(255,255,255,0.06);
+
+  --red-hover: #c71530;
+  --amber: #f5a623;
 
   --badge-text-rates: #0EB12E;
   --badge-text-earnings: #FBBF24;

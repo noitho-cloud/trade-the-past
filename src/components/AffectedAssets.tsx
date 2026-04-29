@@ -124,8 +124,8 @@ function WatchlistStar({ asset }: { asset: string }) {
                  transition-all cursor-pointer disabled:cursor-default
                  focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:outline-none
                  ${isAdded
-                   ? "text-[#f5a623] bg-[#f5a623]/10"
-                   : "text-muted hover:text-[#f5a623] hover:bg-[#f5a623]/10 active:scale-[0.92]"}`}
+                   ? "text-[var(--amber)] bg-[var(--amber)]/10"
+                   : "text-muted hover:text-[var(--amber)] hover:bg-[var(--amber)]/10 active:scale-[0.92]"}`}
     >
       {isLoading ? (
         <span className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
