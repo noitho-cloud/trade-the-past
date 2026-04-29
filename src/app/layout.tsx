@@ -8,6 +8,7 @@ import { AuthProvider } from "@/components/AuthProvider";
 import { LoginButton } from "@/components/LoginButton";
 import { ConnectEtoroModal } from "@/components/ConnectEtoroModal";
 import { ToastProvider } from "@/components/ToastProvider";
+import { ScrollSentinel } from "@/components/ScrollSentinel";
 import "./globals.css";
 
 const THEME_INIT = `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}})()`;
@@ -43,6 +44,7 @@ export default function RootLayout({
         <ThemeProvider>
           <AuthProvider>
           <ToastProvider>
+          <ScrollSentinel />
           <header className="bg-[var(--header-bg)] sticky top-0 z-10">
             <div className="max-w-[720px] mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
               <Suspense

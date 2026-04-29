@@ -159,6 +159,18 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+html[data-scrolled="true"] header {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.dark[data-scrolled="true"] header {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+header {
+  transition: box-shadow 150ms ease;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .card-enter {
     animation: none;
