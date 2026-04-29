@@ -32,7 +32,29 @@ const ASSET_TO_SLUG: Record<string, string> = {
   Netflix: "nflx",
   Chevron: "cvx",
   Shell: "shel.l",
+  UBS: "ubsg.z",
+  Robinhood: "hood",
 };
+
+const ASSET_NAMES_BY_LENGTH = Object.keys(ASSET_TO_SLUG).sort(
+  (a, b) => b.length - a.length
+);
+
+export function extractAssetsFromText(text: string): string[] {
+  const found = new Set<string>();
+  const normalized = text.toLowerCase();
+  for (const name of ASSET_NAMES_BY_LENGTH) {
+    if (found.has(name)) continue;
+    const lower = name.toLowerCase();
+    const idx = normalized.indexOf(lower);
+    if (idx === -1) continue;
+    const before = idx > 0 ? normalized[idx - 1] : " ";
+    const after = idx + lower.length < normalized.length ? normalized[idx + lower.length] : " ";
+    if (/[a-z0-9]/.test(before) || /[a-z0-9]/.test(after)) continue;
+    found.add(name);
+  }
+  return Array.from(found);
+}
 
 const ASSET_TO_SYMBOL: Record<string, string> = {
   "S&P 500": "SPX500",
@@ -68,6 +90,8 @@ const ASSET_TO_SYMBOL: Record<string, string> = {
   Netflix: "NFLX",
   Chevron: "CVX",
   Shell: "SHEL.L",
+  UBS: "UBSG.Z",
+  Robinhood: "HOOD",
 };
 
 export function getEtoroSymbol(assetName: string): string {

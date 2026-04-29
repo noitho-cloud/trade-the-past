@@ -81,7 +81,7 @@ function PctDisplay({ value }: { value: number }) {
   );
 }
 
-function WatchlistStar({ asset }: { asset: string }) {
+export function WatchlistStar({ asset }: { asset: string }) {
   const { isConnected, openConnectModal } = useAuth();
   const { toast } = useToast();
   const [isAdded, setIsAdded] = useState(false);
@@ -142,7 +142,7 @@ function WatchlistStar({ asset }: { asset: string }) {
   );
 }
 
-function TradeButton({ asset, direction }: { asset: string; direction: "up" | "down" }) {
+export function TradeButton({ asset, direction }: { asset: string; direction: "up" | "down" }) {
   const { isConnected, openConnectModal } = useAuth();
   const [showDialog, setShowDialog] = useState(false);
 

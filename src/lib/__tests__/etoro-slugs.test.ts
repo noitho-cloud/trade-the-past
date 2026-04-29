@@ -4,6 +4,7 @@ import {
   filterTradeableReactions,
   getEtoroTradeUrl,
   getEtoroWatchlistUrl,
+  extractAssetsFromText,
 } from "../etoro-slugs";
 
 describe("isEtoroTradeable", () => {
@@ -70,6 +71,41 @@ describe("getEtoroTradeUrl", () => {
 
   it("generates fallback URL for unknown assets", () => {
     expect(getEtoroTradeUrl("Unknown Asset")).toBe("https://www.etoro.com/markets/unknownasset");
+  });
+});
+
+describe("extractAssetsFromText", () => {
+  it("extracts known asset names from event titles", () => {
+    const result = extractAssetsFromText(
+      "UBS profits rocket 80% to $3 billion for first quarter beat, shares pop 5%"
+    );
+    expect(result).toEqual(["UBS"]);
+  });
+
+  it("extracts multiple assets from text", () => {
+    const result = extractAssetsFromText(
+      "Tesla and Apple report earnings this week, Bitcoin surges"
+    );
+    expect(result).toContain("Tesla");
+    expect(result).toContain("Apple");
+    expect(result).toContain("Bitcoin");
+  });
+
+  it("returns empty array when no known assets found", () => {
+    const result = extractAssetsFromText(
+      "Central bank holds interest rates steady amid inflation concerns"
+    );
+    expect(result).toEqual([]);
+  });
+
+  it("does not match partial words", () => {
+    const result = extractAssetsFromText("Meteorological conditions worsen");
+    expect(result).not.toContain("Meta");
+  });
+
+  it("deduplicates results", () => {
+    const result = extractAssetsFromText("Tesla cars outsell Tesla trucks, Tesla wins");
+    expect(result.filter((a) => a === "Tesla")).toHaveLength(1);
   });
 });
 

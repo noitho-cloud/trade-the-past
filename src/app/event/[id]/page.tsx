@@ -58,7 +58,7 @@ async function HistoricalDataLoader({
   } catch {
     matches = null;
   }
-  return <HistoricalSection eventId={eventId} matches={matches} />;
+  return <HistoricalSection eventId={eventId} matches={matches} eventTitle={title} eventSummary={summary} />;
 }
 
 export default async function EventDetail({

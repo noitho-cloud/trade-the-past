@@ -1,13 +1,17 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
+import Link from "next/link";
 import type { HistoricalMatch } from "@/lib/types";
+import { extractAssetsFromText } from "@/lib/etoro-slugs";
 import { UnifiedInsight } from "./UnifiedInsight";
-import { AffectedAssets } from "./AffectedAssets";
+import { AffectedAssets, WatchlistStar, TradeButton } from "./AffectedAssets";
 
 interface HistoricalSectionProps {
   eventId: string;
   matches: HistoricalMatch[] | null;
+  eventTitle?: string;
+  eventSummary?: string;
 }
 
 export function HistoricalSkeleton() {
@@ -39,6 +43,8 @@ export function HistoricalSkeleton() {
 export function HistoricalSection({
   eventId,
   matches: serverMatches,
+  eventTitle = "",
+  eventSummary = "",
 }: HistoricalSectionProps) {
   const [retryMatches, setRetryMatches] = useState<HistoricalMatch[] | null>(null);
   const [retryLoading, setRetryLoading] = useState(false);
@@ -107,11 +113,54 @@ export function HistoricalSection({
   }
 
   if (!matches || matches.length === 0) {
+    const mentionedAssets = extractAssetsFromText(`${eventTitle} ${eventSummary}`);
+
     return (
-      <section className="rounded-[16px] bg-card shadow-[var(--card-shadow)] px-[var(--space-xl)] py-8 text-center">
-        <p className="text-sm text-muted">
-          No historical parallels found for this event.
-        </p>
+      <section className="space-y-6">
+        <div className="rounded-[16px] bg-card shadow-[var(--card-shadow)] px-[var(--space-xl)] py-8 text-center">
+          <p className="text-sm text-muted">
+            No historical parallels found yet. Analysis updates throughout the day.
+          </p>
+        </div>
+
+        {mentionedAssets.length > 0 ? (
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              <h2 className="font-semibold whitespace-nowrap" style={{ fontSize: "clamp(16px, 4vw, 18px)" }}>
+                Mentioned Assets
+              </h2>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {mentionedAssets.map((asset) => (
+                <div
+                  key={asset}
+                  className="rounded-[16px] bg-card border border-[var(--card-border)] p-[var(--space-xl)] flex flex-col gap-3 shadow-[var(--card-shadow)]"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="font-medium text-[15px] leading-snug">{asset}</h3>
+                    <WatchlistStar asset={asset} />
+                  </div>
+                  <div className="pt-1">
+                    <TradeButton asset={asset} direction="up" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="text-center">
+            <Link
+              href="/"
+              className="text-sm text-[var(--etoro-green)] hover:underline inline-flex items-center gap-1"
+            >
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Browse events with analysis
+            </Link>
+          </div>
+        )}
       </section>
     );
   }

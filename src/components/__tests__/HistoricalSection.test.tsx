@@ -1,8 +1,19 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type { ReactNode } from "react";
 import { HistoricalSection } from "../HistoricalSection";
+import { AuthProvider } from "../AuthProvider";
+import { ToastProvider } from "../ToastProvider";
 import type { HistoricalMatch } from "@/lib/types";
+
+function Wrapper({ children }: { children: ReactNode }) {
+  return (
+    <AuthProvider>
+      <ToastProvider>{children}</ToastProvider>
+    </AuthProvider>
+  );
+}
 
 const mockMatch: HistoricalMatch = {
   description: "Fed pauses rate hikes",
@@ -16,6 +27,9 @@ const mockMatch: HistoricalMatch = {
 
 beforeEach(() => {
   vi.restoreAllMocks();
+  vi.spyOn(globalThis, "fetch").mockResolvedValue(
+    new Response(JSON.stringify({ connected: false }), { status: 200 })
+  );
 });
 
 describe("HistoricalSection", () => {
@@ -27,14 +41,41 @@ describe("HistoricalSection", () => {
     expect(screen.getByText("What History Tells Us")).toBeDefined();
   });
 
-  it("shows empty state when matches is empty array", () => {
+  it("shows empty state with fallback assets when matches is empty and title mentions a tradeable asset", () => {
     render(
-      <HistoricalSection eventId="test-1" matches={[]} />
+      <HistoricalSection
+        eventId="test-1"
+        matches={[]}
+        eventTitle="Tesla stock surges after earnings beat"
+        eventSummary="Tesla reported record deliveries."
+      />,
+      { wrapper: Wrapper }
     );
 
     expect(
-      screen.getByText("No historical parallels found for this event.")
+      screen.getByText("No historical parallels found yet. Analysis updates throughout the day.")
     ).toBeDefined();
+    expect(screen.getByText("Mentioned Assets")).toBeDefined();
+    expect(screen.getByText("Tesla")).toBeDefined();
+    expect(screen.getByRole("button", { name: /trade tesla/i })).toBeDefined();
+    expect(screen.getByRole("button", { name: /add tesla to watchlist/i })).toBeDefined();
+  });
+
+  it("shows browse link when no tradeable assets mentioned", () => {
+    render(
+      <HistoricalSection
+        eventId="test-1"
+        matches={[]}
+        eventTitle="Central bank holds rates steady"
+        eventSummary="Interest rates unchanged."
+      />,
+      { wrapper: Wrapper }
+    );
+
+    expect(
+      screen.getByText("No historical parallels found yet. Analysis updates throughout the day.")
+    ).toBeDefined();
+    expect(screen.getByText("Browse events with analysis")).toBeDefined();
   });
 
   it("shows error state with retry button when matches is null", () => {
@@ -86,7 +127,7 @@ describe("HistoricalSection", () => {
     const retryBtn = screen.getByRole("button", { name: /try again/i });
     await userEvent.click(retryBtn);
 
-    await screen.findByText("No historical parallels found for this event.");
+    await screen.findByText("No historical parallels found yet. Analysis updates throughout the day.");
 
     const callArgs = fetchSpy.mock.calls[0];
     expect(callArgs[1]).toBeDefined();
