@@ -10,7 +10,10 @@ import { ToastProvider } from "@/components/ToastProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Trade the Past",
+  title: {
+    template: "%s — Trade the Past",
+    default: "Trade the Past",
+  },
   description:
     "Today's market events paired with historical parallels and market reactions.",
 };

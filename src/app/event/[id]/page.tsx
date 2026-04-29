@@ -34,7 +34,7 @@ export async function generateMetadata({
   const event = await fetchEvent(id);
   if (!event) return { title: "Event not found" };
   return {
-    title: `${event.title} — Trade the Past`,
+    title: event.title,
     description: event.summary,
   };
 }

@@ -4,7 +4,7 @@ import type { MarketEventSummary } from "@/lib/types";
 import { WeeklyViewClient } from "@/components/WeeklyViewClient";
 
 export const metadata: Metadata = {
-  title: "This Week — Trade the Past",
+  title: "This Week",
   description:
     "This week's market-moving events paired with similar historical events and market reactions.",
 };
