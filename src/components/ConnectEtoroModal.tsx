@@ -138,7 +138,7 @@ export function ConnectEtoroModal() {
         </form>
 
         <p className="text-[11px] text-muted/60 leading-relaxed text-center">
-          Your keys are encrypted and stored securely. They are never sent to our servers or stored in your browser.
+          Your keys are encrypted server-side and stored in a secure, HTTP-only cookie. They are never exposed to client-side code.
         </p>
       </div>
     </dialog>
