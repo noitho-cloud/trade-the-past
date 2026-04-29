@@ -236,6 +236,15 @@ export function stripSourceSuffix(title: string): string {
   return result;
 }
 
+const NON_LATIN_RE =
+  /[\p{Script=Arabic}\p{Script=Han}\p{Script=Hangul}\p{Script=Cyrillic}\p{Script=Devanagari}\p{Script=Thai}\p{Script=Hiragana}\p{Script=Katakana}]/gu;
+
+export function isLikelyEnglish(text: string): boolean {
+  if (!text || text.length < 5) return false;
+  const matches = text.match(NON_LATIN_RE);
+  return !matches || matches.length < 2;
+}
+
 function rssItemToArticle(
   item: RSSItem,
   feedSource: string
@@ -247,6 +256,7 @@ function rssItemToArticle(
     title = stripSourceSuffix(title);
   }
   if (title.length < 15) return null;
+  if (!isLikelyEnglish(title)) return null;
 
   const imageUrl =
     item.enclosure?.url ||
