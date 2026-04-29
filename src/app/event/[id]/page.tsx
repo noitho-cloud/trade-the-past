@@ -11,6 +11,11 @@ import { EventNavigation } from "@/components/EventNavigation";
 
 export const revalidate = 300;
 
+export function inferScopeFromId(id: string): "global" | "local" {
+  if (id.startsWith("live-local-")) return "local";
+  return "global";
+}
+
 const fetchEvent = cache(async (id: string): Promise<MarketEvent | undefined> => {
   return getEventById(id, { skipHistorical: true });
 });
@@ -75,23 +80,18 @@ export default async function EventDetail({
   let prev: MarketEventSummary | null = null;
   let next: MarketEventSummary | null = null;
 
-  if (from_scope === "global" || from_scope === "local") {
-    const [eventResult, adjacentResult] = await Promise.all([
-      fetchEvent(id),
-      fetchAdjacentEvents(id, from_scope),
-    ]);
-    event = eventResult;
-    prev = adjacentResult.prev;
-    next = adjacentResult.next;
-  } else {
-    event = await fetchEvent(id);
-    if (event) {
-      const scope: "global" | "local" = event.scope ?? "global";
-      const adjacentResult = await fetchAdjacentEvents(id, scope);
-      prev = adjacentResult.prev;
-      next = adjacentResult.next;
-    }
-  }
+  const scope: "global" | "local" =
+    from_scope === "global" || from_scope === "local"
+      ? from_scope
+      : inferScopeFromId(id);
+
+  const [eventResult, adjacentResult] = await Promise.all([
+    fetchEvent(id),
+    fetchAdjacentEvents(id, scope),
+  ]);
+  event = eventResult;
+  prev = adjacentResult.prev;
+  next = adjacentResult.next;
 
   if (!event) {
     notFound();
