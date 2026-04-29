@@ -56,7 +56,7 @@ export async function POST(request: Request) {
     const instrument = await searchInstrument(keys, symbol.trim().toUpperCase());
     if (!instrument) {
       return addRateLimitHeaders(
-        NextResponse.json({ error: `Instrument not found: ${symbol}` }, { status: 404 }),
+        NextResponse.json({ error: "Instrument not found" }, { status: 404 }),
         rateLimit
       );
     }
