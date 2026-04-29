@@ -215,13 +215,28 @@ function decodeEntities(str: string): string {
     .replace(/<[^>]+>/g, "");
 }
 
+export function stripSourceSuffix(title: string): string {
+  if (!title) return title;
+  const idx = title.lastIndexOf(" - ");
+  if (idx < 0) return title;
+  const suffix = title.slice(idx + 3).trim();
+  const wordCount = suffix.split(/\s+/).length;
+  if (wordCount > 5) return title;
+  const stripped = title.slice(0, idx).trim();
+  if (stripped.length < 15) return title;
+  return stripped;
+}
+
 function rssItemToArticle(
   item: RSSItem,
   feedSource: string
 ): RawArticle | null {
   if (!item.title) return null;
 
-  const title = item.title.trim();
+  let title = item.title.trim();
+  if (feedSource.startsWith("Google News")) {
+    title = stripSourceSuffix(title);
+  }
   if (title.length < 15) return null;
 
   const imageUrl =

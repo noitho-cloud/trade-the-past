@@ -96,3 +96,61 @@ describe("rss-client parseFeed error handling", () => {
     expect(Array.isArray(articles)).toBe(true);
   });
 });
+
+describe("stripSourceSuffix", () => {
+  let stripSourceSuffix: (title: string) => string;
+
+  beforeEach(async () => {
+    const mod = await import("../rss-client");
+    stripSourceSuffix = mod.stripSourceSuffix;
+  });
+
+  it("strips short publisher names like ' - PBS'", () => {
+    expect(stripSourceSuffix("Fed Chair Powell holds briefing on interest rate decision - PBS"))
+      .toBe("Fed Chair Powell holds briefing on interest rate decision");
+  });
+
+  it("strips multi-word publisher names like ' - The Washington Post'", () => {
+    expect(stripSourceSuffix("UAE to leave OPEC amid crisis - The Washington Post"))
+      .toBe("UAE to leave OPEC amid crisis");
+  });
+
+  it("strips ' - CBS News'", () => {
+    expect(stripSourceSuffix("Iran war stuck in limbo as Trump mulls offer - CBS News"))
+      .toBe("Iran war stuck in limbo as Trump mulls offer");
+  });
+
+  it("strips publishers with dots like ' - Nation.Cymru'", () => {
+    expect(stripSourceSuffix("Bank of England set to hold rates - Nation.Cymru"))
+      .toBe("Bank of England set to hold rates");
+  });
+
+  it("strips ' - facebook.com'", () => {
+    expect(stripSourceSuffix("BSP raises key policy rate by 25 bps to 4.5% - facebook.com"))
+      .toBe("BSP raises key policy rate by 25 bps to 4.5%");
+  });
+
+  it("does not strip if remaining title would be too short", () => {
+    expect(stripSourceSuffix("Short - The Washington Post"))
+      .toBe("Short - The Washington Post");
+  });
+
+  it("does not strip when there is no ' - ' separator", () => {
+    expect(stripSourceSuffix("Fed raises rates and markets react strongly"))
+      .toBe("Fed raises rates and markets react strongly");
+  });
+
+  it("handles dashes within the title body (only strips last occurrence)", () => {
+    expect(stripSourceSuffix("U.S.-Iran war evolves into naval standoff - CNBC"))
+      .toBe("U.S.-Iran war evolves into naval standoff");
+  });
+
+  it("does not strip long suffixes that look like content (more than 5 words)", () => {
+    expect(stripSourceSuffix("Market update - and here is a very long continuation of the story"))
+      .toBe("Market update - and here is a very long continuation of the story");
+  });
+
+  it("returns the title unchanged when it is empty", () => {
+    expect(stripSourceSuffix("")).toBe("");
+  });
+});
