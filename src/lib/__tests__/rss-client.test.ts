@@ -59,7 +59,7 @@ describe("rss-client parseFeed error handling", () => {
   });
 
   it("handles network errors gracefully without throwing", async () => {
-    mockHttpsGet.mockImplementation((_url: string, _opts: unknown, _cb: unknown) => {
+    mockHttpsGet.mockImplementation(() => {
       const req = makeReq();
       process.nextTick(() => req.emit("error", new Error("connect ECONNREFUSED")));
       return req;
@@ -71,7 +71,7 @@ describe("rss-client parseFeed error handling", () => {
   });
 
   it("handles TLS certificate errors without throwing", async () => {
-    mockHttpsGet.mockImplementation((_url: string, _opts: unknown, _cb: unknown) => {
+    mockHttpsGet.mockImplementation(() => {
       const req = makeReq();
       const err = new Error("Hostname/IP does not match certificate's altnames");
       (err as NodeJS.ErrnoException).code = "ERR_TLS_CERT_ALTNAME_INVALID";

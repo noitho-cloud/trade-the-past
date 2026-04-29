@@ -326,7 +326,7 @@ describe("WeeklyViewClient", () => {
       }
     } as typeof AbortController;
 
-    let resolvers: Array<(value: unknown) => void> = [];
+    const resolvers: Array<(value: unknown) => void> = [];
     (fetch as ReturnType<typeof vi.fn>).mockImplementation(() => {
       return new Promise((resolve) => {
         resolvers.push(resolve);

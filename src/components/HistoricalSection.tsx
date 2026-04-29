@@ -51,8 +51,32 @@ export function HistoricalSection({
 
   useEffect(() => {
     if (initialMatches.length > 0) return;
-    return fetchMatches();
-  }, [initialMatches, fetchMatches]);
+
+    cancelRef.current?.();
+    let cancelled = false;
+    cancelRef.current = () => { cancelled = true; };
+
+    fetch(`/api/events/${eventId}`, { signal: AbortSignal.timeout(15000) })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed");
+        return res.json();
+      })
+      .then((data) => {
+        if (cancelled) return;
+        const eventMatches: HistoricalMatch[] =
+          data.event?.historicalMatches ?? [];
+        setMatches(eventMatches);
+        setLoading(false);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setFetchError(true);
+          setLoading(false);
+        }
+      });
+
+    return () => { cancelled = true; };
+  }, [initialMatches, eventId]);
 
   if (loading) {
     return (

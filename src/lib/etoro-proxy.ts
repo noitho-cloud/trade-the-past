@@ -100,7 +100,7 @@ export async function executeTrade(
   });
 
   if (!res.ok) {
-    const text = await res.text().catch(() => "Unknown error");
+    await res.text().catch(() => {});
     return { success: false, error: `Trade failed (${res.status})` };
   }
 

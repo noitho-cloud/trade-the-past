@@ -114,6 +114,7 @@ function EmptyDaySlot({ dateStr }: { dateStr: string }) {
 }
 
 const SCOPE_CACHE_TTL = 2 * 60 * 1000; // 2 minutes
+const MODULE_LOAD_TIME = Date.now();
 
 interface CacheEntry {
   data: MarketEventSummary[];
@@ -135,7 +136,7 @@ export function WeeklyViewClient({
   const confirmedScope = useRef<"global" | "local">("global");
   const failedScope = useRef<"global" | "local" | null>(null);
   const scopeCache = useRef<Map<string, CacheEntry>>(
-    new Map([["global", { data: initialEvents, fetchedAt: Date.now() }]])
+    new Map([["global", { data: initialEvents, fetchedAt: MODULE_LOAD_TIME }]])
   );
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -149,16 +150,8 @@ export function WeeklyViewClient({
     return entry.data;
   }, []);
 
-  const fetchScopeData = useCallback((targetScope: "global" | "local") => {
+  const startScopeFetch = useCallback((targetScope: "global" | "local") => {
     failedScope.current = null;
-
-    const cached = getCachedData(targetScope);
-    if (cached) {
-      setEvents(cached);
-      confirmedScope.current = targetScope;
-      setLoading(false);
-      return;
-    }
 
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -196,7 +189,18 @@ export function WeeklyViewClient({
     return () => {
       controller.abort();
     };
-  }, [getCachedData]);
+  }, []);
+
+  const fetchScopeData = useCallback((targetScope: "global" | "local") => {
+    const cached = getCachedData(targetScope);
+    if (cached) {
+      setEvents(cached);
+      confirmedScope.current = targetScope;
+      setLoading(false);
+      return;
+    }
+    return startScopeFetch(targetScope);
+  }, [getCachedData, startScopeFetch]);
 
   const handleScopeChange = useCallback(
     (newScope: "global" | "local") => {
@@ -240,14 +244,14 @@ export function WeeklyViewClient({
     if (isFirstRender.current) {
       isFirstRender.current = false;
       if (urlScope !== "global") {
-        return fetchScopeData(urlScope);
+        return startScopeFetch(urlScope);
       }
       return;
     }
 
     if (getCachedData(scope)) return;
-    return fetchScopeData(scope);
-  }, [scope, fetchScopeData, urlScope, getCachedData]);
+    return startScopeFetch(scope);
+  }, [scope, startScopeFetch, urlScope, getCachedData]);
 
   return (
     <div className="space-y-6">

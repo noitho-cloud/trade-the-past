@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useAuth } from "./AuthProvider";
 
 export function ConnectEtoroModal() {
@@ -12,6 +12,14 @@ export function ConnectEtoroModal() {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const apiKeyRef = useRef<HTMLInputElement>(null);
 
+  const handleClose = useCallback(() => {
+    setApiKey("");
+    setUserKey("");
+    setError("");
+    setIsSubmitting(false);
+    closeConnectModal();
+  }, [closeConnectModal]);
+
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
@@ -20,10 +28,6 @@ export function ConnectEtoroModal() {
       apiKeyRef.current?.focus();
     } else {
       dialog.close();
-      setApiKey("");
-      setUserKey("");
-      setError("");
-      setIsSubmitting(false);
     }
   }, [showConnectModal]);
 
@@ -44,14 +48,14 @@ export function ConnectEtoroModal() {
   return (
     <dialog
       ref={dialogRef}
-      onClose={closeConnectModal}
+      onClose={handleClose}
       className="fixed inset-0 z-50 m-auto w-[calc(100%-32px)] max-w-md rounded-2xl bg-card border border-[var(--card-border)] shadow-xl p-0 backdrop:bg-black/50 backdrop:backdrop-blur-sm"
     >
       <div className="p-6 space-y-5">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold tracking-tight">Connect to eToro</h2>
           <button
-            onClick={closeConnectModal}
+            onClick={handleClose}
             className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--gray-bg)] transition-colors cursor-pointer"
             aria-label="Close"
           >
