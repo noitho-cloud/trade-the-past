@@ -236,6 +236,26 @@ export function stripSourceSuffix(title: string): string {
   return result;
 }
 
+const CAMEL_CASE_RE = /^[a-z]+[A-Z][a-zA-Z]*$/;
+
+export function stripSourcePrefix(title: string): string {
+  if (!title) return title;
+
+  const colonIdx = title.indexOf(": ");
+  if (colonIdx < 0) return title;
+
+  const prefix = title.slice(0, colonIdx);
+  const prefixWords = prefix.split(/\s+/);
+  if (prefixWords.length > 6) return title;
+
+  if (!CAMEL_CASE_RE.test(prefixWords[0])) return title;
+
+  const remaining = title.slice(colonIdx + 2).trim();
+  if (remaining.length < 15) return title;
+
+  return remaining;
+}
+
 const NON_LATIN_RE =
   /[\p{Script=Arabic}\p{Script=Han}\p{Script=Hangul}\p{Script=Cyrillic}\p{Script=Devanagari}\p{Script=Thai}\p{Script=Hiragana}\p{Script=Katakana}]/gu;
 
@@ -254,6 +274,7 @@ function rssItemToArticle(
   let title = item.title.trim();
   if (feedSource.startsWith("Google News")) {
     title = stripSourceSuffix(title);
+    title = stripSourcePrefix(title);
   }
   if (title.length < 15) return null;
   if (!isLikelyEnglish(title)) return null;

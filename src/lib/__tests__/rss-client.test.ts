@@ -204,3 +204,51 @@ describe("stripSourceSuffix", () => {
       .toBe("Rates hold | FT");
   });
 });
+
+describe("stripSourcePrefix", () => {
+  let stripSourcePrefix: (title: string) => string;
+
+  beforeEach(async () => {
+    const mod = await import("../rss-client");
+    stripSourcePrefix = mod.stripSourcePrefix;
+  });
+
+  it("strips camelCase branded column prefix before colon", () => {
+    expect(stripSourcePrefix("investingLive Americas FX news wrap: Dovish BoJ's Ueda, ECB inflation expectations surge"))
+      .toBe("Dovish BoJ's Ueda, ECB inflation expectations surge");
+  });
+
+  it("does not strip editorial colons where first word is not camelCase", () => {
+    expect(stripSourcePrefix("Fed Chair: We will hold rates steady amid inflation concerns"))
+      .toBe("Fed Chair: We will hold rates steady amid inflation concerns");
+  });
+
+  it("does not strip when first word is all lowercase", () => {
+    expect(stripSourcePrefix("breaking: Major earthquake hits Pacific coast killing dozens"))
+      .toBe("breaking: Major earthquake hits Pacific coast killing dozens");
+  });
+
+  it("does not strip when first word is all uppercase", () => {
+    expect(stripSourcePrefix("BREAKING: Oil prices surge after attack on Saudi pipeline"))
+      .toBe("BREAKING: Oil prices surge after attack on Saudi pipeline");
+  });
+
+  it("does not strip when remaining text would be too short", () => {
+    expect(stripSourcePrefix("investingLive Wrap: Short text"))
+      .toBe("investingLive Wrap: Short text");
+  });
+
+  it("does not strip when colon is beyond 6th word", () => {
+    expect(stripSourcePrefix("investingLive Americas Weekly FX Macro Long Term news wrap: Dovish BoJ's Ueda"))
+      .toBe("investingLive Americas Weekly FX Macro Long Term news wrap: Dovish BoJ's Ueda");
+  });
+
+  it("returns empty string unchanged", () => {
+    expect(stripSourcePrefix("")).toBe("");
+  });
+
+  it("returns title without colon unchanged", () => {
+    expect(stripSourcePrefix("investingLive Americas FX news wrap without any colon"))
+      .toBe("investingLive Americas FX news wrap without any colon");
+  });
+});
