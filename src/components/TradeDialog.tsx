@@ -18,6 +18,7 @@ export function TradeDialog({ asset, direction, symbol, onClose }: TradeDialogPr
   const [showRealWarning, setShowRealWarning] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const amountRef = useRef<HTMLInputElement>(null);
+  const submittingRef = useRef(false);
 
   const MIN_AMOUNT = 1;
   const MAX_AMOUNT = 50_000;
@@ -42,6 +43,8 @@ export function TradeDialog({ asset, direction, symbol, onClose }: TradeDialogPr
       return;
     }
 
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setIsSubmitting(true);
     try {
       const res = await fetch("/api/etoro/trade", {
@@ -68,6 +71,7 @@ export function TradeDialog({ asset, direction, symbol, onClose }: TradeDialogPr
     } catch {
       toast("Network error — trade not executed", "error");
     } finally {
+      submittingRef.current = false;
       setIsSubmitting(false);
       setShowRealWarning(false);
     }

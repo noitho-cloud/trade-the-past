@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { TradeDialog } from "../TradeDialog";
 import { ToastProvider } from "../ToastProvider";
 import type { ReactNode } from "react";
@@ -77,5 +77,34 @@ describe("TradeDialog", () => {
     const heading = screen.getByText("Confirm Trade");
     heading.click();
     expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("prevents double trade submission on rapid clicks", async () => {
+    const calls: string[] = [];
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockImplementation(
+      () => {
+        calls.push("fetch");
+        return new Promise<Response>((resolve) => {
+          setTimeout(() => resolve(new Response(JSON.stringify({ success: true }), { status: 200 })), 50);
+        });
+      }
+    );
+
+    render(
+      <TradeDialog asset="Oil" direction="up" symbol="OIL" onClose={vi.fn()} />,
+      { wrapper: Wrapper }
+    );
+
+    const executeBtn = screen.getAllByText("Execute Trade")[0];
+
+    // Simulate rapid double-click by dispatching raw DOM clicks
+    // that bypass React's disabled-attribute re-render
+    executeBtn.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    executeBtn.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+    // Only one fetch should have been initiated
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+
+    fetchSpy.mockRestore();
   });
 });
