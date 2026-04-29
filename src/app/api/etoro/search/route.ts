@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getEtoroKeys, searchInstrument } from "@/lib/etoro-proxy";
+import { getEtoroKeys, searchInstrument, EtoroAuthError } from "@/lib/etoro-proxy";
 import { applyRateLimit, addRateLimitHeaders } from "@/lib/with-rate-limit";
 
 export async function POST(request: Request) {
@@ -41,6 +41,12 @@ export async function POST(request: Request) {
     }
     return addRateLimitHeaders(NextResponse.json(result), rateLimit);
   } catch (error) {
+    if (error instanceof EtoroAuthError) {
+      return addRateLimitHeaders(
+        NextResponse.json({ error: error.message }, { status: 401 }),
+        rateLimit
+      );
+    }
     const { logger } = await import("@/lib/logger");
     const isTimeout = error instanceof Error && (error.name === "TimeoutError" || error.name === "AbortError");
     logger.error("eToro search failed", { route: "/api/etoro/search", symbol, timeout: isTimeout });

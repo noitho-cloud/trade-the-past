@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getEtoroKeys, searchInstrument, buildEtoroHeaders, ETORO_API_BASE } from "@/lib/etoro-proxy";
+import { getEtoroKeys, searchInstrument, buildEtoroHeaders, ETORO_API_BASE, EtoroAuthError } from "@/lib/etoro-proxy";
 import { applyRateLimit, addRateLimitHeaders } from "@/lib/with-rate-limit";
 
 export async function POST(request: Request) {
@@ -56,6 +56,12 @@ export async function POST(request: Request) {
       }
     );
 
+    if (res.status === 401 || res.status === 403) {
+      return addRateLimitHeaders(
+        NextResponse.json({ error: "eToro API keys are invalid — please reconnect" }, { status: 401 }),
+        rateLimit
+      );
+    }
     if (!res.ok) {
       return addRateLimitHeaders(
         NextResponse.json({ error: "Failed to add to watchlist" }, { status: 502 }),
@@ -72,6 +78,12 @@ export async function POST(request: Request) {
       rateLimit
     );
   } catch (error) {
+    if (error instanceof EtoroAuthError) {
+      return addRateLimitHeaders(
+        NextResponse.json({ error: error.message }, { status: 401 }),
+        rateLimit
+      );
+    }
     const { logger } = await import("@/lib/logger");
     const isTimeout = error instanceof Error && (error.name === "TimeoutError" || error.name === "AbortError");
     logger.error("Watchlist add failed", { route: "/api/etoro/watchlist", symbol, timeout: isTimeout });

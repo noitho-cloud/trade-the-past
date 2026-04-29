@@ -31,6 +31,13 @@ export interface EtoroSearchResult {
 
 const ETORO_FETCH_TIMEOUT_MS = 10_000;
 
+export class EtoroAuthError extends Error {
+  constructor() {
+    super("eToro API keys are invalid — please reconnect");
+    this.name = "EtoroAuthError";
+  }
+}
+
 export async function searchInstrument(
   keys: EtoroKeys,
   symbol: string
@@ -47,6 +54,7 @@ export async function searchInstrument(
     signal: AbortSignal.timeout(ETORO_FETCH_TIMEOUT_MS),
   });
 
+  if (res.status === 401 || res.status === 403) throw new EtoroAuthError();
   if (!res.ok) return null;
 
   const data = await res.json();

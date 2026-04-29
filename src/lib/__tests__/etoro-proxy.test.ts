@@ -100,6 +100,50 @@ describe("etoro-proxy", () => {
     vi.unstubAllGlobals();
   });
 
+  it("searchInstrument throws EtoroAuthError on 401", async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 401,
+    });
+    vi.stubGlobal("fetch", mockFetch);
+
+    const { searchInstrument, EtoroAuthError } = await import("../etoro-proxy");
+    await expect(
+      searchInstrument({ apiKey: "bad-key", userKey: "bad-user" }, "AAPL")
+    ).rejects.toThrow(EtoroAuthError);
+
+    vi.unstubAllGlobals();
+  });
+
+  it("searchInstrument throws EtoroAuthError on 403", async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 403,
+    });
+    vi.stubGlobal("fetch", mockFetch);
+
+    const { searchInstrument, EtoroAuthError } = await import("../etoro-proxy");
+    await expect(
+      searchInstrument({ apiKey: "bad-key", userKey: "bad-user" }, "AAPL")
+    ).rejects.toThrow(EtoroAuthError);
+
+    vi.unstubAllGlobals();
+  });
+
+  it("searchInstrument returns null on other non-200 (not auth error)", async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 500,
+    });
+    vi.stubGlobal("fetch", mockFetch);
+
+    const { searchInstrument } = await import("../etoro-proxy");
+    const result = await searchInstrument({ apiKey: "key", userKey: "user" }, "AAPL");
+    expect(result).toBeNull();
+
+    vi.unstubAllGlobals();
+  });
+
   it("validateKeys returns 'valid' when eToro responds 200", async () => {
     const mockFetch = vi.fn().mockResolvedValue({
       ok: true,

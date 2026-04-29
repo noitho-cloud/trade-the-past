@@ -18,6 +18,9 @@ vi.mock("@/lib/event-service", () => ({
 vi.mock("@/lib/etoro-proxy", () => ({
   getEtoroKeys: vi.fn().mockResolvedValue(null),
   validateKeys: vi.fn().mockResolvedValue("valid"),
+  EtoroAuthError: class EtoroAuthError extends Error {
+    constructor() { super("eToro API keys are invalid — please reconnect"); this.name = "EtoroAuthError"; }
+  },
 }));
 
 describe("API routes use structured logger for errors", () => {
