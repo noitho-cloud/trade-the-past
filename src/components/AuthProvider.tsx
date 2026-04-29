@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, type ReactNode } from "react";
 
 export interface ConnectResult {
   success: boolean;
@@ -89,8 +89,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const openConnectModal = useCallback(() => setShowConnectModal(true), []);
   const closeConnectModal = useCallback(() => setShowConnectModal(false), []);
 
-  return (
-    <AuthContext value={{
+  const value = useMemo<AuthContextValue>(
+    () => ({
       isConnected,
       isLoading,
       showConnectModal,
@@ -98,7 +98,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       closeConnectModal,
       connect,
       disconnect,
-    }}>
+    }),
+    [isConnected, isLoading, showConnectModal, openConnectModal, closeConnectModal, connect, disconnect]
+  );
+
+  return (
+    <AuthContext value={value}>
       {children}
     </AuthContext>
   );
