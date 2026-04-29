@@ -436,4 +436,21 @@ describe("WeeklyViewClient", () => {
       expect(screen.getByText("Fed Holds Rates Steady")).toBeInTheDocument();
     });
   });
+
+  it("expands 'How does this work?' into numbered steps", async () => {
+    const user = userEvent.setup();
+    render(<WeeklyViewClient initialEvents={mockEvents} />);
+
+    const toggle = screen.getByRole("button", { name: /how does this work/i });
+    await user.click(toggle);
+
+    const list = screen.getByRole("list");
+    const items = screen.getAllByRole("listitem");
+    expect(list).toBeInTheDocument();
+    expect(items.length).toBe(3);
+
+    expect(items[0]).toHaveTextContent(/scan/i);
+    expect(items[1]).toHaveTextContent(/match/i);
+    expect(items[2]).toHaveTextContent(/reaction/i);
+  });
 });

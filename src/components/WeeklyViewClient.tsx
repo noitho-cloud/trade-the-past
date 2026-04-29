@@ -74,14 +74,13 @@ function MethodologyHint() {
       </button>
       <div
         className="overflow-hidden transition-all duration-200 ease-out"
-        style={{ maxHeight: open ? "120px" : "0px", opacity: open ? 1 : 0 }}
+        style={{ maxHeight: open ? "200px" : "0px", opacity: open ? 1 : 0 }}
       >
-        <p className="text-[12px] text-muted leading-relaxed mt-2 max-w-md">
-          We aggregate headlines from major financial outlets, identify the most
-          market-moving event each day, and use historical pattern matching to
-          find similar past events. Market reaction data shows how affected
-          assets performed after each historical parallel.
-        </p>
+        <ol className="text-[12px] text-muted leading-relaxed mt-2 max-w-md space-y-1.5 list-decimal list-inside">
+          <li><span className="font-medium text-foreground/80">We scan the news</span> — headlines from Reuters, CNBC, Google News and more</li>
+          <li><span className="font-medium text-foreground/80">Match to history</span> — find similar past events using pattern matching</li>
+          <li><span className="font-medium text-foreground/80">Show the market reaction</span> — see how affected assets moved after each parallel</li>
+        </ol>
       </div>
     </div>
   );
