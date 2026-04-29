@@ -88,12 +88,7 @@ export function WatchlistStar({ asset }: { asset: string }) {
   const [isLoading, setIsLoading] = useState(false);
   const inFlightRef = useRef(false);
 
-  async function handleClick() {
-    if (!isConnected) {
-      openConnectModal();
-      return;
-    }
-
+  async function executeAdd() {
     if (inFlightRef.current) return;
     inFlightRef.current = true;
     setIsLoading(true);
@@ -116,6 +111,14 @@ export function WatchlistStar({ asset }: { asset: string }) {
       setIsLoading(false);
       inFlightRef.current = false;
     }
+  }
+
+  function handleClick() {
+    if (!isConnected) {
+      openConnectModal(() => { executeAdd(); });
+      return;
+    }
+    executeAdd();
   }
 
   return (
@@ -148,7 +151,7 @@ export function TradeButton({ asset, direction }: { asset: string; direction: "u
 
   function handleClick() {
     if (!isConnected) {
-      openConnectModal();
+      openConnectModal(() => setShowDialog(true));
       return;
     }
     setShowDialog(true);

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, useCallback, useMemo, type ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef, type ReactNode } from "react";
 
 export interface ConnectResult {
   success: boolean;
@@ -12,7 +12,7 @@ interface AuthContextValue {
   isConnected: boolean;
   isLoading: boolean;
   showConnectModal: boolean;
-  openConnectModal: () => void;
+  openConnectModal: (pendingAction?: () => void) => void;
   closeConnectModal: () => void;
   connect: (apiKey: string, userKey: string) => Promise<ConnectResult>;
   disconnect: () => Promise<void>;
@@ -36,6 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showConnectModal, setShowConnectModal] = useState(false);
+  const pendingActionRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -72,6 +73,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       setIsConnected(true);
       setShowConnectModal(false);
+      const action = pendingActionRef.current;
+      pendingActionRef.current = null;
+      if (action) action();
       return { success: true, warning: data.warning };
     } catch {
       return { success: false, error: "Network error — please try again" };
@@ -86,8 +90,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const openConnectModal = useCallback(() => setShowConnectModal(true), []);
-  const closeConnectModal = useCallback(() => setShowConnectModal(false), []);
+  const openConnectModal = useCallback((pendingAction?: () => void) => {
+    pendingActionRef.current = pendingAction ?? null;
+    setShowConnectModal(true);
+  }, []);
+  const closeConnectModal = useCallback(() => {
+    pendingActionRef.current = null;
+    setShowConnectModal(false);
+  }, []);
 
   const value = useMemo<AuthContextValue>(
     () => ({
