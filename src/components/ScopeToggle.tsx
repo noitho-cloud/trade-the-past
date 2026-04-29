@@ -21,6 +21,7 @@ export function ScopeToggle({
     <div className="inline-flex items-center h-9 bg-[var(--gray-border)] rounded-full p-0.5">
       <button
         onClick={handleGlobal}
+        title="Worldwide market events"
         className={`px-3 h-full text-xs font-semibold rounded-full transition-all duration-150 cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:outline-none ${
           scope === "global" ? active : inactive
         }`}
@@ -29,6 +30,7 @@ export function ScopeToggle({
       </button>
       <button
         onClick={handleLocal}
+        title="UK, Germany, and France market events"
         className={`px-3 h-full text-xs font-semibold rounded-full transition-all duration-150 cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:outline-none ${
           scope === "local" ? active : inactive
         }`}
