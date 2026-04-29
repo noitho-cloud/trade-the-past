@@ -71,6 +71,10 @@ export function ConnectEtoroModal() {
           </button>
         </div>
 
+        <p className="text-sm text-muted -mt-2">
+          Trade directly from event analysis and manage your eToro watchlist.
+        </p>
+
         <div className="rounded-xl bg-[var(--gray-bg)] p-4 space-y-2">
           <h3 className="text-xs font-semibold tracking-wide uppercase text-muted">How to get your API keys</h3>
           <ol className="text-sm text-muted space-y-1 list-decimal list-inside">

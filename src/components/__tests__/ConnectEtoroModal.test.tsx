@@ -72,6 +72,13 @@ describe("ConnectEtoroModal", () => {
     expect(closeConnectModal).toHaveBeenCalled();
   });
 
+  it("shows a value proposition subtitle explaining what connecting enables", () => {
+    render(<ConnectEtoroModal />);
+    const allText = document.body.textContent ?? "";
+    expect(allText).toMatch(/trade.*directly/i);
+    expect(allText).toMatch(/watchlist/i);
+  });
+
   it("does not close when inner content is clicked", () => {
     const closeConnectModal = vi.fn();
     mockUseAuth.mockReturnValue({
