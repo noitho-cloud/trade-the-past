@@ -82,9 +82,9 @@ export default function RootLayout({
                   Sources
                 </h4>
                 <p className="text-xs text-muted leading-relaxed">
-                  News from Reuters, Bloomberg, Financial Times, and other major
-                  financial outlets. Historical data from publicly available
-                  market records.
+                  News aggregated from Reuters, CNBC, BBC, Yahoo Finance, and
+                  other major financial outlets via Google News. Historical data
+                  from publicly available market records.
                 </p>
               </div>
               <hr className="border-border" />
