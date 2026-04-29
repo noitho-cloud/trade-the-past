@@ -107,4 +107,28 @@ describe("TradeDialog", () => {
 
     fetchSpy.mockRestore();
   });
+
+  it("passes AbortSignal.timeout to trade fetch", async () => {
+    let capturedSignal: AbortSignal | undefined;
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockImplementation(
+      (_url, init) => {
+        capturedSignal = init?.signal as AbortSignal | undefined;
+        return Promise.resolve(new Response(JSON.stringify({ success: true }), { status: 200 }));
+      }
+    );
+
+    render(
+      <TradeDialog asset="Oil" direction="up" symbol="OIL" onClose={vi.fn()} />,
+      { wrapper: Wrapper }
+    );
+
+    const executeBtn = screen.getAllByText("Execute Trade")[0];
+    executeBtn.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    expect(capturedSignal).toBeDefined();
+    expect(capturedSignal).toBeInstanceOf(AbortSignal);
+
+    fetchSpy.mockRestore();
+  });
 });

@@ -56,6 +56,7 @@ export function TradeDialog({ asset, direction, symbol, onClose }: TradeDialogPr
           amount: Number(amount),
           isDemo,
         }),
+        signal: AbortSignal.timeout(15_000),
       });
 
       const data = await res.json();
@@ -68,8 +69,9 @@ export function TradeDialog({ asset, direction, symbol, onClose }: TradeDialogPr
         );
         onClose();
       }
-    } catch {
-      toast("Network error — trade not executed", "error");
+    } catch (err) {
+      const isTimeout = err instanceof DOMException && err.name === "TimeoutError";
+      toast(isTimeout ? "Trade timed out — please try again" : "Network error — trade not executed", "error");
     } finally {
       submittingRef.current = false;
       setIsSubmitting(false);

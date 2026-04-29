@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
     async function checkSession() {
       try {
-        const res = await fetch("/api/auth/session");
+        const res = await fetch("/api/auth/session", { signal: AbortSignal.timeout(10_000) });
         if (!res.ok) throw new Error("Session check failed");
         const data = await res.json();
         if (!cancelled) {
@@ -66,6 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ apiKey, userKey }),
+        signal: AbortSignal.timeout(10_000),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -77,8 +78,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       pendingActionRef.current = null;
       if (action) action();
       return { success: true, warning: data.warning };
-    } catch {
-      return { success: false, error: "Network error — please try again" };
+    } catch (err) {
+      const isTimeout = err instanceof DOMException && err.name === "TimeoutError";
+      return { success: false, error: isTimeout ? "Connection timed out — please try again" : "Network error — please try again" };
     }
   }, []);
 

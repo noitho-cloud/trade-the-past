@@ -97,6 +97,7 @@ export function WatchlistStar({ asset }: { asset: string }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ symbol: getEtoroSymbol(asset) }),
+        signal: AbortSignal.timeout(10_000),
       });
       if (res.ok) {
         setIsAdded(true);
@@ -105,8 +106,9 @@ export function WatchlistStar({ asset }: { asset: string }) {
         const data = await res.json().catch(() => ({}));
         toast(data.error ?? "Failed to add to watchlist", "error");
       }
-    } catch {
-      toast("Network error — could not update watchlist", "error");
+    } catch (err) {
+      const isTimeout = err instanceof DOMException && err.name === "TimeoutError";
+      toast(isTimeout ? "Watchlist request timed out — please try again" : "Network error — could not update watchlist", "error");
     } finally {
       setIsLoading(false);
       inFlightRef.current = false;

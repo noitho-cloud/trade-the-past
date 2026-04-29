@@ -22,6 +22,51 @@ function TestConsumer() {
   );
 }
 
+describe("AuthProvider fetch timeouts", () => {
+  it("passes AbortSignal to connect() fetch", async () => {
+    let capturedSignal: AbortSignal | undefined;
+    vi.spyOn(globalThis, "fetch")
+      .mockImplementationOnce(() =>
+        Promise.resolve(new Response(JSON.stringify({ connected: false }), { status: 200 }))
+      )
+      .mockImplementationOnce((_url, init) => {
+        capturedSignal = init?.signal as AbortSignal | undefined;
+        return Promise.resolve(new Response(JSON.stringify({ success: true }), { status: 200 }));
+      });
+
+    render(
+      <AuthProvider>
+        <TestConsumer />
+      </AuthProvider>
+    );
+
+    await act(async () => {});
+    await act(async () => { screen.getByTestId("connect").click(); });
+
+    expect(capturedSignal).toBeDefined();
+    expect(capturedSignal).toBeInstanceOf(AbortSignal);
+  });
+
+  it("passes AbortSignal to checkSession() fetch on mount", async () => {
+    let capturedSignal: AbortSignal | undefined;
+    vi.spyOn(globalThis, "fetch").mockImplementationOnce((_url, init) => {
+      capturedSignal = init?.signal as AbortSignal | undefined;
+      return Promise.resolve(new Response(JSON.stringify({ connected: false }), { status: 200 }));
+    });
+
+    render(
+      <AuthProvider>
+        <TestConsumer />
+      </AuthProvider>
+    );
+
+    await act(async () => {});
+
+    expect(capturedSignal).toBeDefined();
+    expect(capturedSignal).toBeInstanceOf(AbortSignal);
+  });
+});
+
 describe("AuthProvider pending action", () => {
   it("executes pending action after successful connect", async () => {
     vi.spyOn(globalThis, "fetch")
