@@ -113,6 +113,19 @@ describe("ConnectEtoroModal", () => {
     expect(allText).toMatch(/watchlist/i);
   });
 
+  it("dialog has max-height and scrollable content for short viewports", async () => {
+    render(<ConnectEtoroModal />);
+    await waitFor(() => {
+      expect(globalThis.fetch).toHaveBeenCalled();
+    });
+
+    const dialog = document.querySelector("dialog")!;
+    expect(dialog.className).toMatch(/max-h-\[90vh\]/);
+
+    const contentDiv = dialog.querySelector(":scope > div")!;
+    expect(contentDiv.className).toMatch(/overflow-y-auto/);
+  });
+
   it("does not close when inner content is clicked", async () => {
     const closeConnectModal = vi.fn();
     mockUseAuth.mockReturnValue({
