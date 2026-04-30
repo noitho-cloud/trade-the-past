@@ -423,11 +423,15 @@ export function selectDiverseEvents(
     (a, b) => new Date(b).getTime() - new Date(a).getTime()
   );
 
-  // First pass: best event from each day (guarantees daily spread)
+  // First pass: best event per day, but prefer a different type if current type is saturated
   for (const date of sortedDates) {
     if (result.length >= limit) break;
     const dayEvents = byDate.get(date)!;
-    const best = dayEvents.find((e) => !isDuplicate(e, result));
+    const nonSaturated = dayEvents.find(
+      (e) => !isDuplicate(e, result) && (typeCount.get(e.type) || 0) < maxPerType
+    );
+    const fallback = dayEvents.find((e) => !isDuplicate(e, result));
+    const best = nonSaturated || fallback;
     if (best) {
       result.push(best);
       typeCount.set(best.type, (typeCount.get(best.type) || 0) + 1);
@@ -448,7 +452,7 @@ export function selectDiverseEvents(
     dateCount.set(e.date, dCount + 1);
   }
 
-  // Third pass: if still under limit, relax day cap
+  // Third pass: if still under limit, relax day cap but keep type cap
   for (const e of events) {
     if (result.length >= limit) break;
     if (isDuplicate(e, result)) continue;

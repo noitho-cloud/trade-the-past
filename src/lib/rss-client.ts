@@ -262,7 +262,7 @@ const NON_LATIN_RE =
 export function isLikelyEnglish(text: string): boolean {
   if (!text || text.length < 5) return false;
   const matches = text.match(NON_LATIN_RE);
-  return !matches || matches.length < 2;
+  return !matches || matches.length === 0;
 }
 
 function rssItemToArticle(
@@ -278,6 +278,8 @@ function rssItemToArticle(
   }
   if (title.length < 15) return null;
   if (!isLikelyEnglish(title)) return null;
+  const snippet = item.contentSnippet?.slice(0, 200) || "";
+  if (snippet.length > 20 && !isLikelyEnglish(snippet)) return null;
 
   const imageUrl =
     item.enclosure?.url ||
