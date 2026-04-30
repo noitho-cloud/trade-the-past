@@ -3,8 +3,6 @@ import { getEventById } from "@/lib/event-service";
 import { logger } from "@/lib/logger";
 import { applyRateLimit, addRateLimitHeaders } from "@/lib/with-rate-limit";
 
-export const maxDuration = 30;
-
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }

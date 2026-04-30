@@ -1,0 +1,14 @@
+node_modules
+.next
+.git
+.gitignore
+.autobuilder
+.cursor
+.vercel
+.env
+.env*.local
+*.md
+Dockerfile
+.dockerignore
+dogfood-output
+playwright-report
