@@ -8,6 +8,8 @@ import { LoginButton } from "@/components/LoginButton";
 import { ConnectEtoroModal } from "@/components/ConnectEtoroModal";
 import { ToastProvider } from "@/components/ToastProvider";
 import { ScrollSentinel } from "@/components/ScrollSentinel";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const THEME_INIT = `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}})()`;
@@ -104,6 +106,8 @@ export default function RootLayout({
           </ToastProvider>
         </AuthProvider>
         </ThemeProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
