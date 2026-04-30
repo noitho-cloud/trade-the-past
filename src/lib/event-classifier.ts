@@ -274,7 +274,8 @@ export function classifyArticle(
   for (const rule of RULES) {
     let matchCount = 0;
     for (const kw of rule.keywords) {
-      if (text.includes(kw)) matchCount++;
+      const re = new RegExp(`\\b${kw.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`);
+      if (re.test(text)) matchCount++;
     }
     if (matchCount === 0) continue;
 
@@ -405,7 +406,7 @@ export function selectDiverseEvents(
 ): ClassifiedEvent[] {
   if (events.length <= limit) return events;
 
-  const maxPerType = Math.max(2, Math.ceil(limit / 3));
+  const maxPerType = Math.max(2, Math.ceil(limit / 4));
   const result: ClassifiedEvent[] = [];
   const typeCount = new Map<string, number>();
   const dateCount = new Map<string, number>();
