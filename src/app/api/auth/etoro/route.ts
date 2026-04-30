@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { encryptKeys, KEYS_COOKIE_NAME, KEYS_MAX_AGE } from "@/lib/auth";
+import { SSO_SESSION_COOKIE, deleteSession } from "@/lib/sso";
 import { logger } from "@/lib/logger";
 import { validateKeys } from "@/lib/etoro-proxy";
 import { applyRateLimit, addRateLimitHeaders } from "@/lib/with-rate-limit";
@@ -60,6 +61,19 @@ export async function POST(request: Request) {
     const encrypted = encryptKeys(trimmedKeys);
 
     const cookieStore = await cookies();
+
+    const ssoSessionId = cookieStore.get(SSO_SESSION_COOKIE)?.value;
+    if (ssoSessionId) {
+      deleteSession(ssoSessionId);
+    }
+    cookieStore.set(SSO_SESSION_COOKIE, "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 0,
+      path: "/",
+    });
+
     cookieStore.set(KEYS_COOKIE_NAME, encrypted, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -76,7 +90,10 @@ export async function POST(request: Request) {
     });
     return addRateLimitHeaders(response, rateLimit);
   } catch (error) {
-    logger.error("Connect error", { route: "/api/auth/etoro", error: error instanceof Error ? error.message : String(error) });
+    logger.error("Connect error", {
+      route: "/api/auth/etoro",
+      error: error instanceof Error ? error.message : String(error),
+    });
     return NextResponse.json(
       { error: "Failed to store credentials" },
       { status: 500 }

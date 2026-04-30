@@ -1,12 +1,17 @@
 import { NextResponse } from "next/server";
-import { getEtoroKeys, searchInstrument, buildEtoroHeaders, ETORO_API_BASE, EtoroAuthError } from "@/lib/etoro-proxy";
+import {
+  getEtoroRequestHeaders,
+  searchInstrument,
+  ETORO_API_BASE,
+  EtoroAuthError,
+} from "@/lib/etoro-proxy";
 import { applyRateLimit, addRateLimitHeaders } from "@/lib/with-rate-limit";
 
 export async function POST(request: Request) {
   const rateLimit = applyRateLimit(request, "etoro");
   if (rateLimit.blocked) return rateLimit.response;
-  const keys = await getEtoroKeys();
-  if (!keys) {
+  const headers = await getEtoroRequestHeaders();
+  if (!headers) {
     return addRateLimitHeaders(
       NextResponse.json({ error: "Not connected to eToro" }, { status: 401 }),
       rateLimit
@@ -32,7 +37,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const instrument = await searchInstrument(keys, symbol.trim().toUpperCase());
+    const instrument = await searchInstrument(headers, symbol.trim().toUpperCase());
     if (!instrument) {
       return addRateLimitHeaders(
         NextResponse.json({ error: "Instrument not found" }, { status: 404 }),
@@ -40,7 +45,6 @@ export async function POST(request: Request) {
       );
     }
 
-    const headers = buildEtoroHeaders(keys);
     const res = await fetch(
       `${ETORO_API_BASE}/watchlists/default-watchlist/selected-items`,
       {

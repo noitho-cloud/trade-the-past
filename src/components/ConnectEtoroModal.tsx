@@ -3,13 +3,45 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useAuth } from "./AuthProvider";
 
+function base64UrlEncode(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]!);
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function randomVerifier(): string {
+  const arr = new Uint8Array(32);
+  crypto.getRandomValues(arr);
+  return base64UrlEncode(arr.buffer);
+}
+
+async function sha256Challenge(verifier: string): Promise<string> {
+  const data = new TextEncoder().encode(verifier);
+  const hash = await crypto.subtle.digest("SHA-256", data);
+  return base64UrlEncode(hash);
+}
+
+const DEFAULT_AUTHORIZE_BASE =
+  process.env.NEXT_PUBLIC_ETORO_SSO_AUTHORIZE_URL ??
+  "https://www.etoro.com/sso/oauth2/v1/authorize";
+
+interface SSOConfigResponse {
+  configured: boolean;
+  clientId?: string;
+  redirectUri?: string;
+}
+
 export function ConnectEtoroModal() {
   const { showConnectModal, closeConnectModal, connect } = useAuth();
   const [apiKey, setApiKey] = useState("");
   const [userKey, setUserKey] = useState("");
   const [error, setError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [warning, setWarning] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [ssoConfig, setSsoConfig] = useState<SSOConfigResponse | null>(null);
+  const [ssoStarting, setSsoStarting] = useState(false);
+  const [showApiKeys, setShowApiKeys] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const apiKeyRef = useRef<HTMLInputElement>(null);
 
@@ -19,6 +51,8 @@ export function ConnectEtoroModal() {
     setError("");
     setWarning("");
     setIsSubmitting(false);
+    setSsoStarting(false);
+    setShowApiKeys(false);
     closeConnectModal();
   }, [closeConnectModal]);
 
@@ -31,6 +65,23 @@ export function ConnectEtoroModal() {
     } else {
       dialog.close();
     }
+  }, [showConnectModal]);
+
+  useEffect(() => {
+    if (!showConnectModal) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/auth/sso-config", { signal: AbortSignal.timeout(10_000) });
+        const data = (await res.json()) as SSOConfigResponse;
+        if (!cancelled) setSsoConfig(data);
+      } catch {
+        if (!cancelled) setSsoConfig({ configured: false });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [showConnectModal]);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -48,19 +99,51 @@ export function ConnectEtoroModal() {
     setIsSubmitting(false);
   }
 
+  async function startSSO() {
+    if (!ssoConfig?.configured || !ssoConfig.clientId || !ssoConfig.redirectUri) return;
+    setError("");
+    setWarning("");
+    setSsoStarting(true);
+    try {
+      const state = crypto.randomUUID();
+      const codeVerifier = randomVerifier();
+      const challenge = await sha256Challenge(codeVerifier);
+      sessionStorage.setItem("etoro_sso_state", state);
+      sessionStorage.setItem("etoro_sso_code_verifier", codeVerifier);
+      const params = new URLSearchParams({
+        client_id: ssoConfig.clientId,
+        redirect_uri: ssoConfig.redirectUri,
+        response_type: "code",
+        scope: "openid offline_access",
+        state,
+        code_challenge: challenge,
+        code_challenge_method: "S256",
+      });
+      window.location.href = `${DEFAULT_AUTHORIZE_BASE}?${params.toString()}`;
+    } catch {
+      setSsoStarting(false);
+      setError("Could not start eToro login. Please try again.");
+    }
+  }
+
   if (!showConnectModal) return null;
+
+  const ssoReady = ssoConfig?.configured === true;
 
   return (
     <dialog
       ref={dialogRef}
       onClose={handleClose}
-      onClick={(e) => { if (e.target === dialogRef.current) handleClose(); }}
+      onClick={(e) => {
+        if (e.target === dialogRef.current) handleClose();
+      }}
       className="fixed inset-0 z-50 m-auto w-[calc(100%-32px)] max-w-md rounded-2xl bg-card border border-[var(--card-border)] shadow-xl p-0 backdrop:bg-black/50 backdrop:backdrop-blur-sm"
     >
       <div className="p-6 space-y-5">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold tracking-tight">Connect to eToro</h2>
           <button
+            type="button"
             onClick={handleClose}
             className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--gray-bg)] transition-colors cursor-pointer"
             aria-label="Close"
@@ -75,87 +158,141 @@ export function ConnectEtoroModal() {
           Trade directly from event analysis and manage your eToro watchlist.
         </p>
 
-        <div className="rounded-xl bg-[var(--gray-bg)] p-4 space-y-2">
-          <h3 className="text-xs font-semibold tracking-wide uppercase text-muted">How to get your API keys</h3>
-          <ol className="text-sm text-muted space-y-1 list-decimal list-inside">
-            <li>Log in to <a href="https://www.etoro.com" target="_blank" rel="noopener noreferrer" className="text-[var(--etoro-green)] hover:underline">eToro</a></li>
-            <li>Go to Settings &gt; Trading</li>
-            <li>Click &quot;Create New Key&quot;</li>
-            <li>Choose environment (Virtual for demo trading)</li>
-            <li>Copy your Public API Key and User Key</li>
-          </ol>
-        </div>
+        {ssoReady ? (
+          <div className="space-y-3">
+            <button
+              type="button"
+              disabled={ssoStarting}
+              onClick={() => void startSSO()}
+              className="w-full h-11 rounded-full bg-[var(--etoro-green)] text-white font-semibold text-sm
+                         hover:bg-[var(--etoro-green-hover)] active:scale-[0.98] transition-all cursor-pointer
+                         disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
+                         focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:ring-offset-2 focus-visible:outline-none"
+            >
+              {ssoStarting ? (
+                <span className="inline-flex items-center justify-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Redirecting…
+                </span>
+              ) : (
+                "Continue with eToro"
+              )}
+            </button>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-1.5">
-            <label htmlFor="etoro-api-key" className="text-sm font-medium">
-              Public API Key
-            </label>
-            <input
-              ref={apiKeyRef}
-              id="etoro-api-key"
-              type="password"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              placeholder="Enter your Public API Key"
-              required
-              maxLength={200}
-              autoComplete="off"
-              className="w-full h-10 px-3 rounded-lg border border-[var(--border)] bg-background text-sm
-                         focus:outline-none focus:ring-2 focus:ring-[var(--etoro-green)] focus:border-transparent
-                         placeholder:text-muted/50"
-            />
+            <button
+              type="button"
+              onClick={() => setShowApiKeys((v) => !v)}
+              className="w-full text-xs font-medium text-muted hover:text-foreground underline underline-offset-2 cursor-pointer"
+            >
+              {showApiKeys ? "Hide API key option" : "Use API keys instead"}
+            </button>
           </div>
+        ) : (
+          <p className="text-xs text-muted rounded-xl bg-[var(--gray-bg)] p-3">
+            SSO is not configured on this deployment. Connect using your eToro API keys below, or ask the administrator to add eToro OAuth credentials.
+          </p>
+        )}
 
-          <div className="space-y-1.5">
-            <label htmlFor="etoro-user-key" className="text-sm font-medium">
-              User Key
-            </label>
-            <input
-              id="etoro-user-key"
-              type="password"
-              value={userKey}
-              onChange={(e) => setUserKey(e.target.value)}
-              placeholder="Enter your User Key"
-              required
-              maxLength={200}
-              autoComplete="off"
-              className="w-full h-10 px-3 rounded-lg border border-[var(--border)] bg-background text-sm
-                         focus:outline-none focus:ring-2 focus:ring-[var(--etoro-green)] focus:border-transparent
-                         placeholder:text-muted/50"
-            />
-          </div>
+        {(showApiKeys || !ssoReady) && (
+          <>
+            <div className="rounded-xl bg-[var(--gray-bg)] p-4 space-y-2">
+              <h3 className="text-xs font-semibold tracking-wide uppercase text-muted">How to get your API keys</h3>
+              <ol className="text-sm text-muted space-y-1 list-decimal list-inside">
+                <li>
+                  Log in to{" "}
+                  <a href="https://www.etoro.com" target="_blank" rel="noopener noreferrer" className="text-[var(--etoro-green)] hover:underline">
+                    eToro
+                  </a>
+                </li>
+                <li>Go to Settings &gt; Trading</li>
+                <li>Click &quot;Create New Key&quot;</li>
+                <li>Choose environment (Virtual for demo trading)</li>
+                <li>Copy your Public API Key and User Key</li>
+              </ol>
+            </div>
 
-          {error && (
-            <p className="text-sm text-[var(--red)]" role="alert">{error}</p>
-          )}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-1.5">
+                <label htmlFor="etoro-api-key" className="text-sm font-medium">
+                  Public API Key
+                </label>
+                <input
+                  ref={apiKeyRef}
+                  id="etoro-api-key"
+                  type="password"
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  placeholder="Enter your Public API Key"
+                  required={!ssoReady}
+                  maxLength={200}
+                  autoComplete="off"
+                  className="w-full h-10 px-3 rounded-lg border border-[var(--border)] bg-background text-sm
+                             focus:outline-none focus:ring-2 focus:ring-[var(--etoro-green)] focus:border-transparent
+                             placeholder:text-muted/50"
+                />
+              </div>
 
-          {warning && (
-            <p className="text-sm text-[var(--amber)]" role="status">{warning}</p>
-          )}
+              <div className="space-y-1.5">
+                <label htmlFor="etoro-user-key" className="text-sm font-medium">
+                  User Key
+                </label>
+                <input
+                  id="etoro-user-key"
+                  type="password"
+                  value={userKey}
+                  onChange={(e) => setUserKey(e.target.value)}
+                  placeholder="Enter your User Key"
+                  required={!ssoReady}
+                  maxLength={200}
+                  autoComplete="off"
+                  className="w-full h-10 px-3 rounded-lg border border-[var(--border)] bg-background text-sm
+                             focus:outline-none focus:ring-2 focus:ring-[var(--etoro-green)] focus:border-transparent
+                             placeholder:text-muted/50"
+                />
+              </div>
 
-          <button
-            type="submit"
-            disabled={isSubmitting || !apiKey.trim() || !userKey.trim()}
-            className="w-full h-11 rounded-full bg-[var(--etoro-green)] text-white font-semibold text-sm
-                       hover:bg-[var(--etoro-green-hover)] active:scale-[0.98] transition-all cursor-pointer
-                       disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
-                       focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:ring-offset-2 focus-visible:outline-none"
-          >
-            {isSubmitting ? (
-              <span className="inline-flex items-center gap-2">
-                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Connecting...
-              </span>
-            ) : (
-              "Connect"
-            )}
-          </button>
-        </form>
+              {error && (
+                <p className="text-sm text-[var(--red)]" role="alert">
+                  {error}
+                </p>
+              )}
 
-        <p className="text-[11px] text-muted/60 leading-relaxed text-center">
-          Your keys are encrypted server-side and stored in a secure, HTTP-only cookie. They are never exposed to client-side code.
-        </p>
+              {warning && (
+                <p className="text-sm text-[var(--amber)]" role="status">
+                  {warning}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                disabled={isSubmitting || !apiKey.trim() || !userKey.trim()}
+                className="w-full h-11 rounded-full bg-[var(--etoro-green)] text-white font-semibold text-sm
+                           hover:bg-[var(--etoro-green-hover)] active:scale-[0.98] transition-all cursor-pointer
+                           disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
+                           focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:ring-offset-2 focus-visible:outline-none"
+              >
+                {isSubmitting ? (
+                  <span className="inline-flex items-center gap-2">
+                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Connecting...
+                  </span>
+                ) : (
+                  "Connect with API keys"
+                )}
+              </button>
+            </form>
+
+            <p className="text-[11px] text-muted/60 leading-relaxed text-center">
+              Your keys are encrypted server-side and stored in a secure, HTTP-only cookie. They are never exposed to client-side code.
+            </p>
+          </>
+        )}
+
+        {ssoReady && !showApiKeys && (
+          <p className="text-[11px] text-muted/60 leading-relaxed text-center">
+            Recommended: sign in with your eToro account. Tokens stay on the server—never in browser JavaScript.
+          </p>
+        )}
       </div>
     </dialog>
   );

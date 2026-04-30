@@ -6,6 +6,9 @@ beforeEach(() => {
   vi.restoreAllMocks();
 });
 
+const sessionDisconnected = new Response(JSON.stringify({ connected: false }), { status: 200 });
+const ssoConfigDisabled = new Response(JSON.stringify({ available: false }), { status: 200 });
+
 function TestConsumer() {
   const { isConnected, openConnectModal, connect, closeConnectModal, showConnectModal } = useAuth();
   return (
@@ -26,9 +29,8 @@ describe("AuthProvider fetch timeouts", () => {
   it("passes AbortSignal to connect() fetch", async () => {
     let capturedSignal: AbortSignal | undefined;
     vi.spyOn(globalThis, "fetch")
-      .mockImplementationOnce(() =>
-        Promise.resolve(new Response(JSON.stringify({ connected: false }), { status: 200 }))
-      )
+      .mockImplementationOnce(() => Promise.resolve(sessionDisconnected))
+      .mockImplementationOnce(() => Promise.resolve(ssoConfigDisabled))
       .mockImplementationOnce((_url, init) => {
         capturedSignal = init?.signal as AbortSignal | undefined;
         return Promise.resolve(new Response(JSON.stringify({ success: true }), { status: 200 }));
@@ -49,10 +51,12 @@ describe("AuthProvider fetch timeouts", () => {
 
   it("passes AbortSignal to checkSession() fetch on mount", async () => {
     let capturedSignal: AbortSignal | undefined;
-    vi.spyOn(globalThis, "fetch").mockImplementationOnce((_url, init) => {
-      capturedSignal = init?.signal as AbortSignal | undefined;
-      return Promise.resolve(new Response(JSON.stringify({ connected: false }), { status: 200 }));
-    });
+    vi.spyOn(globalThis, "fetch")
+      .mockImplementationOnce((_url, init) => {
+        capturedSignal = init?.signal as AbortSignal | undefined;
+        return Promise.resolve(sessionDisconnected);
+      })
+      .mockImplementationOnce(() => Promise.resolve(ssoConfigDisabled));
 
     render(
       <AuthProvider>
@@ -70,7 +74,8 @@ describe("AuthProvider fetch timeouts", () => {
 describe("AuthProvider pending action", () => {
   it("executes pending action after successful connect", async () => {
     vi.spyOn(globalThis, "fetch")
-      .mockResolvedValueOnce(new Response(JSON.stringify({ connected: false }), { status: 200 }))
+      .mockResolvedValueOnce(sessionDisconnected)
+      .mockResolvedValueOnce(ssoConfigDisabled)
       .mockResolvedValueOnce(new Response(JSON.stringify({ success: true }), { status: 200 }));
 
     render(
@@ -91,7 +96,8 @@ describe("AuthProvider pending action", () => {
 
   it("clears pending action when modal is closed without connecting", async () => {
     vi.spyOn(globalThis, "fetch")
-      .mockResolvedValueOnce(new Response(JSON.stringify({ connected: false }), { status: 200 }))
+      .mockResolvedValueOnce(sessionDisconnected)
+      .mockResolvedValueOnce(ssoConfigDisabled)
       .mockResolvedValueOnce(new Response(JSON.stringify({ success: true }), { status: 200 }));
 
     render(
@@ -112,7 +118,8 @@ describe("AuthProvider pending action", () => {
 
   it("does not execute pending action when opened without one", async () => {
     vi.spyOn(globalThis, "fetch")
-      .mockResolvedValueOnce(new Response(JSON.stringify({ connected: false }), { status: 200 }))
+      .mockResolvedValueOnce(sessionDisconnected)
+      .mockResolvedValueOnce(ssoConfigDisabled)
       .mockResolvedValueOnce(new Response(JSON.stringify({ success: true }), { status: 200 }));
 
     render(

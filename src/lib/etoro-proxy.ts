@@ -1,17 +1,40 @@
 import { cookies } from "next/headers";
 import { decryptKeys, KEYS_COOKIE_NAME, type EtoroKeys } from "./auth";
+import { SSO_SESSION_COOKIE, getValidAccessToken } from "./sso";
 
 const ETORO_API_BASE = "https://public-api.etoro.com/api/v1";
 
-export async function getEtoroKeys(): Promise<EtoroKeys | null> {
+export type ResolvedEtoroAuth =
+  | { mode: "oauth"; accessToken: string }
+  | { mode: "apikey"; keys: EtoroKeys };
+
+export async function resolveEtoroAuth(): Promise<ResolvedEtoroAuth | null> {
   const cookieStore = await cookies();
+  const ssoSessionId = cookieStore.get(SSO_SESSION_COOKIE)?.value;
+  if (ssoSessionId) {
+    const token = await getValidAccessToken(ssoSessionId);
+    if (token) return { mode: "oauth", accessToken: token };
+  }
+
   const encrypted = cookieStore.get(KEYS_COOKIE_NAME)?.value;
   if (!encrypted) return null;
   try {
-    return decryptKeys(encrypted);
+    return { mode: "apikey", keys: decryptKeys(encrypted) };
   } catch {
     return null;
   }
+}
+
+/** @deprecated Prefer resolveEtoroAuth — returns keys only when API-key auth is in use */
+export async function getEtoroKeys(): Promise<EtoroKeys | null> {
+  const auth = await resolveEtoroAuth();
+  return auth?.mode === "apikey" ? auth.keys : null;
+}
+
+export async function getEtoroRequestHeaders(): Promise<Record<string, string> | null> {
+  const auth = await resolveEtoroAuth();
+  if (!auth) return null;
+  return auth.mode === "oauth" ? buildOAuthHeaders(auth.accessToken) : buildEtoroHeaders(auth.keys);
 }
 
 export function buildEtoroHeaders(keys: EtoroKeys): Record<string, string> {
@@ -21,6 +44,18 @@ export function buildEtoroHeaders(keys: EtoroKeys): Record<string, string> {
     "x-user-key": keys.userKey,
     "Content-Type": "application/json",
   };
+}
+
+export function buildOAuthHeaders(accessToken: string): Record<string, string> {
+  return {
+    "x-request-id": crypto.randomUUID(),
+    Authorization: `Bearer ${accessToken}`,
+    "Content-Type": "application/json",
+  };
+}
+
+function isEtoroKeys(x: EtoroKeys | Record<string, string>): x is EtoroKeys {
+  return typeof (x as EtoroKeys).apiKey === "string" && typeof (x as EtoroKeys).userKey === "string";
 }
 
 export interface EtoroSearchResult {
@@ -39,10 +74,10 @@ export class EtoroAuthError extends Error {
 }
 
 export async function searchInstrument(
-  keys: EtoroKeys,
+  keysOrHeaders: EtoroKeys | Record<string, string>,
   symbol: string
 ): Promise<EtoroSearchResult | null> {
-  const headers = buildEtoroHeaders(keys);
+  const headers = isEtoroKeys(keysOrHeaders) ? buildEtoroHeaders(keysOrHeaders) : keysOrHeaders;
   const params = new URLSearchParams({
     internalSymbolFull: symbol,
     fields: "instrumentId,internalSymbolFull,displayname",
@@ -84,10 +119,10 @@ export interface TradeResponse {
 }
 
 export async function executeTrade(
-  keys: EtoroKeys,
+  keysOrHeaders: EtoroKeys | Record<string, string>,
   trade: TradeRequest
 ): Promise<TradeResponse> {
-  const headers = buildEtoroHeaders(keys);
+  const headers = isEtoroKeys(keysOrHeaders) ? buildEtoroHeaders(keysOrHeaders) : keysOrHeaders;
   const isDemo = trade.isDemo !== false;
   const endpoint = isDemo
     ? `${ETORO_API_BASE}/trading/execution/demo/market-open-orders/by-amount`

@@ -15,11 +15,22 @@ vi.mock("@/lib/event-service", () => ({
   getEventById: vi.fn().mockRejectedValue(new Error("test failure")),
 }));
 
+vi.mock("next/headers", () => ({
+  cookies: vi.fn().mockResolvedValue({
+    get: vi.fn().mockReturnValue(undefined),
+    set: vi.fn(),
+  }),
+}));
+
 vi.mock("@/lib/etoro-proxy", () => ({
+  getEtoroRequestHeaders: vi.fn().mockResolvedValue(null),
   getEtoroKeys: vi.fn().mockResolvedValue(null),
   validateKeys: vi.fn().mockResolvedValue("valid"),
   EtoroAuthError: class EtoroAuthError extends Error {
-    constructor() { super("eToro API keys are invalid — please reconnect"); this.name = "EtoroAuthError"; }
+    constructor() {
+      super("eToro API keys are invalid — please reconnect");
+      this.name = "EtoroAuthError";
+    }
   },
 }));
 
@@ -69,7 +80,9 @@ describe("API routes use structured logger for errors", () => {
 
   it("/api/auth/etoro logs via logger.error on internal failure", async () => {
     vi.doMock("@/lib/auth", () => ({
-      encryptKeys: () => { throw new Error("encryption failed"); },
+      encryptKeys: () => {
+        throw new Error("encryption failed");
+      },
       KEYS_COOKIE_NAME: "ttp_etoro_keys",
       KEYS_MAX_AGE: 2592000,
     }));
