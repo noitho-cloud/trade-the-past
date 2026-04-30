@@ -95,7 +95,7 @@ function nativeGet(url: string, timeoutMs: number): Promise<string | null> {
       {
         headers: {
           "User-Agent":
-            `Mozilla/5.0 (compatible; TradeThePast/1.0; +${process.env.NEXT_PUBLIC_APP_URL || "https://trade-the-past.vercel.app"})`,
+            `Mozilla/5.0 (compatible; TradeThePast/1.0; +${process.env.NEXT_PUBLIC_APP_URL || "https://trade-the-past.etoro.app"})`,
           Accept: "application/rss+xml, application/xml, text/xml, */*",
         },
         timeout: timeoutMs,
