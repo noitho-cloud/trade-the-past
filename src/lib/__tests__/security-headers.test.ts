@@ -58,6 +58,8 @@ describe("next.config security headers", () => {
     expect(csp).toContain("font-src 'self' https://marketing.etorostatic.com");
     expect(csp).toContain("frame-ancestors 'none'");
     expect(csp).toContain("connect-src 'self'");
+    expect(csp).toContain("https://va.vercel-scripts.com");
+    expect(csp).toContain("https://vitals.vercel-insights.com");
     expect(csp).not.toContain("unsafe-eval");
   });
 
