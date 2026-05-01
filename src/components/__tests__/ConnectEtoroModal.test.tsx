@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, waitFor } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import { ConnectEtoroModal } from "../ConnectEtoroModal";
 import { useAuth } from "../AuthProvider";
 
@@ -27,19 +27,6 @@ beforeEach(() => {
   HTMLDialogElement.prototype.close ??= vi.fn() as typeof HTMLDialogElement.prototype.close;
 
   mockUseAuth.mockReturnValue(defaultAuthMock);
-
-  vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
-    const url = typeof input === "string" ? input : input instanceof Request ? input.url : "";
-    if (url.includes("/api/auth/sso-config")) {
-      return Promise.resolve(
-        new Response(JSON.stringify({ configured: false }), {
-          status: 200,
-          headers: { "Content-Type": "application/json" },
-        })
-      );
-    }
-    return Promise.resolve(new Response("not mocked", { status: 404 }));
-  });
 });
 
 afterEach(() => {
@@ -47,32 +34,23 @@ afterEach(() => {
 });
 
 describe("ConnectEtoroModal", () => {
-  it("displays accurate security disclaimer that does not claim keys are never sent to server", async () => {
+  it("displays accurate security disclaimer that does not claim keys are never sent to server", () => {
     render(<ConnectEtoroModal />);
-    await waitFor(() => {
-      expect(globalThis.fetch).toHaveBeenCalled();
-    });
 
     const allText = document.body.textContent ?? "";
     expect(allText).not.toContain("never sent to our servers");
   });
 
-  it("displays accurate security disclaimer mentioning encryption", async () => {
+  it("displays accurate security disclaimer mentioning encryption", () => {
     render(<ConnectEtoroModal />);
-    await waitFor(() => {
-      expect(globalThis.fetch).toHaveBeenCalled();
-    });
 
     const allText = document.body.textContent ?? "";
     expect(allText).toMatch(/encrypted/i);
     expect(allText).toMatch(/secure/i);
   });
 
-  it("limits API key input length to prevent oversized payloads", async () => {
+  it("limits API key input length to prevent oversized payloads", () => {
     render(<ConnectEtoroModal />);
-    await waitFor(() => {
-      expect(document.querySelector("#etoro-api-key")).toBeTruthy();
-    });
 
     const apiKeyInput = document.querySelector("#etoro-api-key") as HTMLInputElement;
     const userKeyInput = document.querySelector("#etoro-user-key") as HTMLInputElement;
@@ -85,7 +63,7 @@ describe("ConnectEtoroModal", () => {
     expect(userKeyInput.maxLength).toBeGreaterThan(0);
   });
 
-  it("closes when backdrop (dialog element) is clicked directly", async () => {
+  it("closes when backdrop (dialog element) is clicked directly", () => {
     const closeConnectModal = vi.fn();
     mockUseAuth.mockReturnValue({
       ...defaultAuthMock,
@@ -93,31 +71,22 @@ describe("ConnectEtoroModal", () => {
     });
 
     render(<ConnectEtoroModal />);
-    await waitFor(() => {
-      expect(globalThis.fetch).toHaveBeenCalled();
-    });
 
     const dialog = document.querySelector("dialog")!;
     dialog.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     expect(closeConnectModal).toHaveBeenCalled();
   });
 
-  it("shows a value proposition subtitle explaining what connecting enables", async () => {
+  it("shows a value proposition subtitle explaining what connecting enables", () => {
     render(<ConnectEtoroModal />);
-    await waitFor(() => {
-      expect(globalThis.fetch).toHaveBeenCalled();
-    });
 
     const allText = document.body.textContent ?? "";
     expect(allText).toMatch(/trade.*directly/i);
     expect(allText).toMatch(/watchlist/i);
   });
 
-  it("dialog has max-height and scrollable content for short viewports", async () => {
+  it("dialog has max-height and scrollable content for short viewports", () => {
     render(<ConnectEtoroModal />);
-    await waitFor(() => {
-      expect(globalThis.fetch).toHaveBeenCalled();
-    });
 
     const dialog = document.querySelector("dialog")!;
     expect(dialog.className).toMatch(/max-h-\[90vh\]/);
@@ -126,7 +95,27 @@ describe("ConnectEtoroModal", () => {
     expect(contentDiv.className).toMatch(/overflow-y-auto/);
   });
 
-  it("does not close when inner content is clicked", async () => {
+  it("does not show SSO-related technical messages", () => {
+    render(<ConnectEtoroModal />);
+
+    const allText = document.body.textContent ?? "";
+    expect(allText).not.toContain("SSO is not configured");
+    expect(allText).not.toContain("administrator");
+    expect(allText).not.toContain("OAuth credentials");
+    expect(allText).not.toContain("Continue with eToro");
+  });
+
+  it("shows API key form directly without SSO conditional", () => {
+    render(<ConnectEtoroModal />);
+
+    expect(document.querySelector("#etoro-api-key")).toBeTruthy();
+    expect(document.querySelector("#etoro-user-key")).toBeTruthy();
+    const allText = document.body.textContent ?? "";
+    expect(allText).toContain("How to get your API keys");
+    expect(allText).toContain("Connect with API keys");
+  });
+
+  it("does not close when inner content is clicked", () => {
     const closeConnectModal = vi.fn();
     mockUseAuth.mockReturnValue({
       ...defaultAuthMock,
@@ -134,9 +123,6 @@ describe("ConnectEtoroModal", () => {
     });
 
     render(<ConnectEtoroModal />);
-    await waitFor(() => {
-      expect(globalThis.fetch).toHaveBeenCalled();
-    });
 
     const heading = document.querySelector("h2")!;
     heading.click();
