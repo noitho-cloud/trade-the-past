@@ -1,4 +1,5 @@
 import { jwtVerify, createRemoteJWKSet } from "jose";
+import { encrypt, decrypt } from "./encryption";
 
 // eToro SSO endpoints
 export const ETORO_SSO_URL = "https://www.etoro.com/sso";
@@ -12,7 +13,6 @@ export const SSO_COOKIE_MAX_AGE = 30 * 24 * 60 * 60; // 30 days
 
 const ACCESS_REFRESH_BUFFER_MS = 60_000;
 
-// Get client config from env
 export function getSSOConfig() {
   const clientId = process.env.ETORO_SSO_CLIENT_ID;
   const clientSecret = process.env.ETORO_SSO_CLIENT_SECRET;
@@ -29,8 +29,9 @@ export function isSSOConfigured(): boolean {
   return getSSOConfig() !== null;
 }
 
-// --- Server-side session store ---
-interface SSOSession {
+// --- Encrypted-cookie session store (serverless safe) ---
+
+export interface SSOSession {
   etoroUserId: string;
   accessToken: string;
   refreshToken: string;
@@ -38,67 +39,68 @@ interface SSOSession {
   createdAt: number;
 }
 
-const sessions = new Map<string, SSOSession>();
-
-export function createSession(data: Omit<SSOSession, "createdAt">): string {
-  const sessionId = crypto.randomUUID();
-  sessions.set(sessionId, { ...data, createdAt: Date.now() });
-  return sessionId;
+/**
+ * Serialize session data into an encrypted string suitable for an httpOnly cookie.
+ * No server-side state — survives cold starts and scales horizontally.
+ */
+export function sealSession(data: Omit<SSOSession, "createdAt">): string {
+  const session: SSOSession = { ...data, createdAt: Date.now() };
+  return encrypt(JSON.stringify(session));
 }
 
-export function getSession(sessionId: string): SSOSession | null {
-  return sessions.get(sessionId) ?? null;
-}
-
-export function deleteSession(sessionId: string): void {
-  sessions.delete(sessionId);
-}
-
-export function updateSessionTokens(
-  sessionId: string,
-  accessToken: string,
-  refreshToken: string,
-  expiresIn: number
-): void {
-  const session = sessions.get(sessionId);
-  if (session) {
-    session.accessToken = accessToken;
-    session.refreshToken = refreshToken;
-    session.accessTokenExpiresAt = Date.now() + expiresIn * 1000;
-  }
-}
-
-/** Returns a usable access token, refreshing when near expiry. */
-export async function getValidAccessToken(sessionId: string): Promise<string | null> {
-  const session = getSession(sessionId);
-  if (!session) return null;
-
-  if (Date.now() < session.accessTokenExpiresAt - ACCESS_REFRESH_BUFFER_MS) {
-    return session.accessToken;
-  }
-
+export function unsealSession(sealed: string): SSOSession | null {
   try {
-    const refreshed = await refreshAccessToken(session.refreshToken);
-    updateSessionTokens(
-      sessionId,
-      refreshed.accessToken,
-      refreshed.refreshToken,
-      refreshed.expiresIn
-    );
-    return refreshed.accessToken;
+    const parsed = JSON.parse(decrypt(sealed)) as SSOSession;
+    const maxAge = SSO_COOKIE_MAX_AGE * 1000;
+    if (Date.now() - parsed.createdAt > maxAge) return null;
+    return parsed;
   } catch {
     return null;
   }
 }
 
-// Cleanup expired sessions (call periodically)
-export function cleanupSessions(): void {
-  const maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
-  const now = Date.now();
-  for (const [id, session] of sessions) {
-    if (now - session.createdAt > maxAge) {
-      sessions.delete(id);
-    }
+export function sealUpdatedTokens(
+  session: SSOSession,
+  accessToken: string,
+  refreshToken: string,
+  expiresIn: number
+): string {
+  return encrypt(
+    JSON.stringify({
+      ...session,
+      accessToken,
+      refreshToken,
+      accessTokenExpiresAt: Date.now() + expiresIn * 1000,
+    })
+  );
+}
+
+/**
+ * Returns a usable access token, refreshing when near expiry.
+ * Returns { token, updatedCookie } — caller must persist updatedCookie
+ * if non-null (tokens were refreshed).
+ */
+export async function getValidAccessToken(
+  sealed: string
+): Promise<{ token: string; updatedCookie: string | null } | null> {
+  const session = unsealSession(sealed);
+  if (!session) return null;
+
+  if (Date.now() < session.accessTokenExpiresAt - ACCESS_REFRESH_BUFFER_MS) {
+    return { token: session.accessToken, updatedCookie: null };
+  }
+
+  try {
+    const refreshed = await refreshAccessToken(session.refreshToken);
+    const updatedCookie = sealUpdatedTokens(
+      session,
+      refreshed.accessToken,
+      refreshed.refreshToken,
+      refreshed.expiresIn
+    );
+    return { token: refreshed.accessToken, updatedCookie };
+  } catch {
+    return null;
   }
 }
 

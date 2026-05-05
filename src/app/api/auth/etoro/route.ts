@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { encryptKeys, KEYS_COOKIE_NAME, KEYS_MAX_AGE } from "@/lib/auth";
-import { SSO_SESSION_COOKIE, deleteSession } from "@/lib/sso";
+import { SSO_SESSION_COOKIE } from "@/lib/sso";
 import { logger } from "@/lib/logger";
 import { validateKeys } from "@/lib/etoro-proxy";
 import { applyRateLimit, addRateLimitHeaders } from "@/lib/with-rate-limit";
@@ -62,10 +62,6 @@ export async function POST(request: Request) {
 
     const cookieStore = await cookies();
 
-    const ssoSessionId = cookieStore.get(SSO_SESSION_COOKIE)?.value;
-    if (ssoSessionId) {
-      deleteSession(ssoSessionId);
-    }
     cookieStore.set(SSO_SESSION_COOKIE, "", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",

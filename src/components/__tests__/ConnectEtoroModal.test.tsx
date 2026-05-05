@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render } from "@testing-library/react";
+import { render, fireEvent } from "@testing-library/react";
 import { ConnectEtoroModal } from "../ConnectEtoroModal";
 import { useAuth } from "../AuthProvider";
 
@@ -33,12 +33,22 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("ConnectEtoroModal", () => {
-  it("displays accurate security disclaimer that does not claim keys are never sent to server", () => {
+describe("ConnectEtoroModal — SSO unavailable (API keys only)", () => {
+  it("shows API key form when SSO is not available", () => {
+    render(<ConnectEtoroModal />);
+
+    expect(document.querySelector("#etoro-api-key")).toBeTruthy();
+    expect(document.querySelector("#etoro-user-key")).toBeTruthy();
+    const allText = document.body.textContent ?? "";
+    expect(allText).toContain("How to get your API keys");
+    expect(allText).toContain("Connect with API keys");
+  });
+
+  it("does not show SSO button when unavailable", () => {
     render(<ConnectEtoroModal />);
 
     const allText = document.body.textContent ?? "";
-    expect(allText).not.toContain("never sent to our servers");
+    expect(allText).not.toContain("Continue with eToro");
   });
 
   it("displays accurate security disclaimer mentioning encryption", () => {
@@ -62,13 +72,83 @@ describe("ConnectEtoroModal", () => {
     expect(userKeyInput.maxLength).toBeLessThanOrEqual(200);
     expect(userKeyInput.maxLength).toBeGreaterThan(0);
   });
+});
 
+describe("ConnectEtoroModal — SSO available", () => {
+  beforeEach(() => {
+    mockUseAuth.mockReturnValue({ ...defaultAuthMock, ssoAvailable: true });
+  });
+
+  it("shows 'Continue with eToro' as primary action", () => {
+    render(<ConnectEtoroModal />);
+
+    const allText = document.body.textContent ?? "";
+    expect(allText).toContain("Continue with eToro");
+  });
+
+  it("does not show API key form by default", () => {
+    render(<ConnectEtoroModal />);
+
+    expect(document.querySelector("#etoro-api-key")).toBeFalsy();
+    expect(document.querySelector("#etoro-user-key")).toBeFalsy();
+  });
+
+  it("shows 'Use API keys instead' fallback link", () => {
+    render(<ConnectEtoroModal />);
+
+    const allText = document.body.textContent ?? "";
+    expect(allText).toContain("Use API keys instead");
+  });
+
+  it("shows API key form when 'Use API keys instead' is clicked", () => {
+    render(<ConnectEtoroModal />);
+
+    const fallbackBtn = Array.from(document.querySelectorAll("button")).find(
+      (b) => b.textContent?.includes("Use API keys instead")
+    )!;
+    fireEvent.click(fallbackBtn);
+
+    expect(document.querySelector("#etoro-api-key")).toBeTruthy();
+    expect(document.querySelector("#etoro-user-key")).toBeTruthy();
+  });
+
+  it("can navigate back from API keys to SSO view", () => {
+    render(<ConnectEtoroModal />);
+
+    const fallbackBtn = Array.from(document.querySelectorAll("button")).find(
+      (b) => b.textContent?.includes("Use API keys instead")
+    )!;
+    fireEvent.click(fallbackBtn);
+
+    const backBtn = Array.from(document.querySelectorAll("button")).find(
+      (b) => b.textContent?.includes("Back to SSO login")
+    )!;
+    fireEvent.click(backBtn);
+
+    const allText = document.body.textContent ?? "";
+    expect(allText).toContain("Continue with eToro");
+    expect(document.querySelector("#etoro-api-key")).toBeFalsy();
+  });
+
+  it("calls loginWithSSO when SSO button is clicked", () => {
+    const loginWithSSO = vi.fn().mockResolvedValue(undefined);
+    mockUseAuth.mockReturnValue({ ...defaultAuthMock, ssoAvailable: true, loginWithSSO });
+
+    render(<ConnectEtoroModal />);
+
+    const ssoBtn = Array.from(document.querySelectorAll("button")).find(
+      (b) => b.textContent?.includes("Continue with eToro")
+    )!;
+    fireEvent.click(ssoBtn);
+
+    expect(loginWithSSO).toHaveBeenCalledOnce();
+  });
+});
+
+describe("ConnectEtoroModal — shared behavior", () => {
   it("closes when backdrop (dialog element) is clicked directly", () => {
     const closeConnectModal = vi.fn();
-    mockUseAuth.mockReturnValue({
-      ...defaultAuthMock,
-      closeConnectModal,
-    });
+    mockUseAuth.mockReturnValue({ ...defaultAuthMock, closeConnectModal });
 
     render(<ConnectEtoroModal />);
 
@@ -77,7 +157,7 @@ describe("ConnectEtoroModal", () => {
     expect(closeConnectModal).toHaveBeenCalled();
   });
 
-  it("shows a value proposition subtitle explaining what connecting enables", () => {
+  it("shows a value proposition subtitle", () => {
     render(<ConnectEtoroModal />);
 
     const allText = document.body.textContent ?? "";
@@ -95,32 +175,9 @@ describe("ConnectEtoroModal", () => {
     expect(contentDiv.className).toMatch(/overflow-y-auto/);
   });
 
-  it("does not show SSO-related technical messages", () => {
-    render(<ConnectEtoroModal />);
-
-    const allText = document.body.textContent ?? "";
-    expect(allText).not.toContain("SSO is not configured");
-    expect(allText).not.toContain("administrator");
-    expect(allText).not.toContain("OAuth credentials");
-    expect(allText).not.toContain("Continue with eToro");
-  });
-
-  it("shows API key form directly without SSO conditional", () => {
-    render(<ConnectEtoroModal />);
-
-    expect(document.querySelector("#etoro-api-key")).toBeTruthy();
-    expect(document.querySelector("#etoro-user-key")).toBeTruthy();
-    const allText = document.body.textContent ?? "";
-    expect(allText).toContain("How to get your API keys");
-    expect(allText).toContain("Connect with API keys");
-  });
-
   it("does not close when inner content is clicked", () => {
     const closeConnectModal = vi.fn();
-    mockUseAuth.mockReturnValue({
-      ...defaultAuthMock,
-      closeConnectModal,
-    });
+    mockUseAuth.mockReturnValue({ ...defaultAuthMock, closeConnectModal });
 
     render(<ConnectEtoroModal />);
 

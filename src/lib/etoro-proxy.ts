@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { decryptKeys, KEYS_COOKIE_NAME, type EtoroKeys } from "./auth";
-import { SSO_SESSION_COOKIE, getValidAccessToken } from "./sso";
+import { SSO_SESSION_COOKIE, SSO_COOKIE_MAX_AGE, getValidAccessToken } from "./sso";
 
 const ETORO_API_BASE = "https://public-api.etoro.com/api/v1";
 
@@ -10,10 +10,21 @@ export type ResolvedEtoroAuth =
 
 export async function resolveEtoroAuth(): Promise<ResolvedEtoroAuth | null> {
   const cookieStore = await cookies();
-  const ssoSessionId = cookieStore.get(SSO_SESSION_COOKIE)?.value;
-  if (ssoSessionId) {
-    const token = await getValidAccessToken(ssoSessionId);
-    if (token) return { mode: "oauth", accessToken: token };
+  const sealed = cookieStore.get(SSO_SESSION_COOKIE)?.value;
+  if (sealed) {
+    const result = await getValidAccessToken(sealed);
+    if (result) {
+      if (result.updatedCookie) {
+        cookieStore.set(SSO_SESSION_COOKIE, result.updatedCookie, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          maxAge: SSO_COOKIE_MAX_AGE,
+          path: "/",
+        });
+      }
+      return { mode: "oauth", accessToken: result.token };
+    }
   }
 
   const encrypted = cookieStore.get(KEYS_COOKIE_NAME)?.value;

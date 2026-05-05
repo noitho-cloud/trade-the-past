@@ -7,18 +7,20 @@ describe("/api/health", () => {
 
   afterEach(() => {
     vi.unstubAllEnvs();
+    vi.resetModules();
   });
 
-  it("returns healthy status and timestamp only", async () => {
+  it("returns healthy status with service breakdown", async () => {
     const { GET } = await import("@/app/api/health/route");
     const res = await GET();
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.status).toBe("healthy");
     expect(data.timestamp).toBeDefined();
+    expect(data.version).toBeDefined();
+    expect(data.services.encryption).toBe("ok");
     expect(data).not.toHaveProperty("env");
     expect(data).not.toHaveProperty("uptime");
-    expect(data).not.toHaveProperty("version");
   });
 
   it("returns degraded status when ENCRYPTION_KEY is missing", async () => {
@@ -28,7 +30,7 @@ describe("/api/health", () => {
     const res = await GET();
     const data = await res.json();
     expect(data.status).toBe("degraded");
-    expect(data).not.toHaveProperty("env");
+    expect(data.services.encryption).toBe("missing");
   });
 
   it("does not expose internal env var names", async () => {
@@ -41,5 +43,13 @@ describe("/api/health", () => {
     expect(body).not.toContain("ENCRYPTION_KEY");
     expect(body).not.toContain("NEWSAPI_KEY");
     expect(body).not.toContain("OPENAI_API_KEY");
+  });
+
+  it("reports SSO as disabled when not configured", async () => {
+    vi.resetModules();
+    const { GET } = await import("@/app/api/health/route");
+    const res = await GET();
+    const data = await res.json();
+    expect(data.services.sso).toBe("disabled");
   });
 });

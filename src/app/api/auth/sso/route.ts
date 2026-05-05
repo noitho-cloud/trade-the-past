@@ -3,8 +3,7 @@ import { cookies } from "next/headers";
 import {
   exchangeCodeForTokens,
   validateIdToken,
-  createSession,
-  deleteSession,
+  sealSession,
   isSSOConfigured,
   SSO_SESSION_COOKIE,
   SSO_COOKIE_MAX_AGE,
@@ -53,7 +52,7 @@ export async function POST(request: Request) {
     const tokens = await exchangeCodeForTokens(code, code_verifier);
     const etoroUserId = await validateIdToken(tokens.idToken);
 
-    const sessionId = createSession({
+    const sealed = sealSession({
       etoroUserId,
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
@@ -62,12 +61,7 @@ export async function POST(request: Request) {
 
     const cookieStore = await cookies();
 
-    const prevSso = cookieStore.get(SSO_SESSION_COOKIE)?.value;
-    if (prevSso) {
-      deleteSession(prevSso);
-    }
-
-    cookieStore.set(SSO_SESSION_COOKIE, sessionId, {
+    cookieStore.set(SSO_SESSION_COOKIE, sealed, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",

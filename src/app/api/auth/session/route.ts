@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { decryptKeys, KEYS_COOKIE_NAME } from "@/lib/auth";
-import { getSession, SSO_SESSION_COOKIE } from "@/lib/sso";
+import { unsealSession, SSO_SESSION_COOKIE } from "@/lib/sso";
 import { applyRateLimit, addRateLimitHeaders } from "@/lib/with-rate-limit";
 
 export async function GET(request: Request) {
@@ -9,9 +9,9 @@ export async function GET(request: Request) {
   if (rateLimit.blocked) return rateLimit.response;
   const cookieStore = await cookies();
 
-  const ssoSessionId = cookieStore.get(SSO_SESSION_COOKIE)?.value;
-  if (ssoSessionId) {
-    const session = getSession(ssoSessionId);
+  const sealed = cookieStore.get(SSO_SESSION_COOKIE)?.value;
+  if (sealed) {
+    const session = unsealSession(sealed);
     if (session) {
       return addRateLimitHeaders(
         NextResponse.json({
