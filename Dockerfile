@@ -4,10 +4,12 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package.json package-lock.json* ./
-RUN npm ci --omit=dev
+RUN npm ci
 
 FROM base AS builder
 WORKDIR /app
+ARG ENCRYPTION_KEY
+ENV ENCRYPTION_KEY=$ENCRYPTION_KEY
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
