@@ -6,11 +6,12 @@ export async function GET() {
     process.env.NEXT_PUBLIC_ETORO_SSO_REDIRECT_URI || process.env.ETORO_SSO_REDIRECT_URI;
 
   if (!clientId || !redirectUri) {
-    return NextResponse.json({ configured: false });
+    return NextResponse.json({ configured: false, available: false });
   }
 
   return NextResponse.json({
     configured: true,
+    available: true,
     clientId,
     redirectUri,
   });

@@ -184,6 +184,7 @@ export async function validateKeys(keys: EtoroKeys): Promise<KeyValidationResult
     });
 
     if (res.status === 401 || res.status === 403) return "invalid";
+    if (!res.ok) return "unreachable";
     return "valid";
   } catch {
     return "unreachable";

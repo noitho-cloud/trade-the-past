@@ -59,9 +59,9 @@ export function TradeDialog({ asset, direction, symbol, onClose }: TradeDialogPr
         signal: AbortSignal.timeout(15_000),
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        toast(data.error ?? "Trade failed", "error");
+        toast(data.error ?? `Trade failed (${res.status})`, "error");
       } else {
         toast(
           `${isDemo ? "Demo" : "Real"} ${isBuy ? "buy" : "sell"} of $${amount} ${asset} executed`,
