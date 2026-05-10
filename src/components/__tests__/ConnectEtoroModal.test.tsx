@@ -17,6 +17,7 @@ const defaultAuthMock = {
   closeConnectModal: vi.fn(),
   connect: vi.fn().mockResolvedValue({ success: true }),
   disconnect: vi.fn(),
+  refreshSession: vi.fn().mockResolvedValue(undefined),
   ssoAvailable: false,
   loginWithSSO: vi.fn(),
   authMethod: null as "sso" | "apikey" | null,
