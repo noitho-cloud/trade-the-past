@@ -43,6 +43,7 @@ interface AuthContextValue {
   closeConnectModal: () => void;
   connect: (apiKey: string, userKey: string) => Promise<ConnectResult>;
   disconnect: () => Promise<void>;
+  refreshSession: () => Promise<void>;
   ssoAvailable: boolean;
   loginWithSSO: () => Promise<void>;
   authMethod: "sso" | "apikey" | null;
@@ -56,6 +57,7 @@ const AuthContext = createContext<AuthContextValue>({
   closeConnectModal: () => {},
   connect: async () => ({ success: false }),
   disconnect: async () => {},
+  refreshSession: async () => {},
   ssoAvailable: false,
   loginWithSSO: async () => {},
   authMethod: null,
@@ -73,43 +75,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [authMethod, setAuthMethod] = useState<"sso" | "apikey" | null>(null);
   const pendingActionRef = useRef<(() => void) | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    async function checkSession() {
-      try {
-        const res = await fetch("/api/auth/session", { signal: AbortSignal.timeout(10_000) });
-        if (!res.ok) throw new Error("Session check failed");
-        const data = (await res.json()) as {
-          connected?: boolean;
-          method?: string;
-        };
-        if (!cancelled) {
-          const connected = data.connected === true;
-          setIsConnected(connected);
-          if (!connected) {
-            setAuthMethod(null);
-          } else if (data.method === "sso") {
-            setAuthMethod("sso");
-          } else if (data.method === "apikey") {
-            setAuthMethod("apikey");
-          } else {
-            setAuthMethod("apikey");
-          }
-        }
-      } catch {
-        if (!cancelled) {
-          setIsConnected(false);
-          setAuthMethod(null);
-        }
-      } finally {
-        if (!cancelled) setIsLoading(false);
+  const checkSession = useCallback(async () => {
+    try {
+      const res = await fetch("/api/auth/session", { signal: AbortSignal.timeout(10_000) });
+      if (!res.ok) throw new Error("Session check failed");
+      const data = (await res.json()) as {
+        connected?: boolean;
+        method?: string;
+      };
+      const connected = data.connected === true;
+      setIsConnected(connected);
+      if (!connected) {
+        setAuthMethod(null);
+      } else if (data.method === "sso") {
+        setAuthMethod("sso");
+      } else if (data.method === "apikey") {
+        setAuthMethod("apikey");
+      } else {
+        setAuthMethod("apikey");
       }
+    } catch {
+      setIsConnected(false);
+      setAuthMethod(null);
+    } finally {
+      setIsLoading(false);
     }
-    checkSession();
-    return () => {
-      cancelled = true;
-    };
   }, []);
+
+  useEffect(() => {
+    checkSession();
+  }, [checkSession]);
 
   useEffect(() => {
     let cancelled = false;
@@ -220,6 +215,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setShowConnectModal(false);
   }, []);
 
+  const refreshSession = checkSession;
+
   const value = useMemo<AuthContextValue>(
     () => ({
       isConnected,
@@ -229,6 +226,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       closeConnectModal,
       connect,
       disconnect,
+      refreshSession,
       ssoAvailable,
       loginWithSSO,
       authMethod,
@@ -241,6 +239,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       closeConnectModal,
       connect,
       disconnect,
+      refreshSession,
       ssoAvailable,
       loginWithSSO,
       authMethod,

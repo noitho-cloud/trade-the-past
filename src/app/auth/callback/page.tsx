@@ -2,10 +2,12 @@
 
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useAuth } from "@/components/AuthProvider";
 
 function CallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { refreshSession } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<"processing" | "success" | "error">("processing");
   const processedRef = useRef(false);
@@ -65,6 +67,7 @@ function CallbackContent() {
         }
 
         setStatus("success");
+        await refreshSession();
         setTimeout(() => router.push("/"), 1000);
       } catch {
         setError("Network error during login. Please try again.");
@@ -73,7 +76,7 @@ function CallbackContent() {
     }
 
     handleCallback();
-  }, [searchParams, router]);
+  }, [searchParams, router, refreshSession]);
 
   return (
     <div className="min-h-[60vh] flex items-center justify-center">
