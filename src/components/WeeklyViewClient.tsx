@@ -179,6 +179,13 @@ export function WeeklyViewClient({
           failedScope.current = targetScope;
           setScope(confirmedScope.current);
           setError("Could not load events. Please try again.");
+          const url = new URL(window.location.href);
+          if (confirmedScope.current === "local") {
+            url.searchParams.set("scope", "local");
+          } else {
+            url.searchParams.delete("scope");
+          }
+          window.history.replaceState({}, "", url.toString());
         }
       })
       .finally(() => {

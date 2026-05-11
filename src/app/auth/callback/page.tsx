@@ -56,6 +56,7 @@ function CallbackContent() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ code, code_verifier: codeVerifier }),
+          signal: AbortSignal.timeout(15_000),
         });
 
         const data = await res.json().catch(() => ({}));
@@ -69,8 +70,9 @@ function CallbackContent() {
         setStatus("success");
         await refreshSession();
         setTimeout(() => router.push("/"), 1000);
-      } catch {
-        setError("Network error during login. Please try again.");
+      } catch (err) {
+        const isTimeout = err instanceof DOMException && err.name === "TimeoutError";
+        setError(isTimeout ? "Login timed out. Please try again." : "Network error during login. Please try again.");
         setStatus("error");
       }
     }

@@ -265,6 +265,12 @@ export function isLikelyEnglish(text: string): boolean {
   return !matches || matches.length === 0;
 }
 
+function parseSafeDate(isoDate: string | undefined): string {
+  if (!isoDate) return new Date().toISOString();
+  const d = new Date(isoDate);
+  return isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
+}
+
 function rssItemToArticle(
   item: RSSItem,
   feedSource: string
@@ -291,9 +297,7 @@ function rssItemToArticle(
     description: item.contentSnippet?.slice(0, 500) || null,
     url: item.link || "",
     urlToImage: imageUrl,
-    publishedAt: item.isoDate
-      ? new Date(item.isoDate).toISOString()
-      : new Date().toISOString(),
+    publishedAt: parseSafeDate(item.isoDate),
     source: { id: null, name: feedSource },
   };
 }

@@ -25,6 +25,15 @@ export async function resolveEtoroAuth(): Promise<ResolvedEtoroAuth | null> {
       }
       return { mode: "oauth", accessToken: result.token };
     }
+    // Token refresh failed — clear the stale SSO cookie so session
+    // endpoint stops reporting "connected" for a dead session.
+    cookieStore.set(SSO_SESSION_COOKIE, "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 0,
+      path: "/",
+    });
   }
 
   const encrypted = cookieStore.get(KEYS_COOKIE_NAME)?.value;
@@ -160,7 +169,10 @@ export async function executeTrade(
     return { success: false, error: `Trade failed (${res.status})` };
   }
 
-  const data = await res.json().catch(() => ({}));
+  const data = await res.json().catch(() => null);
+  if (!data) {
+    return { success: false, error: "Trade may have executed but response was unreadable" };
+  }
   return {
     success: true,
     orderId: data.orderId ?? data.OrderId ?? data.OrderID,
