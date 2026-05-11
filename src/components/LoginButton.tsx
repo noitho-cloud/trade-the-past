@@ -63,20 +63,6 @@ export function LoginButton() {
                      hover:bg-[var(--etoro-green-hover)] active:scale-[0.98] transition-all cursor-pointer
                      focus-visible:ring-2 focus-visible:ring-[var(--etoro-green)] focus-visible:outline-none"
         >
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
-            <polyline points="10 17 15 12 10 7" />
-            <line x1="15" y1="12" x2="3" y2="12" />
-          </svg>
           <span className="hidden sm:inline">Login with eToro</span>
           <span className="sm:hidden">Login</span>
         </button>
