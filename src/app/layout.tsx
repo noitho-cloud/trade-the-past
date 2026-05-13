@@ -4,8 +4,6 @@ import { HeaderLink } from "@/components/HeaderLink";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { AuthProvider } from "@/components/AuthProvider";
-import { LoginButton } from "@/components/LoginButton";
-import { ConnectEtoroModal } from "@/components/ConnectEtoroModal";
 import { ToastProvider } from "@/components/ToastProvider";
 import { ScrollSentinel } from "@/components/ScrollSentinel";
 import { Analytics } from "@vercel/analytics/next";
@@ -56,7 +54,6 @@ export default function RootLayout({
                 <HeaderLink />
               </Suspense>
               <div className="flex items-center gap-2">
-                <LoginButton />
                 <ThemeToggle />
               </div>
             </div>
@@ -102,7 +99,6 @@ export default function RootLayout({
               </p>
             </div>
           </footer>
-          <ConnectEtoroModal />
           </ToastProvider>
         </AuthProvider>
         </ThemeProvider>
