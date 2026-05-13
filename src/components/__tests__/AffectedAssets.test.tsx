@@ -67,12 +67,12 @@ describe("AffectedAssets", () => {
     expect(spElements).toHaveLength(1);
   });
 
-  it("shows Trade and Watchlist buttons for each asset", () => {
+  it("shows Trade and Watchlist links for each asset", () => {
     render(<AffectedAssets matches={matches} />, { wrapper: Wrapper });
-    const tradeButtons = screen.getAllByRole("button", { name: /trade .+ on etoro/i });
-    const watchlistButtons = screen.getAllByRole("button", { name: /add .+ to watchlist/i });
-    expect(tradeButtons.length).toBe(3);
-    expect(watchlistButtons.length).toBe(3);
+    const tradeLinks = screen.getAllByRole("link", { name: /trade .+ on etoro/i });
+    const watchlistLinks = screen.getAllByRole("link", { name: /add .+ to watchlist/i });
+    expect(tradeLinks.length).toBe(3);
+    expect(watchlistLinks.length).toBe(3);
   });
 
   it("shows direction indicators for each asset", () => {
@@ -81,19 +81,19 @@ describe("AffectedAssets", () => {
     expect(bullish.length).toBeGreaterThan(0);
   });
 
-  it("does not render standalone 'on eToro' label outside buttons", () => {
+  it("does not render standalone 'on eToro' label outside links", () => {
     render(<AffectedAssets matches={matches} />, { wrapper: Wrapper });
     const onEtoroElements = screen.queryAllByText("on eToro");
     for (const el of onEtoroElements) {
-      const parentButton = el.closest("button");
-      expect(parentButton, "'on eToro' text should only appear inside a button").toBeTruthy();
+      const parentLink = el.closest("a");
+      expect(parentLink, "'on eToro' text should only appear inside a link").toBeTruthy();
     }
   });
 
-  it("Watchlist star icon renders as SVG inside each button", () => {
+  it("Watchlist star icon renders as SVG inside each link", () => {
     render(<AffectedAssets matches={matches} />, { wrapper: Wrapper });
-    const watchlistButtons = screen.getAllByRole("button", { name: /add .+ to watchlist/i });
-    for (const el of watchlistButtons) {
+    const watchlistLinks = screen.getAllByRole("link", { name: /add .+ to watchlist/i });
+    for (const el of watchlistLinks) {
       expect(el.querySelector("svg")).toBeTruthy();
     }
   });

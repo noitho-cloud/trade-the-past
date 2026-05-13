@@ -57,8 +57,8 @@ describe("HistoricalSection", () => {
     ).toBeDefined();
     expect(screen.getByText("Mentioned Assets")).toBeDefined();
     expect(screen.getByText("Tesla")).toBeDefined();
-    expect(screen.getByRole("button", { name: /trade tesla/i })).toBeDefined();
-    expect(screen.getByRole("button", { name: /add tesla to watchlist/i })).toBeDefined();
+    expect(screen.getByRole("link", { name: /trade tesla/i })).toBeDefined();
+    expect(screen.getByRole("link", { name: /add tesla to watchlist/i })).toBeDefined();
   });
 
   it("does not show directional badge on mentioned asset cards when no historical data", () => {
